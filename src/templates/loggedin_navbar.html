@@ -1,0 +1,5 @@
+<div id='navbarwrapper'>
+    <a href='{% url "profile-settings" %}'>Profile Settings</a>
+    <a>Hello, </a> <a href='{% url "user-page" %}'>{{ user.get_username }}</a>
+    <a class='navbar' id='logout' name='logout' href='{% url "logout" %}'>Logout</a>
+</div>

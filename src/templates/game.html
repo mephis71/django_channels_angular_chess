@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% load static %}
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'jquery-ui/external/jquery/jquery.js' %}"></script>
+<script src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
+<script src="{% static 'js/game.js' %}"></script>
+
+
+
+{% endblock %}
+
+{% block content %}
+
+<div id="board">
+</div>
+<script>
+    initPieces();
+    renderPieces();
+    allowDragging();
+    addListeners();
+</script>
+
+{% endblock %}

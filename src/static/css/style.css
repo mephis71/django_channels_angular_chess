@@ -1,0 +1,78 @@
+body
+{
+    background-color: #26282E;
+    color: #209781;
+}
+#board
+{
+    width: 800px;
+    height: 800px;
+    margin-top:55px;
+    margin-left: auto;
+    margin-right: auto;
+    background-image: url("/static/img/game_img/chessboard.jpg");
+}   
+
+.field
+{
+    background-image: none;
+    width: 100px;
+    height: 100px;
+    float: left;
+}
+
+#endgamebox
+{
+    width: 400px;
+    height: 200px;
+    background-color: floralwhite;
+    position: relative;
+    top: 292px;
+    left: 192px;
+    border-style: solid;
+    border-color:rgb(43, 38, 38);
+    border-width: 8px;
+    border-radius: 8px;
+    overflow: visible;
+}
+
+#endgamebox p
+{
+    position: absolute;
+    font-size: 50px;
+    width: 400px;
+    top: 15px;
+    text-align: center;
+}
+
+#promotionbox
+{
+    width: 550px;
+    height: 200px;
+    background-color: floralwhite;
+    position: relative;
+    top: 292px;
+    left: 117px;
+    border-style: solid;
+    border-color:rgb(43, 38, 38);
+    border-width: 8px;
+    border-radius: 8px;
+    overflow: visible;  
+}
+
+.pickbox
+{
+    position: relative;
+    margin: 10px;
+    width:100px;
+    height: 100px;
+    float: left;
+    top: -755px;
+    left: 17px;  
+    border: 4px solid transparent;
+}
+
+.pickbox:hover
+{
+    border: 4px solid rgb(43, 38, 38);
+}

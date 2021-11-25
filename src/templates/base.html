@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    
+    <link rel="stylesheet" type='text/css' href="{% static '/css/style.css' %}">
+
+    {% block head %}
+
+    {% endblock %}
+    
+    <title>Django Chess</title>
+</head>
+<body>
+
+    {% block navbar %}
+
+    {% if user.is_authenticated %}
+
+    {% include 'loggedin_navbar.html' %}
+
+    {% else %}
+
+    {% include 'loggedout_navbar.html' %}
+
+    {% endif %}
+
+    {% endblock %}
+
+    {% block content %}
+
+    {% endblock %}
+    
+</body>
+</html>
