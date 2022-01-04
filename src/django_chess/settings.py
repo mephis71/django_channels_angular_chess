@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'users',
     'game',
     'django_static_jquery_ui',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +56,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'django_chess.urls'
 
-ASGI_APPLICATION = 'django_chess.routing.application'
+ASGI_APPLICATION = 'django_chess.asgi.application'
 
 TEMPLATES = [
     {
@@ -133,3 +134,10 @@ MEDIA_URL = '/img/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/img')
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}

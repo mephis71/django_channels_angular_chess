@@ -1,5 +1,6 @@
 <div id='navbarwrapper'>
-    <a href='{% url "profile-settings" %}'>Profile Settings</a>
-    <a>Hello, </a> <a href='{% url "user-page" %}'>{{ user.get_username }}</a>
+    <a class='navbar' href='{% url "profile-settings" %}'>Profile Settings</a>
+    <a class='navbar' id='username'>Hello, </a> <a href='{% url "user-page" %}'>{{ user.get_username }}</a>
     <a class='navbar' id='logout' name='logout' href='{% url "logout" %}'>Logout</a>
+    <a class='navbar' id='game' name='game' href="{% url 'game' %}">Game</a>
 </div>

@@ -1,0 +1,110 @@
+
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% load static %}
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'jquery-ui/external/jquery/jquery.js' %}"></script>
+<script src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
+<script src="{% static 'js/game.js' %}"></script>
+
+
+
+{% endblock %}
+
+{% block content %}
+    
+<div id="board">
+</div>
+<script>
+    initPieces();
+
+    var loc = window.location
+    var endpointStart = 'ws://'
+    if(loc.protocol == 'https'){
+        endpointStart = 'wss://'
+    }
+    var endpoint = endpointStart + loc.host + loc.pathname
+    var websocket = new WebSocket(endpoint)
+
+
+
+    websocket.onopen = function (e) {
+        console.log('open', e)
+    }
+    websocket.onclose = function (e) {
+        console.log('close', e)
+    }
+    websocket.onerror = function (e) {
+        console.log('error', e)
+    }
+    websocket.onmessage = function (e) { 
+        var msg = JSON.parse(e.data);
+
+        if(msg.type == 'init') {
+            var fen = msg.fen;
+            var color = msg.color;
+            var turn = msg.turn;
+            renderWithFEN(fen);
+            player = color;
+            console.log(color,player);
+            console.log('init', msg)
+            if(turn == player) {
+                console.log('your move');
+                addListeners();
+                allowDragging();
+            }
+            else {
+                console.log('opponents move');
+                removeListeners();
+                disableDragging();
+            }
+        }
+
+        if(msg.type == 'move') {
+            var fen = msg.fen;
+            var turn = msg.turn;
+            renderWithFEN(fen);
+            console.log('move', msg)
+            if(turn == player) {
+                console.log('your move');
+                addListeners();
+                allowDragging();
+            }
+            else {
+                console.log('opponents move');
+                removeListeners();
+                disableDragging();
+            }
+        }
+
+        if(msg.type == 'endgame') { 
+            var fen = msg.fen;
+            var result = msg.result;
+            renderWithFEN(fen);
+            console.log('endgame', msg);
+            removeListeners();
+            disableDragging();
+
+            switch(result) {
+                case 'blackwins': 
+                    $('#board').append('<div id="endgamebox"><p>BLACK WINS</p></div>');
+                    break;
+                case 'whitewins':
+                    $('#board').append('<div id="endgamebox"><p>WHITE WINS</p></div>');
+                    break;
+                case 'draw':
+                    $('#board').append('<div id="endgamebox"><p>WHITE WINS</p></div>');
+                    break;
+            }
+            
+        }
+   
+    }
+
+</script>
+
+
+{% endblock %}

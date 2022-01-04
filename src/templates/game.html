@@ -14,14 +14,23 @@
 {% endblock %}
 
 {% block content %}
-
+    
 <div id="board">
 </div>
 <script>
     initPieces();
-    renderPieces();
+    renderWithFEN('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
     allowDragging();
     addListeners();
 </script>
+
+<ul id='playerslist'>
+    {% for profile in profiles %}
+
+    <a href= 'http://127.0.0.1:8000/game/{{profile.user}}'>{{profile.user}}</a>
+    
+    {% endfor %}
+</ul>
+
 
 {% endblock %}

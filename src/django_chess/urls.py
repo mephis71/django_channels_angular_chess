@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from game.views import game_view
+from game.views import game_view, game_view_against
 from pages.views import home_view, logout_view, register_view, login_view
 from users.views import profile_settings_view, user_view
 
@@ -32,6 +32,7 @@ urlpatterns = [
     path('user/',user_view, name='user-page' ),
     path('settings/', profile_settings_view, name='profile-settings'),
     path('game/',game_view,name='game'),
+    path('game/<str:username>',game_view_against,name='game-against'),
 ] 
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
