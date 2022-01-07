@@ -18,7 +18,13 @@
     
 <div id="board">
 </div>
-<script>
+
+<div class='timer' id='timer1'></div>
+<div class='timer' id='timer2'></div>
+
+<script>    
+
+
     initPieces();
 
     var loc = window.location
@@ -47,6 +53,10 @@
             var fen = msg.fen;
             var color = msg.color;
             var turn = msg.turn;
+            var timer1 = msg.timer1;
+            var timer2 = msg.timer2;
+            document.getElementById('timer1').innerHTML = timer1;
+            document.getElementById('timer2').innerHTML = timer2;
             renderWithFEN(fen);
             player = color;
             console.log(color,player);

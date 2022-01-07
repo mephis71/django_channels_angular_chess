@@ -5,7 +5,29 @@ from django.contrib.auth.models import User
 from rich import print
 
 
+
 #Create your models here.
+
+class Timer(models.Model):
+    minutes = models.PositiveSmallIntegerField(default=10)
+    seconds = models.PositiveSmallIntegerField(default=0)
+
+    def decrement(self):
+        if self.seconds != 0:
+            self.seconds -= 1
+        else:
+            self.minutes -= 1
+            self.seconds = 59
+
+    def get_time_string(self):
+        m = self.minutes
+        s = self.seconds
+        if m<10:
+            m = f'0{m}'
+        if s<10:
+            s = f'0{s}'
+        return f'{m}:{s}'
+
 
 class GameManager(models.Manager):
     def get_or_new(self, username1, username2):
@@ -23,10 +45,6 @@ class GameManager(models.Manager):
             return obj
          
 
-
-    
-
-
 class Game(models.Model):
     DEFAULT_GAME_STATE = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
     STARTING_PLAYER = 'white'
@@ -34,6 +52,9 @@ class Game(models.Model):
     player2 = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='second')
     game_state = models.TextField(default = DEFAULT_GAME_STATE)
     turn = models.TextField(default = STARTING_PLAYER)
+    timer1 = Timer()
+    timer2 = Timer()
+    is_running = models.BooleanField(default = False)
 
     objects = GameManager()
 
@@ -71,6 +92,8 @@ class Game(models.Model):
 
 
     
+
+
 
 
 

@@ -4,7 +4,7 @@ from .models import Game
 from rich import print
 from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
-
+import time
 
 class GameConsumer(AsyncConsumer):
 
@@ -19,7 +19,6 @@ class GameConsumer(AsyncConsumer):
         other_user = self.scope['url_route']['kwargs']['username']
         me = self.scope['user']
         self.game_obj = await self.get_game(me,other_user)
-        database_sync_to_async(self.game_obj.refresh_from_db)()
 
         # grab the name of the 'game room' and assigning it to the class
         game_room_name = self.game_obj.get_game_name()
@@ -205,11 +204,15 @@ class GameConsumer(AsyncConsumer):
     def init_JSON(self, fen, user):
         turn = self.game_obj.turn
         color = self.game_obj.get_color(user)
+        timer1 = self.game_obj.timer1.get_time_string()
+        timer2 = self.game_obj.timer2.get_time_string()
         jsonObj = {
             'type': 'init',
             'fen': fen,
             'color': color,
-            'turn': turn
+            'turn': turn,
+            'timer1': timer1,
+            'timer2': timer2
         }
         
         jsonObj = json.dumps(jsonObj)
@@ -232,3 +235,4 @@ class GameConsumer(AsyncConsumer):
         }
 
         return dict
+
