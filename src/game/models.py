@@ -8,27 +8,6 @@ from rich import print
 
 #Create your models here.
 
-class Timer(models.Model):
-    minutes = models.PositiveSmallIntegerField(default=10)
-    seconds = models.PositiveSmallIntegerField(default=0)
-
-    def decrement(self):
-        if self.seconds != 0:
-            self.seconds -= 1
-        else:
-            self.minutes -= 1
-            self.seconds = 59
-
-    def get_time_string(self):
-        m = self.minutes
-        s = self.seconds
-        if m<10:
-            m = f'0{m}'
-        if s<10:
-            s = f'0{s}'
-        return f'{m}:{s}'
-
-
 class GameManager(models.Manager):
     def get_or_new(self, username1, username2):
         qlookup1 = Q(player1__username = username1) & Q(player2__username = username2)
@@ -48,13 +27,14 @@ class GameManager(models.Manager):
 class Game(models.Model):
     DEFAULT_GAME_STATE = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
     STARTING_PLAYER = 'white'
+    DEFAULT_SECONDS = 600
     player1 = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='first')
     player2 = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='second')
-    game_state = models.TextField(default = DEFAULT_GAME_STATE)
-    turn = models.TextField(default = STARTING_PLAYER)
-    timer1 = Timer()
-    timer2 = Timer()
-    is_running = models.BooleanField(default = False)
+    game_state = models.TextField(default=DEFAULT_GAME_STATE)
+    turn = models.TextField(default=STARTING_PLAYER)
+    timer_black = models.PositiveIntegerField(default = DEFAULT_SECONDS)
+    timer_white = models.PositiveIntegerField(default = DEFAULT_SECONDS)
+    is_running = models.BooleanField(default=False)
 
     objects = GameManager()
 
@@ -89,6 +69,8 @@ class Game(models.Model):
                 players[key] = None
                 break
         self.save()
+
+    
 
 
     

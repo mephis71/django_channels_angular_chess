@@ -290,6 +290,7 @@ function endMove() {
 		var dict = {
 			'type': 'move',
 			'fen': fen,
+			'player': player
 		}
 
 		dict = JSON.stringify(dict);
