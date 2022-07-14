@@ -1,13 +1,12 @@
-from channels.consumer import AsyncConsumer
-import json
-from .models import Game
-from rich import print
-from asgiref.sync import sync_to_async
-from channels.db import database_sync_to_async
-import time
-import threading
 import asyncio
-import concurrent.futures
+import json
+
+from channels.consumer import AsyncConsumer
+from channels.db import database_sync_to_async
+from rich import print
+
+from .models import Game
+
 
 class GameConsumer(AsyncConsumer):
 
@@ -17,22 +16,21 @@ class GameConsumer(AsyncConsumer):
         await self.send({
             'type': 'websocket.accept',
         })
-
         self.timer_task = None
 
         # grab both users and the game related to those users
         other_user = self.scope['url_route']['kwargs']['username']
         me = self.scope['user']
-        self.game_obj = await self.get_game(me,other_user)
+        self.game_obj = await self.get_game(me, other_user)
 
-        # grab the name of the 'game room' and assigning it to the class
+        # grab the name of the 'game room' and assign it to the class
         game_room_name = self.game_obj.get_game_name()
         self.game_room_name = game_room_name
 
         # add the player (consumer) to the 'game room' (game_room_name)
         await self.channel_layer.group_add(
             game_room_name,
-            self.channel_name 
+            self.channel_name
         )
 
         # add the user to the list of connected players in model
@@ -41,7 +39,7 @@ class GameConsumer(AsyncConsumer):
         # grab the game state
         game_state = await self.get_game_state()
 
-        # data contains color of the player and fen of the game, turn and type of 'init' 
+        # data contains color of the player and fen of the game, turn and type of 'init'
         data = await self.init_JSON(game_state, me)
 
         turn = await self.get_turn()
@@ -55,12 +53,12 @@ class GameConsumer(AsyncConsumer):
             'type': 'websocket.send',
             'text': data
         })
-                
-    async def websocket_receive(self,event):
+
+    async def websocket_receive(self, event):
         # grab both users and the game related to those users
         other_user = self.scope['url_route']['kwargs']['username']
         me = self.scope['user']
-        self.game_obj = await self.get_game(me,other_user)
+        self.game_obj = await self.get_game(me, other_user)
 
         # decode from JSON
         msg = event['text']
@@ -72,11 +70,11 @@ class GameConsumer(AsyncConsumer):
         if type == 'move':
 
             player = msg['player']
+            player = self.opposite_color(player)
 
             fen = msg['fen']
             # save the position of the game sent by player to the model
             await self.move_handler(fen)
-
             await self.channel_layer.group_send(
                 self.game_room_name,
                 {
@@ -90,23 +88,29 @@ class GameConsumer(AsyncConsumer):
 
             # pack the data to JSON and python dict
             dict = await self.move_JSON(game_state)
-            
+
             # send the move (new state of the game) to the other player (actually to both [group of self.game_room_name] but that doesnt make a difference)
             await self.channel_layer.group_send(
                 self.game_room_name,
                 {
-                    'type':'move_broadcast',
+                    'type': 'move_broadcast',
                     'text': dict
                 }
             )
-            
-        
+
         if type == 'endgame':
 
             fen = msg['fen']
             result = msg['result']
 
             await self.move_handler(fen)
+
+            await self.channel_layer.group_send(
+                self.game_room_name,
+                {
+                    'type': 'timer_stop_broadcast'
+                }
+            )
 
             dict = await self.endgame_JSON(fen, result)
 
@@ -118,14 +122,34 @@ class GameConsumer(AsyncConsumer):
                 }
             )
 
+        if type == 'reset':
+            player = msg['player']
+            await self.vote_for_reset(player)
+            if await self.check_for_reset() == True:
+                await self.channel_layer.group_send(
+                self.game_room_name,
+                {
+                    'type': 'timer_stop_broadcast'
+                }
+            )
+                await self.reset_handler()
+                jsonObj = await self.reset_JSON()
+                await self.channel_layer.group_send(
+                    self.game_room_name,
+                    {
+                        'type': 'reset_broadcast',
+                        'text': jsonObj
+                    }
+                )
+
     async def websocket_disconnect(self, event):
-        
+
         # remove the user from the list of connected players in model
         me = self.scope['user']
         await self.remove_player(me)
-        
+
         await self.save_game()
-        
+
         # remove consumer from the group
         await self.channel_layer.group_discard(
             self.game_room_name,
@@ -143,24 +167,23 @@ class GameConsumer(AsyncConsumer):
             self.timer_task = asyncio.create_task(self.timer_countdown(player))
         elif self.timer_task == 'placeholder':
             self.timer_task = None
-        else: 
+        else:
             asyncio.Task.cancel(self.timer_task)
             self.timer_task = None
-        
+
     async def timer_countdown(self, player):
         print('COUNTDOWN')
 
         timer = self.get_timer(player)
         timer_color = player
-        
+
         while timer > 0:
             print(timer, timer_color)
-            
+
             await asyncio.sleep(1)
             timer -= 1
             await self.update_timer(timer, timer_color)
             timer_formatted = self.to_timer_format(timer)
-            
 
             data = {
                 'type': 'time',
@@ -178,27 +201,27 @@ class GameConsumer(AsyncConsumer):
             await self.channel_layer.group_send(
                 self.game_room_name,
                 {
-                    'type':'time_broadcast',
+                    'type': 'time_broadcast',
                     'text': dict
                 }
             )
-    
+
     async def time_broadcast(self, event):
         jsonObj = event['text']['jsonObj']
         data = event['text']['data']
 
         await self.send({
-            'type': 'websocket.send', 
+            'type': 'websocket.send',
             'text': jsonObj
         })
-    
+
     def get_timer(self, color):
         if color == 'white':
             timer = self.game_obj.timer_white
         else:
             timer = self.game_obj.timer_black
         return timer
-  
+
     # handler for sending the position of the game to both players using group
     async def move_broadcast(self, event):
         data = event['text']['data']
@@ -217,11 +240,22 @@ class GameConsumer(AsyncConsumer):
         jsonObj = event['text']['jsonObj']
 
         await self.update_endgame(data)
-        
-        await self.send({ 
+
+        await self.send({
             'type': 'websocket.send',
             'text': jsonObj
         })
+
+    async def reset_broadcast(self, event):
+        jsonObj = event['text']
+        await self.send({
+            'type': 'websocket.send',
+            'text': jsonObj
+        })
+
+    async def timer_stop_broadcast(self, event):
+        if self.timer_task is not None and self.timer_task != 'placeholder':
+            asyncio.Task.cancel(self.timer_task)
         
     @database_sync_to_async
     def move_handler(self, msg):
@@ -236,7 +270,7 @@ class GameConsumer(AsyncConsumer):
     @database_sync_to_async
     def save_game(self):
         self.game_obj.save()
-        
+
     @database_sync_to_async
     def update_timer(self, timer, color):
         obj = self.game_obj
@@ -263,13 +297,13 @@ class GameConsumer(AsyncConsumer):
         obj.save()
 
     @database_sync_to_async
-    def get_game(self,username1,username2):
-        return Game.objects.get_or_new(username1,username2)
-    
+    def get_game(self, username1, username2):
+        return Game.objects.get_or_new(username1, username2)
+
     @database_sync_to_async
     def get_game_state(self):
         return self.game_obj.game_state
-    
+
     @database_sync_to_async
     def get_turn(self):
         return self.game_obj.turn
@@ -300,7 +334,7 @@ class GameConsumer(AsyncConsumer):
             'data': data
         }
         return dict
-    
+
     @database_sync_to_async
     def init_JSON(self, fen, user):
         turn = self.game_obj.turn
@@ -315,7 +349,7 @@ class GameConsumer(AsyncConsumer):
             'time_black': time_black,
             'time_white': time_white
         }
-        
+
         jsonObj = json.dumps(jsonObj)
 
         return jsonObj
@@ -337,12 +371,57 @@ class GameConsumer(AsyncConsumer):
 
         return dict
 
+    @database_sync_to_async
+    def vote_for_reset(self, player):
+        self.game_obj.vote_for_reset(player)
+
+    @database_sync_to_async
+    def check_for_reset(self):
+        return self.game_obj.check_for_reset()
+
+    @database_sync_to_async
+    def reset_handler(self):
+        game = self.game_obj
+        game.game_state = Game.DEFAULT_GAME_STATE
+        game.turn = Game.STARTING_PLAYER
+        game.timer_black = Game.DEFAULT_SECONDS
+        game.timer_white = Game.DEFAULT_SECONDS
+        game.reset_votes['white'] = False
+        game.reset_votes['black'] = False
+        game.save()
+
+    @database_sync_to_async
+    def reset_JSON(self):
+        game = self.game_obj
+        fen = game.game_state
+        turn = game.turn
+        time_white = self.to_timer_format(game.timer_white)
+        time_black = self.to_timer_format(game.timer_black)
+
+        jsonObj = {
+            'type': 'reset',
+            'fen': fen,
+            'turn': turn,
+            'time_black': time_black,
+            'time_white': time_white
+        }
+
+        jsonObj = json.dumps(jsonObj)
+
+        return jsonObj
+
     def to_timer_format(self, seconds):
         s = seconds
         m = s//60
         s = s - m*60
-        if m<10:
+        if m < 10:
             m = f'0{m}'
-        if s<10:
+        if s < 10:
             s = f'0{s}'
         return f'{m}:{s}'
+
+    def opposite_color(self, color):
+        if color == 'black':
+            return 'white'
+        else:
+            return 'black'

@@ -31,17 +31,17 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'users',
+    'game',
+    'django_static_jquery_ui',
+    'channels',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'pages',
-    'users',
-    'game',
-    'django_static_jquery_ui',
-    'channels',
 ]
 
 MIDDLEWARE = [
@@ -141,3 +141,5 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
     }
 }
+
+AUTH_USER_MODEL = 'users.CustomUser'

@@ -24,10 +24,10 @@
     addListeners();
 </script>
 
-<ul id='playerslist'>
-    {% for profile in profiles %}
+<ul id='friendslist'>
+    {% for friend in friends.all %}
 
-    <a href= 'http://127.0.0.1:8000/game/{{profile.user}}'>{{profile.user}}</a>
+    <a href="{% url 'game-against-page' friend.username %}">{{friend.username}}</a>
     
     {% endfor %}
 </ul>

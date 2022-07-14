@@ -796,7 +796,7 @@ function isCheckmate(c) {
 		output = 'draw';
 	}
 	return output;
-	// lines that are commented out are handled in the 'game_against_html' now
+	// lines that are commented out are handled in the 'game_against.html' now
 }
 
 function castles(p) {

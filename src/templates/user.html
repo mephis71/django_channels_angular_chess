@@ -1,14 +1,33 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-   <br>
    
-   <img src="{{ user.profile.get_profile_pic }}">
+   <section class='profile'>
 
-   <p>Name: {{ name }}</p> 
-   <p>Username: {{ username }}</p>
+      <div class='container'>
 
-   
+         <div class='row'>
+
+            <div class='col-3'>
+
+               <figure>
+
+                  <img src="{{ searched_user.get_profile_pic }}">
+                     
+                  <figcaption>
+
+                     Username: {{ searched_user.username }}
+
+                  </figcaption>
+
+               </figure>
+
+            </div>
+
+         </div>
+
+      </div>
+
+   </section>
 
 {% endblock %}

@@ -87,7 +87,25 @@ body
     float: right;
     clear: both;
     text-align: center;
-    vertical-align: middle;
     line-height: 100px;
     font-size: 40px;
+}
+
+.profile img
+{
+    width: 100%;
+	height: auto;
+    padding-bottom: 10px;
+}
+
+.reset
+{
+    height: 50px;
+    width: 300px;
+    text-align: center;
+    font-size: 40px;
+    position: relative;
+    bottom: 500px;
+    float: left;
+    line-height: 50px;
 }

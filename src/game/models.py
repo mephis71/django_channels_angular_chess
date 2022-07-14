@@ -1,9 +1,11 @@
+from re import L
 from django.db import models
 from django.conf import settings
 from django.db.models import Q
 from django.contrib.auth.models import User
 from rich import print
-
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 #Create your models here.
@@ -19,6 +21,7 @@ class GameManager(models.Manager):
         else:
             p1 = User.objects.get(username = username1)
             p2 = User.objects.get(username = username2)
+            print(p1, p2)
             obj = self.model(player1 = p1, player2 = p2)
             obj.save()
             return obj
@@ -41,6 +44,11 @@ class Game(models.Model):
     connected_players = {
         'white': None,
         'black': None
+    }
+
+    reset_votes = {
+        'white': False,
+        'black': False
     }
 
     def get_game_name(self):
@@ -69,6 +77,20 @@ class Game(models.Model):
                 players[key] = None
                 break
         self.save()
+
+    def vote_for_reset(self, player):
+        if player == 'white':
+            self.reset_votes['white'] = True
+        else:
+            self.reset_votes['black'] = True
+        self.save()
+
+    def check_for_reset(self):
+        if self.reset_votes['white'] == True and self.reset_votes['black'] == True:
+            return True
+        else:
+            return False
+            
 
     
 

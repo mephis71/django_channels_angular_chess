@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block head %}
@@ -15,26 +14,38 @@
 {% endblock %}
 
 {% block content %}
-    
+
 <div id="board">
 </div>
 
 <div class='timer' id='timer_black'></div>
 <div class='timer' id='timer_white'></div>
+<div class='reset' id='reset'>Reset</div>
 
-<script>    
+<script>
 
 
     initPieces();
 
     var loc = window.location
     var endpointStart = 'ws://'
-    if(loc.protocol == 'https'){
+    if (loc.protocol == 'https') {
         endpointStart = 'wss://'
     }
     var endpoint = endpointStart + loc.host + loc.pathname
     var websocket = new WebSocket(endpoint)
 
+    var resetbutton = $('.reset')
+
+    resetbutton.click(function () {
+        var dict = {
+            'type': 'reset',
+            'player': player,
+        }
+        dict = JSON.stringify(dict);
+        websocket.send(dict)
+        console.log('reset request sent')
+    })
 
 
     websocket.onopen = function (e) {
@@ -46,13 +57,11 @@
     websocket.onerror = function (e) {
         console.log('error', e)
     }
-    websocket.onmessage = function (e) { 
+    websocket.onmessage = function (e) {
         console.log(e.data);
         var msg = JSON.parse(e.data);
 
-        
-
-        if(msg.type == 'init') {
+        if (msg.type == 'init') {
             var fen = msg.fen;
             var color = msg.color;
             var turn = msg.turn;
@@ -62,9 +71,9 @@
             document.getElementById('timer_white').innerHTML = time_white;
             renderWithFEN(fen);
             player = color;
-            console.log(color,player);
+            console.log(color, player);
             console.log('init', msg)
-            if(turn == player) {
+            if (turn == player) {
                 console.log('your move');
                 addListeners();
                 allowDragging();
@@ -76,12 +85,12 @@
             }
         }
 
-        if(msg.type == 'move') {
+        if (msg.type == 'move') {
             var fen = msg.fen;
             var turn = msg.turn;
             renderWithFEN(fen);
             console.log('move', msg)
-            if(turn == player) {
+            if (turn == player) {
                 console.log('your move');
                 addListeners();
                 allowDragging();
@@ -93,7 +102,7 @@
             }
         }
 
-        if(msg.type == 'endgame') { 
+        if (msg.type == 'endgame') {
             var fen = msg.fen;
             var result = msg.result;
             renderWithFEN(fen);
@@ -101,27 +110,50 @@
             removeListeners();
             disableDragging();
 
-            switch(result) {
-                case 'blackwins': 
+            switch (result) {
+                case 'blackwins':
                     $('#board').append('<div id="endgamebox"><p>BLACK WINS</p></div>');
                     break;
                 case 'whitewins':
                     $('#board').append('<div id="endgamebox"><p>WHITE WINS</p></div>');
                     break;
                 case 'draw':
-                    $('#board').append('<div id="endgamebox"><p>WHITE WINS</p></div>');
+                    $('#board').append('<div id="endgamebox"><p>DRAW</p></div>');
                     break;
             }
-            
+
         }
 
-        if(msg.type == 'time') {
+        if (msg.type == 'time') {
             var time = msg.time;
             var timer_color = msg.timer_color;
             var timer_id = 'timer_' + timer_color;
             document.getElementById(timer_id).innerHTML = time;
         }
-   
+
+        if (msg.type == 'reset') {
+            var fen = msg.fen;
+            var turn = msg.turn;
+            var time_black = msg.time_white;
+            var time_white = msg.time_black;
+            document.getElementById('timer_black').innerHTML = time_black;
+            document.getElementById('timer_white').innerHTML = time_white;
+            $('#endgamebox').remove()
+            renderWithFEN(fen);
+
+            console.log('reset', msg)
+            if (turn == player) {
+                console.log('your move');
+                addListeners();
+                allowDragging();
+            }
+            else {
+                console.log('opponents move');
+                removeListeners();
+                disableDragging();
+            }
+        }
+
     }
 
 </script>
