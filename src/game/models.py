@@ -3,12 +3,8 @@ from django.db import models
 from django.conf import settings
 from django.db.models import Q
 from django.contrib.auth.models import User
-from rich import print
 from django.contrib.auth import get_user_model
 User = get_user_model()
-
-
-#Create your models here.
 
 class GameManager(models.Manager):
     def get_or_new(self, username1, username2):

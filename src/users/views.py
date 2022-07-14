@@ -1,4 +1,3 @@
-from rich import print
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from users.decorators import unauthenticated_user

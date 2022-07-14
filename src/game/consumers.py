@@ -3,10 +3,8 @@ import json
 
 from channels.consumer import AsyncConsumer
 from channels.db import database_sync_to_async
-from rich import print
 
 from .models import Game
-
 
 class GameConsumer(AsyncConsumer):
 
