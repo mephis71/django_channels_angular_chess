@@ -6,3 +6,5 @@
 - cofanie ruchow podczas gry strzalkami
 - historia gier
 - widok czarnych
+- tworzenie pokoi do gier (/live/78565467)
+

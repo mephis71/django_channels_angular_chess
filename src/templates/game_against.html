@@ -33,7 +33,7 @@
         endpointStart = 'wss://'
     }
     var endpoint = endpointStart + loc.host + loc.pathname
-    var websocket = new WebSocket(endpoint)
+    var websocket_game = new WebSocket(endpoint)
 
     var resetbutton = $('.reset')
 
@@ -43,21 +43,21 @@
             'player': player,
         }
         dict = JSON.stringify(dict);
-        websocket.send(dict)
+        websocket_game.send(dict)
         console.log('reset request sent')
     })
 
 
-    websocket.onopen = function (e) {
+    websocket_game.onopen = function (e) {
         console.log('open', e)
     }
-    websocket.onclose = function (e) {
+    websocket_game.onclose = function (e) {
         console.log('close', e)
     }
-    websocket.onerror = function (e) {
+    websocket_game.onerror = function (e) {
         console.log('error', e)
     }
-    websocket.onmessage = function (e) {
+    websocket_game.onmessage = function (e) {
         console.log(e.data);
         var msg = JSON.parse(e.data);
 

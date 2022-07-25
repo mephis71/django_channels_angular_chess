@@ -284,7 +284,7 @@ function endMove() {
 		}
 
 		dict = JSON.stringify(dict);
-		websocket.send(dict);
+		websocket_game.send(dict);
 	}
 	else {
 		var dict = {
@@ -294,7 +294,7 @@ function endMove() {
 		}
 
 		dict = JSON.stringify(dict);
-		websocket.send(dict);
+		websocket_game.send(dict);
 	}
 }
 

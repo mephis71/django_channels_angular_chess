@@ -5,6 +5,7 @@ from channels.consumer import AsyncConsumer
 from channels.db import database_sync_to_async
 
 from .models import Game
+from rich import print
 
 class GameConsumer(AsyncConsumer):
 
@@ -16,10 +17,12 @@ class GameConsumer(AsyncConsumer):
         })
         self.timer_task = None
 
-        # grab both users and the game related to those users
-        other_user = self.scope['url_route']['kwargs']['username']
+        # grab user and the game object
+        game_id = self.scope['url_route']['kwargs']['game_id']
+        self.game_obj = await self.get_game_by_id(game_id)
         me = self.scope['user']
-        self.game_obj = await self.get_game(me, other_user)
+
+        print(me, 'connected')
 
         # grab the name of the 'game room' and assign it to the class
         game_room_name = self.game_obj.get_game_name()
@@ -53,10 +56,6 @@ class GameConsumer(AsyncConsumer):
         })
 
     async def websocket_receive(self, event):
-        # grab both users and the game related to those users
-        other_user = self.scope['url_route']['kwargs']['username']
-        me = self.scope['user']
-        self.game_obj = await self.get_game(me, other_user)
 
         # decode from JSON
         msg = event['text']
@@ -295,8 +294,12 @@ class GameConsumer(AsyncConsumer):
         obj.save()
 
     @database_sync_to_async
-    def get_game(self, username1, username2):
+    def get_game_by_users(self, username1, username2):
         return Game.objects.get_or_new(username1, username2)
+
+    @database_sync_to_async
+    def get_game_by_id(self, game_id):
+        return Game.objects.get(id=game_id)
 
     @database_sync_to_async
     def get_game_state(self):
@@ -423,3 +426,54 @@ class GameConsumer(AsyncConsumer):
             return 'white'
         else:
             return 'black'
+
+class InviteConsumer(AsyncConsumer):
+    async def websocket_connect(self, event):
+        await self.send({
+            'type': 'websocket.accept'
+        })
+
+        await self.channel_layer.group_add(
+            'invite_group',
+            self.channel_name
+        )
+
+    async def websocket_receive(self, event):
+        msg = json.loads(event['text'])
+        await self.channel_layer.group_send(
+            'invite_group',
+            {
+                'type': 'invite_broadcast',
+                'text': msg
+            }
+        )
+    
+    async def websocket_disconnect(self, event):
+
+        await self.channel_layer.group_discard(
+            'invite_group',
+            self.channel_name
+        )
+
+        await self.send({
+            'type': 'websocket.disconnect'
+        })
+
+
+    async def invite_broadcast(self, event):
+        msg = event['text']
+        msg = json.dumps(msg)
+   
+        await self.send({
+            'type': 'websocket.send',
+            'text': msg
+        })
+
+    async def invite_accept_broadcast(self, event):
+        msg = event['text']
+        msg = json.dumps(msg)
+
+        await self.send({
+            'type': 'websocket.send',
+            'text': msg
+        })
