@@ -38,10 +38,10 @@ class GameConsumer(AsyncConsumer):
         await self.add_player(me)
 
         # grab the game state
-        game_state = await self.get_game_state()
+        fen = await self.get_fen()
 
         # data contains color of the player and fen of the game, turn and type of 'init'
-        data = await self.init_JSON(game_state, me)
+        data = await self.init_JSON(fen, me)
 
         turn = await self.get_turn()
         player = await self.get_color(me)
@@ -61,17 +61,44 @@ class GameConsumer(AsyncConsumer):
         msg = event['text']
         msg = json.loads(msg)
 
-        # check if the message is a 'move' or 'endgame' type
+        # check if the message is a 'move' or 'reset' type
         type = msg['type']
 
         if type == 'move':
+            
+            game_id = self.scope['url_route']['kwargs']['game_id']
+            self.game_obj = await self.get_game_by_id(game_id)
+            p = msg['picked_id']
+            t = msg['target_id']
 
+            is_legal_flag, game_result = await self.is_legal(p, t)
+
+            if is_legal_flag == False:
+                return
+            
+            # if the game ends
+            if game_result != False:
+                await self.channel_layer.group_send(
+                    self.game_room_name,
+                    {
+                        'type': 'timer_stop_broadcast'
+                    }
+                )
+
+                jsonObj = await self.endgame_JSON(game_result)
+
+                await self.channel_layer.group_send(
+                    self.game_room_name,
+                    {
+                        'type': 'basic_broadcast',
+                        'text': jsonObj
+                    }
+                )
+                return
+                
             player = msg['player']
             player = self.opposite_color(player)
 
-            fen = msg['fen']
-            # save the position of the game sent by player to the model
-            await self.move_handler(fen)
             await self.channel_layer.group_send(
                 self.game_room_name,
                 {
@@ -80,44 +107,18 @@ class GameConsumer(AsyncConsumer):
                 }
             )
 
-            # grab the game state
-            game_state = await self.get_game_state()
-
-            # pack the data to JSON and python dict
-            dict = await self.move_JSON(game_state)
+            jsonObj = await self.move_JSON()
 
             # send the move (new state of the game) to the other player (actually to both [group of self.game_room_name] but that doesnt make a difference)
             await self.channel_layer.group_send(
                 self.game_room_name,
                 {
-                    'type': 'move_broadcast',
-                    'text': dict
+                    'type': 'basic_broadcast',
+                    'text': jsonObj
                 }
             )
+            return
 
-        if type == 'endgame':
-
-            fen = msg['fen']
-            result = msg['result']
-
-            await self.move_handler(fen)
-
-            await self.channel_layer.group_send(
-                self.game_room_name,
-                {
-                    'type': 'timer_stop_broadcast'
-                }
-            )
-
-            dict = await self.endgame_JSON(fen, result)
-
-            await self.channel_layer.group_send(
-                self.game_room_name,
-                {
-                    'type': 'endgame_broadcast',
-                    'text': dict
-                }
-            )
 
         if type == 'reset':
             player = msg['player']
@@ -134,10 +135,11 @@ class GameConsumer(AsyncConsumer):
                 await self.channel_layer.group_send(
                     self.game_room_name,
                     {
-                        'type': 'reset_broadcast',
+                        'type': 'basic_broadcast',
                         'text': jsonObj
                     }
                 )
+            return
 
     async def websocket_disconnect(self, event):
 
@@ -169,13 +171,10 @@ class GameConsumer(AsyncConsumer):
             self.timer_task = None
 
     async def timer_countdown(self, player):
-        print('COUNTDOWN')
-
         timer = self.get_timer(player)
         timer_color = player
 
         while timer > 0:
-            print(timer, timer_color)
 
             await asyncio.sleep(1)
             timer -= 1
@@ -190,27 +189,13 @@ class GameConsumer(AsyncConsumer):
 
             jsonObj = json.dumps(data)
 
-            dict = {
-                'data': data,
-                'jsonObj': jsonObj
-            }
-
             await self.channel_layer.group_send(
                 self.game_room_name,
                 {
-                    'type': 'time_broadcast',
-                    'text': dict
+                    'type': 'basic_broadcast',
+                    'text': jsonObj
                 }
             )
-
-    async def time_broadcast(self, event):
-        jsonObj = event['text']['jsonObj']
-        data = event['text']['data']
-
-        await self.send({
-            'type': 'websocket.send',
-            'text': jsonObj
-        })
 
     def get_timer(self, color):
         if color == 'white':
@@ -220,49 +205,17 @@ class GameConsumer(AsyncConsumer):
         return timer
 
     # handler for sending the position of the game to both players using group
-    async def move_broadcast(self, event):
-        data = event['text']['data']
-        jsonObj = event['text']['jsonObj']
-        turn = data['turn']
-
-        await self.update_game(data)
+    async def basic_broadcast(self, event):
+        jsonObj = event['text']
 
         await self.send({
             "type": 'websocket.send',
             'text': jsonObj
         })
 
-    async def endgame_broadcast(self, event):
-        data = event['text']['data']
-        jsonObj = event['text']['jsonObj']
-
-        await self.update_endgame(data)
-
-        await self.send({
-            'type': 'websocket.send',
-            'text': jsonObj
-        })
-
-    async def reset_broadcast(self, event):
-        jsonObj = event['text']
-        await self.send({
-            'type': 'websocket.send',
-            'text': jsonObj
-        })
-
     async def timer_stop_broadcast(self, event):
         if self.timer_task is not None and self.timer_task != 'placeholder':
             asyncio.Task.cancel(self.timer_task)
-        
-    @database_sync_to_async
-    def move_handler(self, msg):
-        obj = self.game_obj
-        obj.game_state = msg
-        if obj.turn == 'white':
-            obj.turn = 'black'
-        else:
-            obj.turn = 'white'
-        obj.save()
 
     @database_sync_to_async
     def save_game(self):
@@ -278,22 +231,6 @@ class GameConsumer(AsyncConsumer):
         obj.save()
 
     @database_sync_to_async
-    def update_game(self, data):
-        fen = data['fen']
-        turn = data['turn']
-        obj = self.game_obj
-        obj.game_state = fen
-        obj.turn = turn
-        obj.save()
-
-    @database_sync_to_async
-    def update_endgame(self, data):
-        fen = data['fen']
-        obj = self.game_obj
-        obj.game_state = fen
-        obj.save()
-
-    @database_sync_to_async
     def get_game_by_users(self, username1, username2):
         return Game.objects.get_or_new(username1, username2)
 
@@ -302,8 +239,8 @@ class GameConsumer(AsyncConsumer):
         return Game.objects.get(id=game_id)
 
     @database_sync_to_async
-    def get_game_state(self):
-        return self.game_obj.game_state
+    def get_fen(self):
+        return self.game_obj.fen
 
     @database_sync_to_async
     def get_turn(self):
@@ -322,19 +259,31 @@ class GameConsumer(AsyncConsumer):
         self.game_obj.remove_player(username)
 
     @database_sync_to_async
-    def move_JSON(self, value):
+    def move_JSON(self):
+        fen = self.game_obj.fen
         turn = self.game_obj.turn
         data = {
             'type': 'move',
-            'fen': value,
+            'fen': fen,
             'turn': turn
         }
         jsonObj = json.dumps(data)
-        dict = {
-            'jsonObj': jsonObj,
-            'data': data
+        
+        return jsonObj
+
+    @database_sync_to_async
+    def endgame_JSON(self, game_result):
+        fen = self.game_obj.fen
+        turn = self.game_obj.turn
+        data = {
+            'type': 'endgame',
+            'fen': fen,
+            'turn': turn,
+            'game_result': game_result
         }
-        return dict
+        jsonObj = json.dumps(data)
+        
+        return jsonObj
 
     @database_sync_to_async
     def init_JSON(self, fen, user):
@@ -352,25 +301,7 @@ class GameConsumer(AsyncConsumer):
         }
 
         jsonObj = json.dumps(jsonObj)
-
         return jsonObj
-
-    @database_sync_to_async
-    def endgame_JSON(self, fen, result):
-        data = {
-            'type': 'endgame',
-            'fen': fen,
-            'result': result
-        }
-
-        jsonObj = json.dumps(data)
-
-        dict = {
-            'data': data,
-            'jsonObj': jsonObj
-        }
-
-        return dict
 
     @database_sync_to_async
     def vote_for_reset(self, player):
@@ -383,7 +314,7 @@ class GameConsumer(AsyncConsumer):
     @database_sync_to_async
     def reset_handler(self):
         game = self.game_obj
-        game.game_state = Game.DEFAULT_GAME_STATE
+        game.fen = Game.DEFAULT_GAME_FEN
         game.turn = Game.STARTING_PLAYER
         game.timer_black = Game.DEFAULT_SECONDS
         game.timer_white = Game.DEFAULT_SECONDS
@@ -394,7 +325,7 @@ class GameConsumer(AsyncConsumer):
     @database_sync_to_async
     def reset_JSON(self):
         game = self.game_obj
-        fen = game.game_state
+        fen = game.fen
         turn = game.turn
         time_white = self.to_timer_format(game.timer_white)
         time_black = self.to_timer_format(game.timer_black)
@@ -410,6 +341,12 @@ class GameConsumer(AsyncConsumer):
         jsonObj = json.dumps(jsonObj)
 
         return jsonObj
+
+    @database_sync_to_async
+    def is_legal(self, p , t):
+        game = self.game_obj
+        output = game.is_legal(p, t)
+        return output
 
     def to_timer_format(self, seconds):
         s = seconds
@@ -469,11 +406,3 @@ class InviteConsumer(AsyncConsumer):
             'text': msg
         })
 
-    async def invite_accept_broadcast(self, event):
-        msg = event['text']
-        msg = json.dumps(msg)
-
-        await self.send({
-            'type': 'websocket.send',
-            'text': msg
-        })

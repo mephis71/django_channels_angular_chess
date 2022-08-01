@@ -9,23 +9,20 @@
 <script src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
 <script src="{% static 'js/game.js' %}"></script>
 
-
-
 {% endblock %}
 
 {% block content %}
 
-<div id="board">
-</div>
+<div id="board"></div>
 
 <div class='timer' id='timer_black'></div>
 <div class='timer' id='timer_white'></div>
 <div class='reset' id='reset'>Reset</div>
 
 <script>
+    // var player = '{{ request.user }}'
 
-
-    initPieces();
+    init_fields()
 
     var loc = window.location
     var endpointStart = 'ws://'
@@ -47,7 +44,6 @@
         console.log('reset request sent')
     })
 
-
     websocket_game.onopen = function (e) {
         console.log('open', e)
     }
@@ -58,7 +54,6 @@
         console.log('error', e)
     }
     websocket_game.onmessage = function (e) {
-        console.log(e.data);
         var msg = JSON.parse(e.data);
 
         if (msg.type == 'init') {
@@ -67,50 +62,54 @@
             var turn = msg.turn;
             var time_black = msg.time_white;
             var time_white = msg.time_black;
+
             document.getElementById('timer_black').innerHTML = time_black;
             document.getElementById('timer_white').innerHTML = time_white;
-            renderWithFEN(fen);
+
+            render_with_fen(fen);
             player = color;
+
             console.log(color, player);
             console.log('init', msg)
+
             if (turn == player) {
                 console.log('your move');
-                addListeners();
-                allowDragging();
+                add_listeners();
+                allow_dragging();
             }
             else {
                 console.log('opponents move');
-                removeListeners();
-                disableDragging();
+                remove_listeners();
+                disable_dragging();
             }
         }
 
         if (msg.type == 'move') {
             var fen = msg.fen;
             var turn = msg.turn;
-            renderWithFEN(fen);
+            render_with_fen(fen);
             console.log('move', msg)
             if (turn == player) {
                 console.log('your move');
-                addListeners();
-                allowDragging();
+                add_listeners();
+                allow_dragging();
             }
             else {
                 console.log('opponents move');
-                removeListeners();
-                disableDragging();
+                remove_listeners();
+                disable_dragging();
             }
         }
 
         if (msg.type == 'endgame') {
             var fen = msg.fen;
-            var result = msg.result;
-            renderWithFEN(fen);
+            var game_result = msg.game_result;
+            render_with_fen(fen);
             console.log('endgame', msg);
-            removeListeners();
-            disableDragging();
+            remove_listeners();
+            disable_dragging();
 
-            switch (result) {
+            switch (game_result) {
                 case 'blackwins':
                     $('#board').append('<div id="endgamebox"><p>BLACK WINS</p></div>');
                     break;
@@ -139,24 +138,23 @@
             document.getElementById('timer_black').innerHTML = time_black;
             document.getElementById('timer_white').innerHTML = time_white;
             $('#endgamebox').remove()
-            renderWithFEN(fen);
+            render_with_fen(fen);
 
             console.log('reset', msg)
             if (turn == player) {
                 console.log('your move');
-                addListeners();
-                allowDragging();
+                add_listeners();
+                allow_dragging();
             }
             else {
                 console.log('opponents move');
-                removeListeners();
-                disableDragging();
+                remove_listeners();
+                disable_dragging();
             }
         }
 
     }
 
 </script>
-
 
 {% endblock %}

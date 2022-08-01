@@ -28,6 +28,10 @@ def game_invite_handler(request):
 
     game_obj = get_game(player1,player2)
     game_id = game_obj.id
+    game_obj.is_running = True
+    fen = game_obj.DEFAULT_GAME_FEN
+    game_obj.init_game_with_fen(fen)
+
     
     msg = {
         'type': 'invite_accept',
@@ -39,11 +43,14 @@ def game_invite_handler(request):
     async_to_sync(channel_layer.group_send)(
         "invite_group",
         {
-            "type": "invite_accept_broadcast",
+            "type": "invite_broadcast",
             'text': msg
         })
     
     return HttpResponse('Invite accepted')
+
+def endgame_handler(request):
+    return
 
 def get_game(username1,username2):
         return Game.objects.get_or_new(username1,username2)
