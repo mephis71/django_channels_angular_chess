@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, re_path
-from game.views import game_invite_handler, game_view, game_view_against, game_live_view, endgame_handler
+from game.views import game_invite_handler, game_view, game_view_against, game_live_view
 from users.views import profile_settings_view, user_view, friends_view, send_friend_request, accept_friend_request, home_view, logout_view, register_view, login_view
 
 from django.conf import settings
@@ -19,7 +19,6 @@ urlpatterns = [
     path('game/<str:username>/',game_view_against, name='game-against-page'),
     path('game/invite', game_invite_handler, name='game-invite-handler'),
     path('game/live/<int:game_id>/', game_live_view, name='game-live-view'),
-    path('game/endgame/', endgame_handler, name='endgame-handler'),
 
     path('friends/', friends_view, name='friends-page'),
     path('send_friend_request/', send_friend_request, name='send-friend-request'),

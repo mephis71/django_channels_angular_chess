@@ -1,10 +1,6 @@
-- wysylanie zaproszenia do gry
 - system ELO
-- losowanie stron po resecie i nie tylko
 - cofanie ruchu
 - rysowanie strzalek na szachownicy
-- cofanie ruchow podczas gry strzalkami
 - historia gier
 - widok czarnych
-- tworzenie pokoi do gier (/live/78565467)
-
+- JSON field do scorollowania
