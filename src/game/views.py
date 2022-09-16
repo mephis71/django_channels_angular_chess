@@ -1,6 +1,6 @@
 from rich import print
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from .models import Game
 import json
 
@@ -30,7 +30,7 @@ def game_invite_handler(request):
     game_obj.assign_colors_randomly(username1, username2)
     game_id = game_obj.id
     game_obj.is_running = True
-    
+    game_obj.save()
     msg = {
         'type': 'invite_accept',
         'player1': username1,

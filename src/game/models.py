@@ -2,7 +2,6 @@ import random
 from django.db import models
 from django.conf import settings
 from django.db.models import Q
-from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from channels.db import database_sync_to_async
 
@@ -14,7 +13,7 @@ class GameManager(models.Manager):
         qlookup2 = Q(player_white__username = username2) & Q(player_black__username = username1)
 
         qs = self.get_queryset().filter(qlookup1 | qlookup2).distinct()
-        if qs.count() != 0:
+        if qs.count() != 0 and qs[0].is_finished == False:
             return qs[0]
         else:
             obj = self.model()
@@ -63,6 +62,9 @@ class Game(models.Model):
             return 'white'
         elif self.player_black.username == player:
             return 'black'
+        else:
+            raise Exception(f'Username not matched: {player}')
+
 
     def vote_for_reset(self, color):
         if color == 'white':
@@ -81,6 +83,7 @@ class Game(models.Model):
         user1 = User.objects.get(username=username1)
         user2 = User.objects.get(username=username2)
         number = random.randint(1, 2)
+        print('losowanie:', number)
         if number == 1:
             self.player_white = user1 
             self.player_black = user2

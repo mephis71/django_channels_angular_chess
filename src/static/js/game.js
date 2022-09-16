@@ -180,6 +180,8 @@ var prev_picked_id, prev_target_id;
 
 var moving = false
 
+var moves_list = []
+
 function init_fields() {
   for (var i = 0; i < 64; i++) {
     $("#board").append(
@@ -429,6 +431,8 @@ function piece_drop(e) {
           return;
         }
         send_move(picked_id, target_id);
+        const move = [picked_id, target_id]
+        moves_list.push(move)
         moving = false;
     }
   }

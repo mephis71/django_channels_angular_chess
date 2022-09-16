@@ -11,7 +11,7 @@
 
 <div class="timer" id="timer_black"></div>
 <div class="timer" id="timer_white"></div>
-<div class="reset" id="reset">Reset</div>
+<!-- <div class="reset" id="reset">Reset</div> -->
 
 <script>
   init_fields();
@@ -23,17 +23,17 @@
   var endpoint = endpointStart + loc.host + loc.pathname;
   var websocket_game = new WebSocket(endpoint);
 
-  var resetbutton = $(".reset");
+  // var resetbutton = $(".reset");
 
-  resetbutton.click(function () {
-    var dict = {
-      'type': "reset",
-      'color': color,
-    };
-    dict = JSON.stringify(dict);
-    websocket_game.send(dict);
-    console.log("reset request sent");
-  });
+  // resetbutton.click(function () {
+  //   var dict = {
+  //     'type': "reset",
+  //     'color': color,
+  //   };
+  //   dict = JSON.stringify(dict);
+  //   websocket_game.send(dict);
+  //   console.log("reset request sent");
+  // });
 
   websocket_game.onopen = function (e) {
     console.log("open", e);

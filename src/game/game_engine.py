@@ -1,4 +1,5 @@
 import re
+from rich import print
 
 class Piece:
     def __init__(self, color, type, moved):
@@ -21,17 +22,16 @@ class GameEngine:
         self.update_pieces_with_fen(fen)  
 
     def is_legal(self, p, t):
-        print('if the field is empty')
+        # print('if the field is empty')
         if self.pieces[p] == None:
             return False, False, None
 
-        print("if wrong color of the piece")
-        print(self.pieces[p].color, self.get_turn())
+        # print("if wrong color of the piece")
         # if the moving piece is not the player's color
         if self.pieces[p].color != self.get_turn():
             return False, False, None
 
-        print('if the move is enpassant')
+        # print('if the move is enpassant')
         # if the move is enpassant
         if self.prev_t != None and self.prev_p != None and self.pieces[self.prev_t] != None and self.pieces[self.prev_t].type == 'pawn' and self.pieces[p].type == 'pawn' and \
         abs(p - self.prev_t) == 1 and abs(self.prev_p - self.prev_t) == 16 and abs(self.prev_t - t) == 8:
@@ -56,12 +56,12 @@ class GameEngine:
 
         self.update_possible_moves(p)
         
-        print("if the move is against the moving pattern of the piece")
+        # print("if the move is against the moving pattern of the piece")
         # if the move is against the moving pattern of the piece return False
         if self.possible_moves[t] == False:
             return False, False, None
 
-        print("if the player is being checked after the move")
+        # print("if the player is being checked after the move")
         # if the player is being checked after the move return False
         if self.is_checked_nextmove(p, t) == True:
             return False, False, None
@@ -99,7 +99,7 @@ class GameEngine:
                 self.pieces[61] = Piece(moving_piece.color, 'rook', True)
 
 
-            print('if the player is checked after castles')
+            # print('if the player is checked after castles')
             if self.is_checked(moving_piece.color) == True:
                 self.pieces = origin_pieces
                 self.attacked_fields = origin_attacked_fields # <- probably not necessary
@@ -110,7 +110,7 @@ class GameEngine:
                 game_result, new_fen = self.end_move(p, t)
                 return True, game_result, new_fen
 
-        print("at that point the move is legal")  
+        # print("at that point the move is legal")  
         # at that point the move is legal
         self.pieces[p] = None
         self.pieces[t] = Piece(moving_piece.color, moving_piece.type, True)
@@ -286,9 +286,10 @@ class GameEngine:
                 if p + patterns[i] < 0 or \
                 p + patterns[i] > 63 or \
                 (p % 8 == 0 and (patterns[i] == -9 or patterns[i] == 7)) or \
-                (p % 8 == 7 and(patterns[i] == -7 or patterns[i] == 9)):
+                (p % 8 == 7 and(patterns[i] == -7 or patterns[i] == 9)) or \
+                (self.pieces[p + patterns[i]] != None and self.pieces[p + patterns[i]].color == c):
                     break
-                if self.pieces[p + patterns[i]] != None and self.pieces[p + patterns[i]] != c:
+                if self.pieces[p + patterns[i]] != None and self.pieces[p + patterns[i]].color != c:
                     p += patterns[i]
                     self.possible_moves[p] = True
                     break
@@ -526,9 +527,10 @@ class GameEngine:
         # 'color' argument is color of the player that is being checked
         self.update_attacked_fields(self.opposite_color(color))
         type_list = [
-            x.type if x is not None and x.color is color else None 
+            x.type if x is not None and x.color is color else None \
             for x in self.pieces
         ]
+        # print(type_list)
         king_position = type_list.index('king')
         if self.attacked_fields[king_position] == True:
             return True
@@ -546,7 +548,6 @@ class GameEngine:
 
         self.pieces[p2] = moving_piece
         self.pieces[p1] = None
-
         output = None
 
         if self.is_checked(moving_piece.color) == False:
