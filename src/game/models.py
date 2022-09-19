@@ -37,6 +37,7 @@ class Game(models.Model):
     is_running = models.BooleanField(default=False)
     is_finished = models.BooleanField(default=False)
     winner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='winner', default=None, null=True)
+    moves_list = models.TextField(default=DEFAULT_GAME_FEN, null=False)
 
     objects = GameManager()
 
@@ -44,6 +45,10 @@ class Game(models.Model):
         'white': False,
         'black': False
     }  
+
+    def get_moves_list(self):
+        output = self.moves_list.split(';')
+        return output
 
     def get_turn(self):
         fen = self.fen

@@ -103,8 +103,14 @@
         case "whitewins":
           $("#board").append('<div id="endgamebox"><p>WHITE WINS</p></div>');
           break;
-        case "draw":
-          $("#board").append('<div id="endgamebox"><p>DRAW</p></div>');
+        case "draw-stalemate":
+          $("#board").append('<div id="endgamebox"><p>DRAW - STALEMATE</p></div>');
+          break;
+        case "draw-50m":
+          $("#board").append('<div id="endgamebox"><p>DRAW - 50 MOVES RULE</p></div>');
+          break;
+        case "draw-3r":
+          $("#board").append('<div id="endgamebox"><p>DRAW - THREEFOLD REPETITION</p></div>');
           break;
       }
     }

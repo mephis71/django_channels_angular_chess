@@ -23,7 +23,7 @@ urlpatterns = [
     path('friends/', friends_view, name='friends-page'),
     path('send_friend_request/', send_friend_request, name='send-friend-request'),
     path('accept_friend_request/<int:request_id>/', accept_friend_request, name='accept-friend-request'),
-    path('<str:username>/',user_view, name='user-page'),
+    path('community/<str:username>/',user_view, name='user-page'),
 
 ] 
 

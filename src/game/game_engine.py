@@ -8,8 +8,9 @@ class Piece:
         self.moved = moved
 
 class GameEngine:
-    def __init__(self, fen):
+    def __init__(self, fen, moves_list):
         self.fen = fen
+        self.moves_list = moves_list
         self.halfmoves = 0
         self.fullmoves = 0
         self.enpassant_sqr = '-'
@@ -474,7 +475,7 @@ class GameEngine:
     def castles(self, p):
         if self.pieces[p].moved == False:
             c = self.pieces[p].color
-            self.update_attacked_fields(self.get_turn())
+            self.update_attacked_fields(self.opposite_color(self.get_turn()))
             if c == 'white':
                 indexes_pieces = (57, 58, 59)
                 indexes_fields = (58, 59)
@@ -634,8 +635,31 @@ class GameEngine:
         self.change_turn()
         self.fen = self.update_fen()
         game_result = self.is_checkmated(self.get_turn())
+        if game_result == False:
+            if self.halfmoves == 50:
+                return 'draw-50m', self.fen
+            elif self.threefold_repetition():
+                return 'draw-3r', self.fen  
         return game_result, self.fen
-
+    
+    def threefold_repetition(self):
+        cut_fen = self.fen.split()
+        cut_fen.pop(5)
+        cut_fen.pop(4)
+        cut_fen = " ".join(cut_fen)
+        cut_moves_list = []
+        for move in self.moves_list:
+            cut_move = move.split()
+            cut_move.pop(5)
+            cut_move.pop(4)
+            cut_move = " ".join(cut_move)
+            cut_moves_list.append(cut_move)
+        cut_moves_list.append(cut_fen)
+        if cut_moves_list.count(cut_fen) > 2:
+            return True
+        else:
+            return False
+        
     def is_checkmated(self, c):
         # 'c' argument is the color of player who is being checkmated
         for i in range(64):
@@ -651,11 +675,9 @@ class GameEngine:
                 output = 'blackwins'
             elif c == 'black':
                 output = 'whitewins'
-            else:
-                output = 'stalemate'
-            return output
         else:
-            return False
+            output = 'draw-stalemate'
+        return output
     
     def promotion_handler(self, p, t, piece, turn):
         self.pieces[p] = None
