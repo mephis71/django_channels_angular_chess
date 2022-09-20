@@ -65,6 +65,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
             if is_legal_flag == False:
                 return
+            
             elif game_result == 'promoting':
                 turn = self.game_obj.get_turn()
                 data = {
@@ -359,10 +360,16 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         game_obj.is_finished = True
         if game_result == 'whitewins':
             game_obj.winner = game_obj.player_white
+            game_obj.endgame_cause = 'CHECKMATE'
         elif game_result == 'blackwins':
             game_obj.winner = game_obj.player_black
-        elif game_result == 'stalemate':
-            pass
+            game_obj.endgame_cause = 'CHECKMATE'
+        elif game_result == 'draw-stalemate':
+            game_obj.endgame_cause = 'STALEMATE'
+        elif game_result == 'draw-3r':
+            game_obj.endgame_cause = 'THREEFOLD REPETITION'
+        elif game_result == 'draw-50m':
+            game_obj.endgame_cause = '50 MOVES RULE'
         await database_sync_to_async(game_obj.save)()
         self.game_obj = game_obj
         return

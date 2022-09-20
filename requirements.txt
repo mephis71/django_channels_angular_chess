@@ -1,4 +1,4 @@
 django
 channels
-Pillow 
+Pillow
 django_static_jquery_ui
