@@ -41,7 +41,7 @@ def game_invite_handler(request):
     async_to_sync(channel_layer.group_send)(
         "invite_group",
         {
-            "type": "invite_broadcast",
+            "type": "invite_accept_broadcast",
             'text': msg
         })
     

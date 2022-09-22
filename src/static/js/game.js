@@ -170,8 +170,6 @@ const fen_dict = {
   blackqueen: "q",
 };
 
-var color = null;
-
 var picked_id;
 
 var target_id;
@@ -306,42 +304,6 @@ function add_listeners() {
   });
 }
 
-function add_arrow_listeners() {
-  document.onkeydown = function (e) {
-    switch (e.key) {
-      case "ArrowLeft":
-		if (scrolling_iterator - 1 < 0) {break;} 
-		else {
-        scrolling_iterator -= 1;
-        render_with_fen(game_positions[scrolling_iterator]);
-		}
-        break;
-
-      case "ArrowRight":
-        if (scrolling_iterator + 1 > game_positions.length) {break;} 
-		else {
-        scrolling_iterator += 1;
-        render_with_fen(game_positions[scrolling_iterator]);
-        }
-        break;
-
-      case "ArrowUp":
-        scrolling_iterator = game_positions.length;
-        render_with_fen(game_positions[scrolling_iterator]);
-        break;
-
-      case "ArrowDown":
-        scrolling_iterator = 0;
-        render_with_fen(game_positions[scrolling_iterator]);
-        break;
-
-      default:
-        return; // exit this handler for other keys
-    }
-    e.preventDefault(); // prevent the default action (scroll / move caret)
-  };
-}
-
 function remove_listeners() {
   $("#board").unbind();
 }
@@ -440,7 +402,6 @@ function piece_drop(e) {
 
 function send_move(picked_id, target_id) {
   msg = {
-    'color': color,
     'type': "move",
     'picked_id': picked_id,
     'target_id': target_id,

@@ -42,11 +42,6 @@ class Game(models.Model):
 
     objects = GameManager()
 
-    reset_votes = {
-        'white': False,
-        'black': False
-    }  
-
     def get_moves_list(self):
         output = self.moves_list.split(';')
         return output
@@ -70,20 +65,6 @@ class Game(models.Model):
             return 'black'
         else:
             raise Exception(f'Username not matched: {player}')
-
-
-    def vote_for_reset(self, color):
-        if color == 'white':
-            self.reset_votes['white'] = True
-        else:
-            self.reset_votes['black'] = True
-        self.save()
-
-    def check_for_reset(self):
-        if self.reset_votes['white'] == True and self.reset_votes['black'] == True:
-            return True
-        else:
-            return False
     
     def assign_colors_randomly(self, username1, username2):
         user1 = User.objects.get(username=username1)

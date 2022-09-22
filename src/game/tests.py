@@ -30,8 +30,13 @@ class WhiteWinsTest(TestCase):
             application=application,
             path=f'/game/live/{self.game_id}/'
             )  
-        communicator_1.scope['user'] = self.user_1
-        communicator_2.scope['user'] = self.user_2
+
+        if self.game_obj.player_white.username == self.user_1.username:
+            communicator_1.scope['user'] = self.user_1
+            communicator_2.scope['user'] = self.user_2
+        else:
+            communicator_1.scope['user'] = self.user_2
+            communicator_2.scope['user'] = self.user_1
 
         connected1, _ = await communicator_1.connect()
         connected2, _ = await communicator_2.connect()
@@ -45,7 +50,6 @@ class WhiteWinsTest(TestCase):
         
         for i in range(len(moves_white)):
             await communicator_1.send_json_to({  
-                'color': 'white',
                 'type': "move",
                 'picked_id': moves_white[i][0],
                 'target_id': moves_white[i][1],
@@ -60,7 +64,6 @@ class WhiteWinsTest(TestCase):
                 break
 
             await communicator_2.send_json_to({  
-                'color': 'black',
                 'type': "move",
                 'picked_id': moves_black[i][0],
                 'target_id': moves_black[i][1],
@@ -98,8 +101,13 @@ class BlackWinsTest(TestCase):
             application=application,
             path=f'/game/live/{self.game_id}/'
             )  
-        communicator_1.scope['user'] = self.user_1
-        communicator_2.scope['user'] = self.user_2
+
+        if self.game_obj.player_white.username == self.user_1.username:
+            communicator_1.scope['user'] = self.user_1
+            communicator_2.scope['user'] = self.user_2
+        else:
+            communicator_1.scope['user'] = self.user_2
+            communicator_2.scope['user'] = self.user_1
 
         connected1, _ = await communicator_1.connect()
         connected2, _ = await communicator_2.connect()
@@ -113,7 +121,6 @@ class BlackWinsTest(TestCase):
         
         for i in range(len(moves_white)):
             await communicator_1.send_json_to({  
-                'color': 'white',
                 'type': "move",
                 'picked_id': moves_white[i][0],
                 'target_id': moves_white[i][1],
@@ -128,7 +135,6 @@ class BlackWinsTest(TestCase):
                 break
 
             await communicator_2.send_json_to({  
-                'color': 'black',
                 'type': "move",
                 'picked_id': moves_black[i][0],
                 'target_id': moves_black[i][1],
@@ -166,8 +172,13 @@ class ThreefoldRepetitionTest(TestCase):
             application=application,
             path=f'/game/live/{self.game_id}/'
             )  
-        communicator_1.scope['user'] = self.user_1
-        communicator_2.scope['user'] = self.user_2
+
+        if self.game_obj.player_white.username == self.user_1.username:
+            communicator_1.scope['user'] = self.user_1
+            communicator_2.scope['user'] = self.user_2
+        else:
+            communicator_1.scope['user'] = self.user_2
+            communicator_2.scope['user'] = self.user_1
 
         connected1, _ = await communicator_1.connect()
         connected2, _ = await communicator_2.connect()
@@ -181,7 +192,6 @@ class ThreefoldRepetitionTest(TestCase):
         
         for i in range(len(moves_white)):
             await communicator_1.send_json_to({  
-                'color': 'white',
                 'type': "move",
                 'picked_id': moves_white[i][0],
                 'target_id': moves_white[i][1],
@@ -196,7 +206,6 @@ class ThreefoldRepetitionTest(TestCase):
                 break
 
             await communicator_2.send_json_to({  
-                'color': 'black',
                 'type': "move",
                 'picked_id': moves_black[i][0],
                 'target_id': moves_black[i][1],
@@ -234,8 +243,13 @@ class FiftyMovesRuleTest(TestCase):
             application=application,
             path=f'/game/live/{self.game_id}/'
             )  
-        communicator_1.scope['user'] = self.user_1
-        communicator_2.scope['user'] = self.user_2
+
+        if self.game_obj.player_white.username == self.user_1.username:
+            communicator_1.scope['user'] = self.user_1
+            communicator_2.scope['user'] = self.user_2
+        else:
+            communicator_1.scope['user'] = self.user_2
+            communicator_2.scope['user'] = self.user_1
 
         connected1, _ = await communicator_1.connect()
         connected2, _ = await communicator_2.connect()
@@ -249,7 +263,6 @@ class FiftyMovesRuleTest(TestCase):
         
         for i in range(len(moves_white)):
             await communicator_1.send_json_to({  
-                'color': 'white',
                 'type': "move",
                 'picked_id': moves_white[i][0],
                 'target_id': moves_white[i][1],
@@ -264,7 +277,6 @@ class FiftyMovesRuleTest(TestCase):
                 break
 
             await communicator_2.send_json_to({  
-                'color': 'black',
                 'type': "move",
                 'picked_id': moves_black[i][0],
                 'target_id': moves_black[i][1],
@@ -302,8 +314,13 @@ class StalemateTest(TestCase):
             application=application,
             path=f'/game/live/{self.game_id}/'
             )  
-        communicator_1.scope['user'] = self.user_1
-        communicator_2.scope['user'] = self.user_2
+
+        if self.game_obj.player_white.username == self.user_1.username:
+            communicator_1.scope['user'] = self.user_1
+            communicator_2.scope['user'] = self.user_2
+        else:
+            communicator_1.scope['user'] = self.user_2
+            communicator_2.scope['user'] = self.user_1
 
         connected1, _ = await communicator_1.connect()
         connected2, _ = await communicator_2.connect()
@@ -317,7 +334,6 @@ class StalemateTest(TestCase):
         
         for i in range(len(moves_white)):
             await communicator_1.send_json_to({  
-                'color': 'white',
                 'type': "move",
                 'picked_id': moves_white[i][0],
                 'target_id': moves_white[i][1],
@@ -332,7 +348,6 @@ class StalemateTest(TestCase):
                 break
 
             await communicator_2.send_json_to({  
-                'color': 'black',
                 'type': "move",
                 'picked_id': moves_black[i][0],
                 'target_id': moves_black[i][1],
@@ -348,8 +363,3 @@ class StalemateTest(TestCase):
         self.assertEqual(game_obj.endgame_cause, 'STALEMATE')
         self.assertEqual(game_obj.is_finished, True)
         self.assertEqual(game_obj.is_running, False)
-        
-        
-        
-
-      

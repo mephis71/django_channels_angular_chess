@@ -11,7 +11,7 @@
 
 <div class="timer" id="timer_black"></div>
 <div class="timer" id="timer_white"></div>
-<!-- <div class="reset" id="reset">Reset</div> -->
+<button class="draw_offer_button" type="button">Zaproponuj remis</button> 
 
 <script>
   init_fields();
@@ -23,17 +23,46 @@
   var endpoint = endpointStart + loc.host + loc.pathname;
   var websocket_game = new WebSocket(endpoint);
 
-  // var resetbutton = $(".reset");
+  function draw_offer(){
+    msg = {
+        'type': 'draw_offer'
+    }
+    msg = JSON.stringify(msg)
+    websocket_game.send(msg)
+    $('.draw_offer_button').remove()
+  }
 
-  // resetbutton.click(function () {
-  //   var dict = {
-  //     'type': "reset",
-  //     'color': color,
-  //   };
-  //   dict = JSON.stringify(dict);
-  //   websocket_game.send(dict);
-  //   console.log("reset request sent");
-  // });
+  function draw_accept(){
+    msg = {
+      'type': 'draw_accept'
+    }
+    msg = JSON.stringify(msg)
+    websocket_game.send(msg)
+    $('.draw_accept_button').remove()
+    $('.draw_reject_button').remove()
+    $('body').append('<button class="draw_offer_button" type="button">Zaproponuj remis</button>')
+    $('.draw_offer_button').click(function() {
+    draw_offer()
+    })
+  }
+
+  function draw_reject(){
+    msg = {
+      'type': 'draw_reject'
+    }
+    msg = JSON.stringify(msg)
+    websocket_game.send(msg)
+    $('.draw_accept_button').remove()
+    $('.draw_reject_button').remove()
+    $('body').append('<button class="draw_offer_button" type="button">Zaproponuj remis</button>')
+    $('.draw_offer_button').click(function() {
+    draw_offer()
+    })
+  }
+
+  $('.draw_offer_button').click(function() {
+    draw_offer()
+  })
 
   websocket_game.onopen = function (e) {
     console.log("open", e);
@@ -122,40 +151,26 @@
       document.getElementById(timer_id).innerHTML = time;
     }
 
-    if (msg.type == "reset") {
-      console.log(msg.game_id)
-      window.location = '/game/live/' + msg.game_id
-      color = msg.color
-      var fen = msg.fen;
-      var turn = msg.turn;
-      var time_black = msg.time_white;
-      var time_white = msg.time_black;
-      document.getElementById("timer_black").innerHTML = time_black;
-      document.getElementById("timer_white").innerHTML = time_white;
-      $("#endgamebox").remove();
-      render_with_fen(fen);
-
-      console.log("reset", msg);
-      if (turn == color) {
-        console.log("your move");
-        add_listeners();
-        allow_dragging();
-      } else {
-        console.log("opponents move");
-        remove_listeners();
-        disable_dragging();
-      }
-    }
-
     if (msg.type == "promoting") {
       var p = msg.p;
       var t = msg.t;
       var turn = msg.turn;
       pawn_promotion(p, t, turn);
     }
+
+    if (msg.type == 'draw_offer') {
+      $('.draw_offer_button').remove()
+      $('body').append('<button class="draw_accept_button" type="button">Zaakceptuj remis</button>')
+      $('.draw_accept_button').click(function () {
+        draw_accept()
+      })
+      $('body').append('<button class="draw_reject_button" type="button">Odrzuć remis</button>')
+      $('.draw_reject_button').click(function () {
+        draw_reject()
+      })
+    }
   };
 
-  // add_arrow_listeners();
 </script>
 
 {% endblock %}
