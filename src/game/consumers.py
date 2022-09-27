@@ -120,10 +120,27 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                 }
             )
         if type == 'draw_accept':
-            print(type)
+            await self.endgame_wrapper('draw-mutual')
+            await self.channel_layer.group_send(
+                self.game_room_name,
+                {
+                    'type': 'basic_broadcast',
+                    'text': {
+                        'type': 'draw_accept',
+                    }
+                }
+            )
             return
         if type == 'draw_reject':
-            print(type)
+            await self.channel_layer.group_send(
+                self.game_room_name,
+                {
+                    'type': 'basic_broadcast',
+                    'text': {
+                        'type': 'draw_reset',
+                    }
+                }
+            )
             return
 
     async def disconnect(self, close_code):
@@ -285,6 +302,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             game_obj.endgame_cause = 'THREEFOLD REPETITION'
         elif game_result == 'draw-50m':
             game_obj.endgame_cause = '50 MOVES RULE'
+        elif game_result == 'draw-mutual':
+            game_obj.endgame_cause = 'MUTUAL AGREEMENT'
         await database_sync_to_async(game_obj.save)()
         self.game_obj = game_obj
         return

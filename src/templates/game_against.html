@@ -23,47 +23,6 @@
   var endpoint = endpointStart + loc.host + loc.pathname;
   var websocket_game = new WebSocket(endpoint);
 
-  function draw_offer(){
-    msg = {
-        'type': 'draw_offer'
-    }
-    msg = JSON.stringify(msg)
-    websocket_game.send(msg)
-    $('.draw_offer_button').remove()
-  }
-
-  function draw_accept(){
-    msg = {
-      'type': 'draw_accept'
-    }
-    msg = JSON.stringify(msg)
-    websocket_game.send(msg)
-    $('.draw_accept_button').remove()
-    $('.draw_reject_button').remove()
-    $('body').append('<button class="draw_offer_button" type="button">Zaproponuj remis</button>')
-    $('.draw_offer_button').click(function() {
-    draw_offer()
-    })
-  }
-
-  function draw_reject(){
-    msg = {
-      'type': 'draw_reject'
-    }
-    msg = JSON.stringify(msg)
-    websocket_game.send(msg)
-    $('.draw_accept_button').remove()
-    $('.draw_reject_button').remove()
-    $('body').append('<button class="draw_offer_button" type="button">Zaproponuj remis</button>')
-    $('.draw_offer_button').click(function() {
-    draw_offer()
-    })
-  }
-
-  $('.draw_offer_button').click(function() {
-    draw_offer()
-  })
-
   websocket_game.onopen = function (e) {
     console.log("open", e);
   };
@@ -141,6 +100,8 @@
         case "draw-3r":
           $("#board").append('<div id="endgamebox"><p>DRAW - THREEFOLD REPETITION</p></div>');
           break;
+        case 'draw-mutual':
+          $("#board").append('<div id="endgamebox"><p>DRAW - MUTUAL AGREEMENT</p></div>');
       }
     }
 
@@ -159,7 +120,7 @@
     }
 
     if (msg.type == 'draw_offer') {
-      $('.draw_offer_button').remove()
+      clear_draw_buttons()
       $('body').append('<button class="draw_accept_button" type="button">Zaakceptuj remis</button>')
       $('.draw_accept_button').click(function () {
         draw_accept()
@@ -169,8 +130,65 @@
         draw_reject()
       })
     }
+
+    if (msg.type == 'draw_reset') {
+      clear_draw_buttons()
+      $('body').append('<button class="draw_offer_button" type="button">Zaproponuj remis</button>')
+      $('.draw_offer_button').click(function() {
+      draw_offer()
+      })
+    }
+
+    if (msg.type == 'draw_accept') {
+      clear_draw_buttons()
+    }
   };
 
+  $('.draw_offer_button').click(function() {
+    draw_offer()
+  })
+
+
+  function clear_draw_buttons() {
+    $('.draw_accept_button').remove()
+    $('.draw_reject_button').remove()
+    $('.draw_offer_button').remove()
+  }
+
+  function draw_offer(){
+    msg = {
+        'type': 'draw_offer'
+    }
+    msg = JSON.stringify(msg)
+    websocket_game.send(msg)
+    clear_draw_buttons()
+  }
+
+  function draw_accept(){
+    msg = {
+      'type': 'draw_accept'
+    }
+    msg = JSON.stringify(msg)
+    websocket_game.send(msg)
+    clear_draw_buttons()
+    $('body').append('<button class="draw_offer_button" type="button">Zaproponuj remis</button>')
+    $('.draw_offer_button').click(function() {
+    draw_offer()
+    })
+  }
+
+  function draw_reject(){
+    msg = {
+      'type': 'draw_reject'
+    }
+    msg = JSON.stringify(msg)
+    websocket_game.send(msg)
+    clear_draw_buttons()
+    $('body').append('<button class="draw_offer_button" type="button">Zaproponuj remis</button>')
+    $('.draw_offer_button').click(function() {
+    draw_offer()
+    })
+  }
 </script>
 
 {% endblock %}
