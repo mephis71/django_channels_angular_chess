@@ -7,8 +7,11 @@ from rich import print
 from .game_engine import GameEngine
 from .models import Game
 
-
 class GameConsumer(AsyncJsonWebsocketConsumer):
+    def __init__(self):
+        self.timer_task = None
+        super().__init__()
+
     async def connect(self):
         user = self.scope['user']
         if user.is_anonymous:
@@ -20,10 +23,9 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         else:
             await self.accept()
             print(user,'connected')
-            self.timer_task = None
 
-            game_id = self.scope['url_route']['kwargs']['game_id']
-            self.game_obj = await self.get_game_by_id(game_id)
+            self.game_id = self.scope['url_route']['kwargs']['game_id']
+            self.game_obj = await self.get_game_by_id(self.game_id)
 
             self.game_room_name = self.game_obj.get_game_name()
        
@@ -33,20 +35,15 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             )
 
             fen = self.game_obj.fen
-            turn = self.game_obj.get_turn()
-            color = self.game_obj.get_color(user.username)
             moves_list = self.game_obj.get_moves_list()
-            data = self.init_JSON()
+            data = await self.init_JSON()
             self.game_engine = GameEngine(fen, moves_list)
-
-            if turn != color:
-                self.timer_task = 'placeholder'
 
             await self.send_json(data)
 
     async def receive_json(self, msg):
-        game_id = self.scope['url_route']['kwargs']['game_id']
-        self.game_obj = await self.get_game_by_id(game_id)
+        self.game_id = self.scope['url_route']['kwargs']['game_id']
+        self.game_obj = await self.get_game_by_id(self.game_id)
 
         user = self.scope['user']
         fen = self.game_obj.fen
@@ -150,42 +147,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         )
         print('close_code:',close_code)
 
-    async def timer_handler(self, event):
-        if self.timer_task is None:
-            color = event['text']
-            self.timer_task = asyncio.create_task(self.timer_countdown(color))
-        elif self.timer_task == 'placeholder':
-            self.timer_task = None
-        else:
-            asyncio.Task.cancel(self.timer_task)
-            self.timer_task = None
-
-    async def timer_countdown(self, color):
-        timer = self.get_timer(color)
-        while timer > 0:
-            await asyncio.sleep(1)
-            timer -= 1
-            await self.update_timer(timer, color)
-            timer_formatted = self.to_timer_format(timer)
-            data = {
-                'type': 'time',
-                'time': timer_formatted,
-                'timer_color': color
-            }
-            await self.channel_layer.group_send(
-                self.game_room_name,
-                {
-                    'type': 'basic_broadcast',
-                    'text': data
-                }
-            )
-
-    def get_timer(self, color):
-        if color == 'white':
-            timer = self.game_obj.timer_white
-        else:
-            timer = self.game_obj.timer_black
-        return timer
+    
 
     async def basic_broadcast(self, event):
         data = event['text']
@@ -198,8 +160,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
     @database_sync_to_async
     def update_game(self, new_fen):
-        game_id = self.scope['url_route']['kwargs']['game_id']
-        game_obj = Game.objects.get(id=game_id)
+        game_obj = Game.objects.get(id=self.game_id)
         game_obj.fen = new_fen
         game_obj.moves_list += ';' + new_fen
         game_obj.save()
@@ -207,19 +168,6 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
     def get_usernames(self):
         return self.game_obj.player_white.username, self.game_obj.player_black.username 
-
-    async def timer_stop_broadcast(self, event):
-        if self.timer_task is not None and self.timer_task != 'placeholder':
-            asyncio.Task.cancel(self.timer_task)
-
-    @database_sync_to_async
-    def update_timer(self, timer, color):
-        obj = self.game_obj
-        if color == 'white':
-            obj.timer_white = timer
-        else:
-            obj.timer_black = timer
-        obj.save()
 
     @database_sync_to_async
     def get_game_by_id(self, game_id):
@@ -250,11 +198,11 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         }
         return data
 
-    def init_JSON(self):
+    async def init_JSON(self):
         user = str(self.scope['user'])
         fen = self.game_obj.fen
         turn = self.game_obj.get_turn()
-        color = self.game_obj.get_color(user)
+        color = await database_sync_to_async(self.game_obj.get_color)(user)
         time_black = self.to_timer_format(self.game_obj.timer_black)
         time_white = self.to_timer_format(self.game_obj.timer_white)
         moves_list = self.game_obj.get_moves_list()
@@ -286,8 +234,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             return 'black'
 
     async def end_game(self, game_result):
-        game_id = self.scope['url_route']['kwargs']['game_id']
-        game_obj = await self.get_game_by_id(game_id)
+        game_obj = await self.get_game_by_id(self.game_id)
         game_obj.is_running = False
         game_obj.is_finished = True
         if game_result == 'whitewins':
@@ -336,7 +283,6 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     async def move_wrapper(self, color):
         # 'color' argument is color of the player which is moving
 
-        color = self.opposite_color(color)
         await self.channel_layer.group_send(
             self.game_room_name,
             {
@@ -353,6 +299,68 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             }
         )
         return
+
+    async def timer_handler(self, event):
+        moving_color = event['text']
+        username = self.scope['user'].username
+        consumer_color = self.game_obj.get_color(username)
+        if consumer_color == moving_color:
+            if self.timer_task != None:
+                asyncio.Task.cancel(self.timer_task)
+                self.timer_task = None
+        elif consumer_color == self.opposite_color(moving_color):
+            if self.timer_task == None:
+                self.timer_task = asyncio.create_task(self.timer_countdown(self.opposite_color(moving_color)))
+            else:
+                try:
+                    raise Exception("Scheduled a timer task for a timer that's already running")
+                finally:
+                    print('self.timer_task:', self.timer_task)
+
+    
+    async def timer_countdown(self, color):
+        timer = self.get_timer(color)
+        while True:
+            await asyncio.sleep(1)
+            timer -= 1
+            await database_sync_to_async(self.update_timer)(timer, color)
+            timer_formatted = self.to_timer_format(timer)
+            data = {
+                'type': 'time',
+                'time': timer_formatted,
+                'timer_color': color
+            }
+            await self.channel_layer.group_send(
+                self.game_room_name,
+                {
+                    'type': 'basic_broadcast',
+                    'text': data
+                }
+            )
+
+    def update_timer(self, time, timer_color):
+        game_obj = Game.objects.get(id=self.game_id)
+        if timer_color == 'white':
+            game_obj.timer_white = time
+        elif timer_color == 'black':
+            game_obj.timer_black = time
+        else:
+            try:
+                raise Exception('Undefined timer color')
+            finally:
+                print('timer_color:', timer_color)
+        game_obj.save()
+
+    def get_timer(self, color):
+        if color == 'white':
+            timer = self.game_obj.timer_white
+        else:
+            timer = self.game_obj.timer_black
+        return timer
+
+    async def timer_stop_broadcast(self, event):
+        if self.timer_task is not None:
+            asyncio.Task.cancel(self.timer_task)
 
 class InviteConsumer(AsyncJsonWebsocketConsumer):
     groups = ['invite_group']

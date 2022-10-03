@@ -43,7 +43,8 @@ def game_invite_handler(request):
         {
             "type": "invite_accept_broadcast",
             'text': msg
-        })
+        }
+    )
     
     return HttpResponse('Invite accepted')
 

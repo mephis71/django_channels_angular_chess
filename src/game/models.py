@@ -3,7 +3,6 @@ from django.db import models
 from django.conf import settings
 from django.db.models import Q
 from django.contrib.auth import get_user_model
-from channels.db import database_sync_to_async
 
 User = get_user_model()
 
