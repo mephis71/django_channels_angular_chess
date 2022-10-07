@@ -18,7 +18,7 @@ class WhiteWinsTest(TestCase):
         self.game_obj = get_game(username_1, username_2)
         self.game_obj.assign_colors_randomly(username_1, username_2)
         self.game_id = self.game_obj.id
-        self.game_obj.is_running = True
+        
         self.game_obj.save()
         
     async def test_game_consumer(self):
@@ -89,7 +89,7 @@ class BlackWinsTest(TestCase):
         self.game_obj = get_game(username_1, username_2)
         self.game_obj.assign_colors_randomly(username_1, username_2)
         self.game_id = self.game_obj.id
-        self.game_obj.is_running = True
+        
         self.game_obj.save()
         
     async def test_game_consumer(self):
@@ -160,7 +160,7 @@ class ThreefoldRepetitionTest(TestCase):
         self.game_obj = get_game(username_1, username_2)
         self.game_obj.assign_colors_randomly(username_1, username_2)
         self.game_id = self.game_obj.id
-        self.game_obj.is_running = True
+        
         self.game_obj.save()
         
     async def test_game_consumer(self):
@@ -231,7 +231,7 @@ class FiftyMovesRuleTest(TestCase):
         self.game_obj = get_game(username_1, username_2)
         self.game_obj.assign_colors_randomly(username_1, username_2)
         self.game_id = self.game_obj.id
-        self.game_obj.is_running = True
+        
         self.game_obj.save()
         
     async def test_game_consumer(self):
@@ -302,7 +302,7 @@ class StalemateTest(TestCase):
         self.game_obj = get_game(username_1, username_2)
         self.game_obj.assign_colors_randomly(username_1, username_2)
         self.game_id = self.game_obj.id
-        self.game_obj.is_running = True
+        
         self.game_obj.save()
         
     async def test_game_consumer(self):

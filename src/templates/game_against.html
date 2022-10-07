@@ -39,8 +39,8 @@
       var fen = msg.fen;
       color = msg.color;
       var turn = msg.turn;
-      var time_black = msg.time_white;
-      var time_white = msg.time_black;
+      var time_black = msg.time_black;
+      var time_white = msg.time_white;
 
       document.getElementById("timer_black").innerHTML = time_black;
       document.getElementById("timer_white").innerHTML = time_white;
@@ -62,6 +62,11 @@
     if (msg.type == "move") {
       var fen = msg.fen;
       var turn = msg.turn;
+      var time_black = msg.time_black;
+      var time_white = msg.time_white;
+
+      document.getElementById("timer_black").innerHTML = time_black;
+      document.getElementById("timer_white").innerHTML = time_white;
 
       render_with_fen(fen);
       console.log("move", msg);
@@ -79,6 +84,11 @@
     if (msg.type == "endgame") {
       var fen = msg.fen;
       var game_result = msg.game_result;
+      var time_black = msg.time_black;
+      var time_white = msg.time_white;
+
+      document.getElementById("timer_black").innerHTML = time_black;
+      document.getElementById("timer_white").innerHTML = time_white;
       render_with_fen(fen);
       console.log("endgame", msg);
       remove_listeners();
@@ -103,13 +113,6 @@
         case 'draw-mutual':
           $("#board").append('<div id="endgamebox"><p>DRAW - MUTUAL AGREEMENT</p></div>');
       }
-    }
-
-    if (msg.type == "time") {
-      var time = msg.time;
-      var timer_color = msg.timer_color;
-      var timer_id = "timer_" + timer_color;
-      document.getElementById(timer_id).innerHTML = time;
     }
 
     if (msg.type == "promoting") {

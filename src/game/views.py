@@ -29,7 +29,6 @@ def game_invite_handler(request):
     game_obj = get_game(username1, username2)
     game_obj.assign_colors_randomly(username1, username2)
     game_id = game_obj.id
-    game_obj.is_running = True
     game_obj.save()
     msg = {
         'type': 'invite_accept',

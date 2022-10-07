@@ -38,6 +38,8 @@ class Game(models.Model):
     winner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='winner', default=None, null=True)
     moves_list = models.TextField(default=DEFAULT_GAME_FEN, null=False)
     endgame_cause = models.TextField(null=True)
+    game_start_time = models.DateTimeField(default=None, null=True)
+    last_move_time = models.DateTimeField(default=None, null=True)
 
     objects = GameManager()
 
