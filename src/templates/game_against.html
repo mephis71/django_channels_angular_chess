@@ -24,13 +24,13 @@
   var websocket_game = new WebSocket(endpoint);
 
   websocket_game.onopen = function (e) {
-    console.log("open", e);
+    // console.log("open", e);
   };
   websocket_game.onclose = function (e) {
-    console.log("close", e);
+    // console.log("close", e);
   };
   websocket_game.onerror = function (e) {
-    console.log("error", e);
+    // console.log("error", e);
   };
   websocket_game.onmessage = function (e) {
     var msg = JSON.parse(e.data);
@@ -46,14 +46,14 @@
       document.getElementById("timer_white").innerHTML = time_white;
 
       render_with_fen(fen);
-      console.log("init", msg);
+      // console.log("init", msg);
 
       if (turn == color) {
-        console.log("your move");
+        // console.log("your move");
         add_listeners();
         allow_dragging();
       } else {
-        console.log("opponents move");
+        // console.log("opponents move");
         remove_listeners();
         disable_dragging();
       }
@@ -69,13 +69,13 @@
       document.getElementById("timer_white").innerHTML = time_white;
 
       render_with_fen(fen);
-      console.log("move", msg);
+      // console.log("move", msg);
       if (turn == color) {
-        console.log("your move");
+        // console.log("your move");
         add_listeners();
         allow_dragging();
       } else {
-        console.log("opponents move");
+        // console.log("opponents move");
         remove_listeners();
         disable_dragging();
       }
@@ -90,7 +90,7 @@
       document.getElementById("timer_black").innerHTML = time_black;
       document.getElementById("timer_white").innerHTML = time_white;
       render_with_fen(fen);
-      console.log("endgame", msg);
+      // console.log("endgame", msg);
       remove_listeners();
       disable_dragging();
 
@@ -120,6 +120,15 @@
       var t = msg.t;
       var turn = msg.turn;
       pawn_promotion(p, t, turn);
+    }
+
+    if (msg.type == 'time') {
+      if (msg.color == 'white') {
+        document.getElementById("timer_white").innerHTML = msg.time;
+      }
+      else if (msg.color == 'black') { 
+        document.getElementById("timer_black").innerHTML = msg.time;
+      }
     }
 
     if (msg.type == 'draw_offer') {

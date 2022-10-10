@@ -8,6 +8,7 @@ from datetime import timezone
 
 from .game_engine import GameEngine
 from .models import Game
+from .tasks import trigger_timer_task
 
 class GameConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
@@ -181,6 +182,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         game_obj.moves_list += ';' + new_fen
         await database_sync_to_async(game_obj.save)()
         self.game_obj = game_obj
+        trigger_timer_task(self.game_obj)
 
     def get_usernames(self):
         return self.game_obj.player_white.username, self.game_obj.player_black.username 
@@ -192,8 +194,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     def move_JSON(self):
         fen = self.game_obj.fen
         turn = self.game_obj.get_turn()
-        time_black = self.to_timer_format(self.game_obj.timer_black)
-        time_white = self.to_timer_format(self.game_obj.timer_white)
+        time_black = to_timer_format(self.game_obj.timer_black)
+        time_white = to_timer_format(self.game_obj.timer_white)
         moves_list = self.game_obj.get_moves_list()
         data = {
             'type': 'move',
@@ -208,8 +210,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     def endgame_JSON(self, game_result):
         fen = self.game_obj.fen
         turn = self.game_obj.get_turn()
-        time_black = self.to_timer_format(self.game_obj.timer_black)
-        time_white = self.to_timer_format(self.game_obj.timer_white)
+        time_black = to_timer_format(self.game_obj.timer_black)
+        time_white = to_timer_format(self.game_obj.timer_white)
         moves_list = self.game_obj.get_moves_list()
         data = {
             'type': 'endgame',
@@ -227,8 +229,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         fen = self.game_obj.fen
         turn = self.game_obj.get_turn()
         color = self.game_obj.get_color(user.username)
-        time_black = self.to_timer_format(self.game_obj.timer_black)
-        time_white = self.to_timer_format(self.game_obj.timer_white)
+        time_black = to_timer_format(self.game_obj.timer_black)
+        time_white = to_timer_format(self.game_obj.timer_white)
         moves_list = self.game_obj.get_moves_list()
         data = {
             'type': 'init',
@@ -240,16 +242,6 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             'moves_list': moves_list
         }
         return data
-
-    def to_timer_format(self, seconds):
-        s = seconds
-        m = s//60
-        s = s - m*60
-        if m < 10:
-            m = f'0{m}'
-        if s < 10:
-            s = f'0{s}'
-        return f'{m}:{s}'
 
     def opposite_color(self, color):
         if color == 'black':
@@ -337,3 +329,14 @@ class InviteConsumer(AsyncJsonWebsocketConsumer):
         msg = msg['text']
         await self.send_json(msg)
            
+
+
+def to_timer_format(seconds):
+        s = seconds
+        m = s//60
+        s = s - m*60
+        if m < 10:
+            m = f'0{m}'
+        if s < 10:
+            s = f'0{s}'
+        return f'{m}:{s}'
