@@ -93,7 +93,6 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             if game_result != False:
                 await self.endgame_wrapper(game_result)
 
-            color = self.game_obj.get_color(user.username)
             await self.move_wrapper()
             return
 
@@ -139,8 +138,6 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             self.channel_name
         )
         print('close_code:',close_code)
-
-    
 
     async def basic_broadcast(self, event):
         data = event['text']

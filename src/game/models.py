@@ -23,7 +23,7 @@ class Game(models.Model):
     # default values
     DEFAULT_GAME_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
     STARTING_PLAYER = 'white'
-    DEFAULT_SECONDS = 600
+    DEFAULT_SECONDS = 10
 
     # players
     player_white = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='first', null=True)

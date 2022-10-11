@@ -112,6 +112,14 @@
           break;
         case 'draw-mutual':
           $("#board").append('<div id="endgamebox"><p>DRAW - MUTUAL AGREEMENT</p></div>');
+          break;
+        case 'whitewins-oot':
+          $("#board").append('<div id="endgamebox"><p>WHITE WINS - OUT OF TIME</p></div>');
+          break;
+        case 'blackwins-oot':
+          $("#board").append('<div id="endgamebox"><p>BLACK WINS - OUT OF TIME</p></div>');
+          break;
+
       }
     }
 
