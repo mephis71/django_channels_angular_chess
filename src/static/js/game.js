@@ -178,7 +178,7 @@ var prev_picked_id, prev_target_id;
 
 var moving = false
 
-var moves_list = ''
+var moves_list_ids = ''
 
 function init_fields() {
   for (var i = 0; i < 64; i++) {
@@ -280,12 +280,12 @@ function render_with_fen(fen) {
 function allow_dragging() {
   for (var i = 0; i < 64; i++) {
     var piece = $("#f" + i);
-    if (piece.attr("color") == color) {
+    if (piece.attr("color") == player_color) {
       piece.draggable({
         disabled: false,
       });
       piece.attr("class", "field ui-draggable ui-draggable-handle");
-    } else if (piece.attr("color") != color) {
+    } else if (piece.attr("color") != player_color) {
       piece.draggable({
         disabled: true,
       });
@@ -359,10 +359,9 @@ function add_promotion_listeners(p, t, turn) {
 }
 
 function piece_pick(e) {
-  console.log('moving:',moving)
   switch (e.which) {
     case 1:
-      if (e.target.getAttribute("color") == color) {
+      if (e.target.getAttribute("color") == player_color) {
         picked_id = Number(e.target.id.slice(1));
         moving = true;
       }
@@ -371,7 +370,6 @@ function piece_pick(e) {
 }
 
 function piece_drop(e) {
-  console.log('moving:',moving)
   if (moving == true) {
     switch (e.which) {
       case 1:
@@ -387,14 +385,12 @@ function piece_drop(e) {
         $("#f" + picked_id).css("left", 0);
         $("#f" + picked_id).css("top", 0);
 
-        console.log(picked_id, target_id);
-
         if (target_id == picked_id) {
           return;
         }
         send_move(picked_id, target_id);
         var move = '(' + picked_id + ', ' + target_id + '), '
-        moves_list += move
+        moves_list_ids += move
         moving = false;
     }
   }

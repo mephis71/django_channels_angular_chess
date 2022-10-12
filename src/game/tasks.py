@@ -2,8 +2,10 @@ from channels.layers import get_channel_layer
 
 channel_layer = get_channel_layer()
 import asyncio
-from rich import print
+
 from channels.db import database_sync_to_async
+from rich import print
+
 from .models import Game
 
 

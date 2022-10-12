@@ -1,11 +1,11 @@
 from channels.testing import WebsocketCommunicator
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-
 from django_chess.asgi import application
-from .views import get_game
 from rich import print
+
 from .consumers import GameConsumer
+from .views import get_game
 
 User = get_user_model()
 

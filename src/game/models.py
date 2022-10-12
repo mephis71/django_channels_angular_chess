@@ -1,8 +1,9 @@
 import random
-from django.db import models
+
 from django.conf import settings
-from django.db.models import Q
 from django.contrib.auth import get_user_model
+from django.db import models
+from django.db.models import Q
 
 User = get_user_model()
 
@@ -23,7 +24,7 @@ class Game(models.Model):
     # default values
     DEFAULT_GAME_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
     STARTING_PLAYER = 'white'
-    DEFAULT_SECONDS = 10
+    DEFAULT_SECONDS = 300
 
     # players
     player_white = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='first', null=True)

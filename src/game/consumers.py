@@ -1,14 +1,14 @@
-import asyncio
+import datetime
+from datetime import timezone
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from rich import print
-import datetime
-from datetime import timezone
 
 from .game_engine import GameEngine
 from .models import Game
 from .tasks import trigger_timer_task
+
 
 class GameConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
@@ -150,7 +150,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
     
     async def update_game(self, new_fen):
-        game_obj = await database_sync_to_async(Game.objects.get)(id=self.game_id)
+        game_obj = await self.get_game_by_id(self.game_id)
         user = self.scope['user']
         color = self.game_obj.get_color(user.username)
 

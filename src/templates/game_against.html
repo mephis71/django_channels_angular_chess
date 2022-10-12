@@ -23,6 +23,10 @@
   var endpoint = endpointStart + loc.host + loc.pathname;
   var websocket_game = new WebSocket(endpoint);
 
+  var player_color = null
+  var moves_list = null
+  var moves_list_iterator = null
+
   websocket_game.onopen = function (e) {
     // console.log("open", e);
   };
@@ -37,23 +41,22 @@
 
     if (msg.type == "init") {
       var fen = msg.fen;
-      color = msg.color;
       var turn = msg.turn;
       var time_black = msg.time_black;
       var time_white = msg.time_white;
+      moves_list = msg.moves_list;
+      moves_list_iterator = moves_list.length - 1
+      player_color = msg.color;
 
       document.getElementById("timer_black").innerHTML = time_black;
       document.getElementById("timer_white").innerHTML = time_white;
 
       render_with_fen(fen);
-      // console.log("init", msg);
 
-      if (turn == color) {
-        // console.log("your move");
+      if (turn == player_color) {
         add_listeners();
         allow_dragging();
       } else {
-        // console.log("opponents move");
         remove_listeners();
         disable_dragging();
       }
@@ -64,18 +67,17 @@
       var turn = msg.turn;
       var time_black = msg.time_black;
       var time_white = msg.time_white;
+      moves_list = msg.moves_list;
+      moves_list_iterator = moves_list.length - 1
 
       document.getElementById("timer_black").innerHTML = time_black;
       document.getElementById("timer_white").innerHTML = time_white;
 
       render_with_fen(fen);
-      // console.log("move", msg);
-      if (turn == color) {
-        // console.log("your move");
+      if (turn == player_color) {
         add_listeners();
         allow_dragging();
       } else {
-        // console.log("opponents move");
         remove_listeners();
         disable_dragging();
       }
@@ -86,11 +88,12 @@
       var game_result = msg.game_result;
       var time_black = msg.time_black;
       var time_white = msg.time_white;
+      moves_list = msg.moves_list;
+      moves_list_iterator = moves_list.length - 1
 
       document.getElementById("timer_black").innerHTML = time_black;
       document.getElementById("timer_white").innerHTML = time_white;
       render_with_fen(fen);
-      // console.log("endgame", msg);
       remove_listeners();
       disable_dragging();
 
@@ -209,6 +212,36 @@
     draw_offer()
     })
   }
+
+  document.onkeydown = function (e) {
+    switch (e.key) {
+        case 'ArrowUp':
+          moves_list_iterator = moves_list.length - 1
+          render_with_fen(moves_list[moves_list_iterator])
+          break;
+        case 'ArrowDown':
+          moves_list_iterator = 0
+          render_with_fen(moves_list[moves_list_iterator])
+          break;
+        case 'ArrowLeft':
+          if (moves_list_iterator == 0) {return;}
+          else {
+            moves_list_iterator -= 1
+            render_with_fen(moves_list[moves_list_iterator])
+          }
+          break;
+        case 'ArrowRight':
+          if (moves_list_iterator == moves_list.length - 1) {return;}
+          else {
+            moves_list_iterator += 1
+            render_with_fen(moves_list[moves_list_iterator])
+          }
+          break;    
+    }
+};
+
+
+
 </script>
 
 {% endblock %}

@@ -1,13 +1,13 @@
-from rich import print
-from django.http import HttpResponse
-from django.shortcuts import redirect, render
-from .models import Game
-import json
-
 from channels.layers import get_channel_layer
+from django.http import HttpResponse
+from django.shortcuts import render
+
+from .models import Game
+
 channel_layer = get_channel_layer()
 
 from asgiref.sync import async_to_sync
+
 
 def game_view(request, *args, **kwargs):
     friends = request.user.friends
