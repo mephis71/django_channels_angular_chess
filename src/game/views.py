@@ -16,11 +16,8 @@ def game_view(request, *args, **kwargs):
     }
     return render(request, 'game.html', context)
 
-def game_view_against(request, username, *args, **kwargs):
-    return render(request,'game_against.html')
-
 def game_live_view(request, game_id, *args, **kwargs):
-    return render(request,'game_against.html')
+    return render(request,'game_live.html')
 
 def game_invite_handler(request):
     username1 = request.GET.get('p1')

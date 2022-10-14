@@ -40,6 +40,9 @@
                 <a href="{% url 'user-page' friend.username %}"> 
                     {{ friend.username }}
                 </a>
+                <a href="{% url 'remove-friend' friend.username %}"> 
+                    Remove friend
+                </a>
 
             {% endfor %}
 

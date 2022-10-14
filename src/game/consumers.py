@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 from datetime import timezone
 
@@ -248,6 +249,9 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
     async def end_game(self, game_result):
         game_obj = await self.get_game_by_id(self.game_id)
+        for task in asyncio.Task.all_tasks():
+            if task.get_name() == self.game_room_name:
+                task.cancel()
         game_obj.is_running = False
         game_obj.is_finished = True
         if game_result == 'whitewins':

@@ -85,6 +85,13 @@ def send_friend_request(request):
     from_user_id = request.user.id
     from_user_username = request.user.username
 
+    if from_user_username == to_user_username:
+        msg = 'You can not invite yourself'
+        context = {
+            'msg': msg
+        }
+        return render(request, 'friends.html', context)
+
     f_request, status = FriendRequest.objects.get_or_create(
         to_user_id=to_user_id,
         to_user_username = to_user_username,
@@ -118,4 +125,17 @@ def accept_friend_request(request, request_id):
         'msg': msg
     }
 
+    return render(request, 'friends.html', context)
+
+@login_required(login_url='login-page')
+def remove_friend(request, friend_username):
+    friend = CustomUser.objects.get(username=friend_username)
+    request.user.friends.remove(friend)
+    request.user.save()
+    friend.friends.remove(request.user)
+    friend.save()
+    msg = f'Removed {friend_username} from friend list'
+    context = {
+        'msg': msg
+    }
     return render(request, 'friends.html', context)

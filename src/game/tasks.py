@@ -20,16 +20,16 @@ def to_timer_format(seconds):
         return f'{m}:{s}'
 
 def trigger_timer_task(game_obj):
-    channel_name = game_obj.get_game_name()
+    game_room_name = game_obj.get_game_name()
     for task in asyncio.Task.all_tasks():
-        if task.get_name() == channel_name:
+        if task.get_name() == game_room_name:
             task.cancel()
-            asyncio.create_task(realtime_timer_broadcast(game_obj), name=channel_name)
+            asyncio.create_task(realtime_timer_broadcast(game_obj), name=game_room_name)
             return
-    asyncio.create_task(realtime_timer_broadcast(game_obj), name=channel_name)
+    asyncio.create_task(realtime_timer_broadcast(game_obj), name=game_room_name)
     
 async def realtime_timer_broadcast(game_obj):
-    channel_name = game_obj.get_game_name()
+    game_room_name = game_obj.get_game_name()
     turn = game_obj.get_turn()
     timer = None
     if turn == 'white':
@@ -50,17 +50,17 @@ async def realtime_timer_broadcast(game_obj):
         }
         await asyncio.sleep(1)
         if timer == 0:
-            await end_game(game_id=game_obj.id, turn=turn, channel_name=channel_name)
+            await end_game(game_id=game_obj.id, turn=turn, game_room_name=game_room_name)
             return
         await channel_layer.group_send(
-            channel_name,
+            game_room_name,
             {
                 'type': 'basic_broadcast',
                 'text': msg
             }
         )
 
-async def end_game(game_id, turn, channel_name):
+async def end_game(game_id, turn, game_room_name):
     game_obj = await get_game_by_id(game_id)
     game_obj.is_running = False
     game_obj.is_finished = True
@@ -76,7 +76,7 @@ async def end_game(game_id, turn, channel_name):
     await database_sync_to_async(game_obj.save)()
     msg = endgame_JSON(game_obj, game_result)
     await channel_layer.group_send(
-        channel_name,
+        game_room_name,
         {
             'type': 'basic_broadcast',
             'text': msg
