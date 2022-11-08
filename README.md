@@ -1,9 +1,10 @@
 # django_chess
 
-Multiplayer Web Chess App made using Django Web Framework and Django Channels asynchronous package. 
-The game engine was written in pure JS, and jQueryUI from scratch and it's fully functional. 
-The front-end connects with the server using WebSockets. 
+Multiplayer Web Chess App made using Django, Django REST Framework and Django Channels package. 
+The game layout is written using JQuery UI.
+Back-end part of the application is fully functional, right know I'm working on integrating it with front-end using Angular. 
 
 The image below demonstrates a snapshot of the game.
 
 ![alt text](https://github.com/mephis71/django_chess/blob/master/src/static/img/chess_screenshot.png?raw=true)
+![alt text](https://github.com/mephis71/django_chess/blob/master/src/static/img/home_screenshot.png?raw=true)
