@@ -2,7 +2,7 @@
 
 Multiplayer Web Chess App made using Django, Django REST Framework and Django Channels package. 
 The game layout is written using JQuery UI.
-Back-end part of the application is fully functional, right know I'm working on integrating it with front-end using Angular. 
+Back-end part of the game engine is fully functional, right know I'm working on integrating it with front-end using Angular, as well as adding more features such as game history, ELO system, etc. 
 
 The image below demonstrates a snapshot of the game.
 
