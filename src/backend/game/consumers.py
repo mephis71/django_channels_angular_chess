@@ -1,19 +1,32 @@
 import asyncio
 import datetime
 from datetime import timezone
-
+from django.conf import settings
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from rich import print
-
+import jwt
 from .game_engine import GameEngine
 from .models import Game
 from .tasks import trigger_timer_task
+from django.contrib.auth import get_user_model
+User = get_user_model()
+from rest_framework import exceptions
 
 
 class GameConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
-        user = self.scope['user']
+        token = self.scope['cookies']['jwt']
+        try:
+            payload = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
+        except:
+            raise exceptions.AuthenticationFailed('Invalid authentication. Could not decode token.')
+        try:
+            user = await database_sync_to_async (User.objects.get)(pk=payload['id'])
+            self.user = user
+        except User.DoesNotExist:
+            raise exceptions.AuthenticationFailed('No user matching this token was found.')
+
         if user.is_anonymous:
             try:
                 raise Exception('Anonymous user tried to connect')
@@ -45,7 +58,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         self.game_id = self.scope['url_route']['kwargs']['game_id']
         self.game_obj = await self.get_game_by_id(self.game_id)
 
-        user = self.scope['user']
+        user = self.user
         fen = self.game_obj.fen
         moves_list = self.game_obj.get_moves_list()
         self.game_engine = GameEngine(fen, moves_list)
@@ -54,13 +67,14 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         if type == 'move':
             color = self.game_obj.get_color(user.username)
             if color != self.game_obj.get_turn():
-                try:
-                    raise Exception("Color of the player does not match game's current turn")
-                finally:
-                    print(color, self.game_obj.get_turn())
+                # try:
+                #     raise Exception("Color of the player does not match game's current turn")
+                # finally:
+                #     print(color, self.game_obj.get_turn())
+                return
 
-            p = msg['picked_id']
-            t = msg['target_id']
+            p = int(msg['pick_id'])
+            t = int(msg['drop_id'])
             is_legal_flag, game_result, new_fen = self.game_engine.is_legal(p, t)
 
             if is_legal_flag == False:
@@ -152,7 +166,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     
     async def update_game(self, new_fen):
         game_obj = await self.get_game_by_id(self.game_id)
-        user = self.scope['user']
+        user = self.user
         color = self.game_obj.get_color(user.username)
 
         if game_obj.is_running == False:
@@ -191,14 +205,14 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     
     def move_JSON(self):
         fen = self.game_obj.fen
-        turn = self.game_obj.get_turn()
+        current_turn = self.game_obj.get_turn()
         time_black = to_timer_format(self.game_obj.timer_black)
         time_white = to_timer_format(self.game_obj.timer_white)
         moves_list = self.game_obj.get_moves_list()
         data = {
             'type': 'move',
             'fen': fen,
-            'turn': turn,
+            'current_turn': current_turn,
             'time_black': time_black,
             'time_white': time_white,
             'moves_list': moves_list
@@ -207,14 +221,14 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
     def endgame_JSON(self, game_result):
         fen = self.game_obj.fen
-        turn = self.game_obj.get_turn()
+        current_turn = self.game_obj.get_turn()
         time_black = to_timer_format(self.game_obj.timer_black)
         time_white = to_timer_format(self.game_obj.timer_white)
         moves_list = self.game_obj.get_moves_list()
         data = {
             'type': 'endgame',
             'fen': fen,
-            'turn': turn,
+            'current_turn': current_turn,
             'time_black': time_black,
             'time_white': time_white,
             'game_result': game_result,
@@ -223,18 +237,18 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         return data
 
     def init_JSON(self):
-        user = self.scope['user']
+        user = self.user
         fen = self.game_obj.fen
-        turn = self.game_obj.get_turn()
-        color = self.game_obj.get_color(user.username)
+        current_turn = self.game_obj.get_turn()
+        player_color = self.game_obj.get_color(user.username)
         time_black = to_timer_format(self.game_obj.timer_black)
         time_white = to_timer_format(self.game_obj.timer_white)
         moves_list = self.game_obj.get_moves_list()
         data = {
             'type': 'init',
             'fen': fen,
-            'color': color,
-            'turn': turn,
+            'player_color': player_color,
+            'current_turn': current_turn,
             'time_black': time_black,
             'time_white': time_white,
             'moves_list': moves_list

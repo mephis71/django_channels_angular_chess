@@ -10,7 +10,7 @@ application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": AuthMiddlewareStack(
         URLRouter([
-            path("game/", InviteConsumer.as_asgi()),
+            path("game/invite/", InviteConsumer.as_asgi()),
             re_path(r"^game/live/(?P<game_id>[0-9]+)", GameConsumer.as_asgi()),
         ])
     )

@@ -9,6 +9,7 @@ import { Emitters } from '../emitters/emitters';
 })
 export class NavComponent implements OnInit {
   authenticated = false;
+  username: string;
 
   constructor(private http: HttpClient) { }
 
@@ -16,6 +17,11 @@ export class NavComponent implements OnInit {
     Emitters.authEmitter.subscribe(
       (auth: boolean) => {
         this.authenticated = auth;
+      }
+    )
+    Emitters.usernameEmitter.subscribe(
+      (username: string) => {
+        this.username = username;
       }
     )
   } 

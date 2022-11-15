@@ -14,6 +14,9 @@
     
         <ul class="navbar-nav me-auto mb-2 mb-md-0" *ngIf="authenticated">
           <li class="nav-item">
+            <a class="nav-link active">{{username}}</a>
+          </li>
+          <li class="nav-item">
             <a routerLink="/login" class="nav-link active" (click)="logout()">Logout</a>
           </li>
         </ul>

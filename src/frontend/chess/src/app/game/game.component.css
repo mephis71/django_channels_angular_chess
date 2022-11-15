@@ -1,0 +1,30 @@
+.field {
+    width: 100px;
+    height: 100px;
+    border: 1px solid black;
+    float: left;
+}
+
+#board {
+    width: 800px;
+    height: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    background-image: url("/assets/img/game_img/chessboard.jpg");
+}
+
+#timercol {
+    display: flex;
+}
+
+#timers {
+    margin: auto;
+}
+
+.timer {
+    width: 200px;
+    height: 80px;
+    text-align: center;
+    line-height: 80px;
+    font-size: 40px;
+}

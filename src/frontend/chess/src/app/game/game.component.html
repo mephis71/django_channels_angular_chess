@@ -1,0 +1,27 @@
+<div class="container">
+    <div class="row">
+        <div class="col-10">
+            <div id="board">
+                <div cdkDropList
+                cdkDropListOrientation="horizontal">
+                    <div *ngFor="let piece of wsService.pieces; index as i;"
+                    cdkDrag
+                    class="field"
+                    id="{{i}}"
+                    [cdkDragDisabled]="piece.empty"
+                    [ngStyle]="!piece.empty? {'background-image': 'url(' + piece.img_url + ')'} : null"
+                    (cdkDragStarted)="onPick($event)"
+                    (cdkDragReleased)="onDrop($event)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-2" id="timercol">
+            <div id="timers">
+                <div class="timer" id="timerwhite">{{wsService.time_white}}</div>
+                <div class="timer" id="timerblack">{{wsService.time_black}}</div>
+            </div>
+        </div>
+    </div>
+</div>
