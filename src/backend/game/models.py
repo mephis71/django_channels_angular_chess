@@ -37,15 +37,15 @@ class Game(models.Model):
     is_running = models.BooleanField(default=False)
     is_finished = models.BooleanField(default=False)
     winner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='winner', default=None, null=True)
-    moves_list = models.TextField(default=DEFAULT_GAME_FEN, null=False)
+    game_positions = models.TextField(default=DEFAULT_GAME_FEN, null=False)
     endgame_cause = models.TextField(null=True)
     game_start_time = models.DateTimeField(default=None, null=True)
     last_move_time = models.DateTimeField(default=None, null=True)
 
     objects = GameManager()
 
-    def get_moves_list(self):
-        output = self.moves_list.split(';')
+    def get_game_positions(self):
+        output = self.game_positions.split(';')
         return output
 
     def get_turn(self):

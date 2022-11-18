@@ -48,9 +48,9 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             )
 
             fen = self.game_obj.fen
-            moves_list = self.game_obj.get_moves_list()
+            game_positions = self.game_obj.get_game_positions()
             data = self.init_JSON()
-            self.game_engine = GameEngine(fen, moves_list)
+            self.game_engine = GameEngine(fen, game_positions)
 
             await self.send_json(data)
 
@@ -60,8 +60,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
         user = self.user
         fen = self.game_obj.fen
-        moves_list = self.game_obj.get_moves_list()
-        self.game_engine = GameEngine(fen, moves_list)
+        game_positions = self.game_obj.get_game_positions()
+        self.game_engine = GameEngine(fen, game_positions)
         type = msg['type']
 
         if type == 'move':
@@ -80,13 +80,11 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             if is_legal_flag == False:
                 return
             elif game_result == 'promoting':
-                turn = self.game_obj.get_turn()
                 data = {
-                    'type': 'promoting',
-                    'p': p,
-                    't': t,
-                    'turn': turn
+                    'type': 'promoting'
                 }
+                self.promotion_p = p
+                self.promotion_t = t
                 await self.send_json(data)
                 return   
             else:
@@ -99,11 +97,9 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             return
 
         if type == 'promotion':
-            p = msg['p']
-            t = msg['t']
-            turn = msg['turn']
-            piece = msg['piece']
-            game_result, new_fen = self.game_engine.promotion_handler(p, t, piece, turn)
+            current_turn = self.game_obj.get_turn()
+            piece_type = msg['piece_type']
+            game_result, new_fen = self.game_engine.promotion_handler(self.promotion_p, self.promotion_t, piece_type, current_turn)
             await self.update_game(new_fen)
             if game_result != False:
                 await self.endgame_wrapper(game_result)
@@ -141,7 +137,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                 {
                     'type': 'basic_broadcast',
                     'text': {
-                        'type': 'draw_reset',
+                        'type': 'draw_reject',
                     }
                 }
             )
@@ -191,7 +187,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             game_obj.last_move_time = now
 
         game_obj.fen = new_fen
-        game_obj.moves_list += ';' + new_fen
+        game_obj.game_positions += ';' + new_fen
         await database_sync_to_async(game_obj.save)()
         self.game_obj = game_obj
         trigger_timer_task(self.game_obj)
@@ -208,14 +204,14 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         current_turn = self.game_obj.get_turn()
         time_black = to_timer_format(self.game_obj.timer_black)
         time_white = to_timer_format(self.game_obj.timer_white)
-        moves_list = self.game_obj.get_moves_list()
+        game_positions = self.game_obj.get_game_positions()
         data = {
             'type': 'move',
             'fen': fen,
             'current_turn': current_turn,
             'time_black': time_black,
             'time_white': time_white,
-            'moves_list': moves_list
+            'game_positions': game_positions
         }
         return data
 
@@ -224,7 +220,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         current_turn = self.game_obj.get_turn()
         time_black = to_timer_format(self.game_obj.timer_black)
         time_white = to_timer_format(self.game_obj.timer_white)
-        moves_list = self.game_obj.get_moves_list()
+        game_positions = self.game_obj.get_game_positions()
         data = {
             'type': 'endgame',
             'fen': fen,
@@ -232,7 +228,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             'time_black': time_black,
             'time_white': time_white,
             'game_result': game_result,
-            'moves_list': moves_list
+            'game_positions': game_positions
         }
         return data
 
@@ -243,7 +239,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         player_color = self.game_obj.get_color(user.username)
         time_black = to_timer_format(self.game_obj.timer_black)
         time_white = to_timer_format(self.game_obj.timer_white)
-        moves_list = self.game_obj.get_moves_list()
+        game_positions = self.game_obj.get_game_positions()
         data = {
             'type': 'init',
             'fen': fen,
@@ -251,7 +247,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             'current_turn': current_turn,
             'time_black': time_black,
             'time_white': time_white,
-            'moves_list': moves_list
+            'game_positions': game_positions
         }
         return data
 

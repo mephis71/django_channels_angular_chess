@@ -2,6 +2,16 @@
     <div class="row">
         <div class="col-10">
             <div id="board">
+                <div id="endgameinfo" *ngIf="wsService.endgame_info">
+                    <p id="endgametext">{{wsService.endgame_info}}</p>
+                </div>
+                <div id="promotionbox" *ngIf="wsService.promoting">
+                    <div *ngFor="let piece of wsService.promotion_pieces"
+                    class="promotionpick"
+                    [ngStyle]="{'background-image': 'url(' + piece.img_url + ')'}"
+                    (click)="sendPromotionPick(piece.type)">
+                    </div>
+                </div>
                 <div cdkDropList
                 cdkDropListOrientation="horizontal">
                     <div *ngFor="let piece of wsService.pieces; index as i;"
@@ -17,10 +27,16 @@
             </div>
         </div>
 
-        <div class="col-2" id="timercol">
-            <div id="timers">
-                <div class="timer" id="timerwhite">{{wsService.time_white}}</div>
+        <div class="col-2">
+            <div class="wrapper">
+                <div class="player">{{player_black}}</div>
                 <div class="timer" id="timerblack">{{wsService.time_black}}</div>
+                <div class="timer" id="timerwhite">{{wsService.time_white}}</div>
+                <div class="player">{{player_white}}</div>
+                <div class="w-100"></div>
+                <button *ngIf="wsService.allow_draw_offer" id="offerdrawbutton" type="button" class="btn btn-primary" (click)="sendDrawOffer()">Offer a draw</button>
+                <button *ngIf="wsService.draw_offer_pending" id="acceptdrawbutton" type="button" class="btn btn-primary" (click)="acceptDrawOffer()">Accept draw</button>
+                <button *ngIf="wsService.draw_offer_pending" id="rejectdrawbutton" type="button" class="btn btn-primary" (click)="rejectDrawOffer()">Reject draw</button>
             </div>
         </div>
     </div>

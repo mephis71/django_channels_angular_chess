@@ -8,9 +8,9 @@ class Piece:
         self.moved = moved
 
 class GameEngine:
-    def __init__(self, fen, moves_list):
+    def __init__(self, fen, game_positions):
         self.fen = fen
-        self.moves_list = moves_list
+        self.game_positions = game_positions
         self.halfmoves = 0
         self.fullmoves = 0
         self.enpassant_sqr = '-'
@@ -647,15 +647,15 @@ class GameEngine:
         cut_fen.pop(5)
         cut_fen.pop(4)
         cut_fen = " ".join(cut_fen)
-        cut_moves_list = []
-        for move in self.moves_list:
+        cut_game_positions = []
+        for move in self.game_positions:
             cut_move = move.split()
             cut_move.pop(5)
             cut_move.pop(4)
             cut_move = " ".join(cut_move)
-            cut_moves_list.append(cut_move)
-        cut_moves_list.append(cut_fen)
-        if cut_moves_list.count(cut_fen) > 2:
+            cut_game_positions.append(cut_move)
+        cut_game_positions.append(cut_fen)
+        if cut_game_positions.count(cut_fen) > 2:
             return True
         else:
             return False
@@ -679,9 +679,9 @@ class GameEngine:
             output = 'draw-stalemate'
         return output
     
-    def promotion_handler(self, p, t, piece, turn):
+    def promotion_handler(self, p, t, piece_type, current_turn):
         self.pieces[p] = None
-        self.pieces[t] = Piece(turn, piece, False)
+        self.pieces[t] = Piece(current_turn, piece_type, False)
         return self.end_move(p, t)
 
     def get_fen(self):

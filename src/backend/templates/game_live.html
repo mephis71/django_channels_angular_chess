@@ -155,7 +155,7 @@
       })
     }
 
-    if (msg.type == 'draw_reset') {
+    if (msg.type == 'draw_reject') {
       clear_draw_buttons()
       $('body').append('<button class="draw_offer_button" type="button">Zaproponuj remis</button>')
       $('.draw_offer_button').click(function() {

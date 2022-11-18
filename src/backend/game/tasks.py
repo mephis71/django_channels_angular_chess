@@ -92,7 +92,7 @@ def endgame_JSON(game_obj, game_result):
     turn = game_obj.get_turn()
     time_black = to_timer_format(game_obj.timer_black)
     time_white = to_timer_format(game_obj.timer_white)
-    moves_list = game_obj.get_moves_list()
+    game_positions = game_obj.get_game_positions()
     data = {
         'type': 'endgame',
         'fen': fen,
@@ -100,6 +100,6 @@ def endgame_JSON(game_obj, game_result):
         'time_black': time_black,
         'time_white': time_white,
         'game_result': game_result,
-        'moves_list': moves_list
+        'game_positions': game_positions
     }
     return data

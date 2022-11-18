@@ -5,7 +5,7 @@ from django_chess.asgi import application
 from rich import print
 
 from .consumers import GameConsumer
-from .views import get_game
+from game.api.views import get_game
 
 User = get_user_model()
 
