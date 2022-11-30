@@ -1,0 +1,28 @@
+<div class="container">
+    <div class="row">
+        <div class="col-10">
+            <div id="board">
+                <div cdkDropList
+                cdkDropListOrientation="horizontal">
+                    <div *ngFor="let piece of gameService.pieces; index as i;"
+                    cdkDrag
+                    class="field"
+                    id="{{i}}"
+                    [cdkDragDisabled]="piece.empty"
+                    [ngStyle]="!piece.empty? {'background-image': 'url(' + piece.img_url + ')'} : null">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-2">
+            <div class="wrapper">
+                <div class="player">{{game.player_black}}</div>
+                <div class="timer" id="timerblack">{{gameService.time_black}}</div>
+                <div class="timer" id="timerwhite">{{gameService.time_white}}</div>
+                <div class="player">{{game.player_white}}</div>
+                <div class="w-100"></div>
+            </div>
+        </div>
+    </div>
+</div>

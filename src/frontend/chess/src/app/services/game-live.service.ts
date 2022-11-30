@@ -1,24 +1,35 @@
-import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, HostListener } from '@angular/core';
 import { Piece } from '../models/piece';
+import { Game } from '../models/game';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class GameService {
+export class GameLiveService {
   ws: WebSocket;
+
   pieces: Piece[] = [];
   promotion_pieces: Piece[] = [];
+
   time_white: string;
   time_black: string;
-  game_positions: string[] = [];
+
   endgame_info: string;
   player_color: string;
   promoting: boolean;
 
   allow_draw_offer = true;
   draw_offer_pending = false;
+  
+  game_positions: string[] = [];
+  move_timestamps: string[] = [];
+  game_positions_iterator: number;
 
-  constructor() { }
+  constructor(
+    private http: HttpClient
+  ) { }
 
   public openWebSocket() {
     let path = window.location.pathname
@@ -33,18 +44,20 @@ export class GameService {
       console.log(data)
 
       if(data.type == 'init') {
-        this.fenToPieces(data.fen);
+        this.game_positions = data.game_positions;
+        this.game_positions_iterator = this.game_positions.length - 1;
+        this.fenToPieces(this.game_positions[this.game_positions_iterator]);
         this.time_white = data.time_white;
         this.time_black = data.time_black;
-        this.game_positions = data.game_positions;
         this.player_color = data.player_color;
       }
 
       if(data.type == 'move') {
-        this.fenToPieces(data.fen);
+        this.game_positions = data.game_positions;
+        this.game_positions_iterator = this.game_positions.length - 1;
+        this.fenToPieces(this.game_positions[this.game_positions_iterator]);
         this.time_white = data.time_white;
         this.time_black = data.time_black;
-        this.game_positions = data.game_positions;
       }
       
       if(data.type == 'time') {
@@ -62,10 +75,11 @@ export class GameService {
       }
 
       if(data.type == 'endgame') {
-        this.fenToPieces(data.fen);
+        this.game_positions = data.game_positions;
+        this.game_positions_iterator = this.game_positions.length - 1;
+        this.fenToPieces(this.game_positions[this.game_positions_iterator]);
         this.time_white = data.time_white;
         this.time_black = data.time_black;
-        this.game_positions = data.game_positions;
         
         if(data.game_result == 'blackwins') {
           this.endgame_info = 'Black wins by checkmate';
@@ -120,7 +134,7 @@ export class GameService {
     this.ws.send(msg)
   }
 
-  private fenToPieces(fen: string) {
+  fenToPieces(fen: string) {
     this.pieces = [];
     const numbers = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -203,5 +217,28 @@ export class GameService {
     for(let i=0; i<4; i++) {
       this.promotion_pieces.push(new Piece(this.player_color, piece_types[i], false))
     }
+  }
+
+  scrollGame(event: KeyboardEvent) {
+    if(event.key == 'ArrowDown') {
+      this.game_positions_iterator = 0;
+    }
+    if(event.key == 'ArrowUp') {
+      this.game_positions_iterator = this.game_positions.length - 1;
+    }
+    if(event.key == 'ArrowLeft' && this.game_positions_iterator != 0) {
+      this.game_positions_iterator -= 1;
+    }
+    if(event.key == 'ArrowRight' && this.game_positions_iterator != this.game_positions.length - 1) {
+      this.game_positions_iterator += 1;
+    }
+    this.fenToPieces(this.game_positions[this.game_positions_iterator]);
+  }
+
+  getGame(id: number): Observable<Game>  {
+    return this.http.get<Game>(
+      `http://localhost:8000/api/game/${id}`,
+      {withCredentials: true}
+    )
   }
 }

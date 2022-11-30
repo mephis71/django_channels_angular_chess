@@ -1,8 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Emitters } from '../emitters/emitters';
-import { InviteService } from '../services/invite.service';
+import { User } from 'src/app/models/user';
+import { UserService } from 'src/app/services/user.service';
+import { Emitters } from '../../emitters/emitters';
+import { GameInviteService } from '../../services/game-invite.service';
 
 @Component({
   selector: 'app-home',
@@ -11,40 +13,31 @@ import { InviteService } from '../services/invite.service';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   form: FormGroup;
-  
-  friend_requests = [];
-  friends = [];
+  authenticated = false;
+  user: User;
 
   friend_request_message = '';
   greet_message = 'You are not logged in';
   friend_request_accept_message = '';
 
-  authenticated = false;
-
-  username: string;
-
   constructor(
-    public wsService: InviteService,
-    private http: HttpClient,
+    private userService: UserService,
+    public gameInviteService: GameInviteService,
     private formBuilder: FormBuilder
   ) { }
   
 
   ngOnInit(): void {
-    this.http.get('http://localhost:8000/api/user', {withCredentials:true}).subscribe({
+    this.userService.getUser().subscribe({
       next:(res: any) => {
-        this.greet_message = `Hi ${res.username}`;
-        this.username = res.username;
-        this.wsService.username = this.username;
-        this.friend_requests = res.friend_requests;
-        this.friends = res.friends;
-        Emitters.authEmitter.emit(true);
-        Emitters.usernameEmitter.emit(res.username);
+        this.user = res;
+        this.greet_message = `Hi ${this.user.username}`;
+        this.gameInviteService.username = this.user.username;
         this.authenticated = true;
       },
       error:(err: any) => {
+        console.log(err)
         this.greet_message = 'You are not logged in';
-        Emitters.authEmitter.emit(false);
         this.authenticated = false;
       }
     })
@@ -53,22 +46,15 @@ export class HomeComponent implements OnInit, OnDestroy {
       to_username: ''
     })
 
-    this.wsService.openWebSocket();
+    this.gameInviteService.openWebSocket();
   }
 
   ngOnDestroy(): void {
-    this.wsService.closeWebSocket();
+    this.gameInviteService.closeWebSocket();
   }
 
   submit(): any {
-    this.http.post(
-      'http://localhost:8000/api/user/send_friend_request/',
-      this.form.getRawValue(),
-      {
-        withCredentials: true,
-        observe: 'response'
-      }
-      )
+    this.userService.send_friend_request(this.form)
     .subscribe({
       next: res => {
         if (res.status == 201) {
@@ -87,14 +73,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   acceptFriendRequest(id: number): any {
-    this.http.post(
-      `http://localhost:8000/api/user/accept_friend_request/${id}`,
-      {},
-      {
-        withCredentials:true,
-        observe: 'response'
-      }
-    )
+    this.userService.accept_friend_request(id)
     .subscribe({
       next: res => {
         if(res.status == 202) {
@@ -109,24 +88,21 @@ export class HomeComponent implements OnInit, OnDestroy {
     })
   }
 
-  sendInvite(username: string) {
+  sendGameInvite(username: string) {
     var invite = {
       "type": "invite",
-      "from": this.username,
+      "from": this.user.username,
       "to": username
     }
-    this.wsService.sendMsg(JSON.stringify(invite));
+    this.gameInviteService.sendMsg(JSON.stringify(invite));
   }
 
-  acceptInvite(username: string) { 
+  acceptGameInvite(username: string) { 
     var invite_accept = {
-      "p1": this.username,
+      "p1": this.user.username,
       "p2": username 
     }
-    this.http.post(
-      'http://localhost:8000/api/game/invite_accept',
-      {invite_accept},
-      {withCredentials:true}
-      ).subscribe()
+    this.userService.accept_game_invite(invite_accept)
+    .subscribe()
   }
 }

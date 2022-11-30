@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Q
+from users.models import UserProfile
 
 User = get_user_model()
 
@@ -29,6 +30,7 @@ class Game(models.Model):
     # players
     player_white = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='first', null=True)
     player_black = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='second', null=True)
+    winner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='winner', default=None, null=True)
 
     # game info
     fen = models.TextField(default=DEFAULT_GAME_FEN)
@@ -36,8 +38,8 @@ class Game(models.Model):
     timer_white = models.PositiveIntegerField(default = DEFAULT_SECONDS)
     is_running = models.BooleanField(default=False)
     is_finished = models.BooleanField(default=False)
-    winner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='winner', default=None, null=True)
     game_positions = models.TextField(default=DEFAULT_GAME_FEN, null=False)
+    move_timestamps = models.TextField(default=f'{DEFAULT_SECONDS}-{DEFAULT_SECONDS}')
     endgame_cause = models.TextField(null=True)
     game_start_time = models.DateTimeField(default=None, null=True)
     last_move_time = models.DateTimeField(default=None, null=True)
@@ -45,7 +47,15 @@ class Game(models.Model):
     objects = GameManager()
 
     def get_game_positions(self):
-        output = self.game_positions.split(';')
+        return self.game_positions.split(';')
+
+    def get_move_timestamps(self):
+        pairs = self.move_timestamps.split(';')
+        output = []
+        for pair in pairs:
+            pair = pair.split('-')
+            pair = [to_timer_format(pair[0]), to_timer_format(pair[1])]
+            output.append(pair)
         return output
 
     def get_turn(self):
@@ -82,7 +92,15 @@ class Game(models.Model):
         self.save()
 
     def add_to_history(self):
-        self.player_white.game_history.add(self)
-        self.player_white.save()
-        self.player_black.game_history.add(self)
-        self.player_black.save()
+        UserProfile.objects.get(pk=self.player_white.pk).game_history.add(self)
+        UserProfile.objects.get(pk=self.player_black.pk).game_history.add(self)
+
+def to_timer_format(seconds):
+        s = int(seconds)
+        m = s//60
+        s = s - m*60
+        if m < 10:
+            m = f'0{m}'
+        if s < 10:
+            s = f'0{s}'
+        return f'{m}:{s}'

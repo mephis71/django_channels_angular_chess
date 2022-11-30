@@ -9,8 +9,6 @@ channel_layer = get_channel_layer()
 from asgiref.sync import async_to_sync
 from rich import print
 
-
-
 class GameAPIView(APIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = GameSerializer
@@ -32,7 +30,7 @@ class GameInviteAcceptAPIView(APIView):
         print('test')
         player1 = request.data['invite_accept']['p1']
         player2 = request.data['invite_accept']['p2']
-        game_obj = self.get_game(player1, player2)
+        game_obj = get_game(player1, player2)
         game_obj.assign_colors_randomly(player1, player2)
         game_id = game_obj.id
         game_obj.save()
@@ -54,5 +52,5 @@ class GameInviteAcceptAPIView(APIView):
 
         return Response(status=status.HTTP_202_ACCEPTED)
 
-    def get_game(self, username1, username2):
-        return Game.objects.get_or_new(username1, username2)
+def get_game(username1, username2):
+    return Game.objects.get_or_new(username1, username2)

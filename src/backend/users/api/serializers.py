@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from users.models import User, FriendRequest
+from users.models import User, FriendRequest, UserProfile
 from django.contrib.auth import authenticate
+from game.api.serializers import GameHistorySerializer
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -30,7 +31,9 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        user = User.objects.create_user(**validated_data)
+        profile = UserProfile.objects.create(pk=user.pk, user=user)
+        return user
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=255)
@@ -54,6 +57,7 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('This user has been deactivated.')
 
         return {
+            'user': user,
             'token': user.token
         }
 
@@ -107,3 +111,12 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    game_history = GameHistorySerializer(many=True)
+    username = serializers.CharField()
+
+    class Meta:
+        model = UserProfile
+        fields = ('game_history', 'username')

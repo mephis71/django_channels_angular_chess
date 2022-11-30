@@ -4,11 +4,14 @@ import { Router } from '@angular/router';
 @Injectable({
   providedIn: 'root'
 })
-export class InviteService {
+export class GameInviteService {
   ws: WebSocket;
   invites: string[] = []
   username: string;
-  constructor(private router: Router) { }
+  
+  constructor(
+    private router: Router
+    ) { }
 
   public openWebSocket() {
     this.ws = new WebSocket('ws://localhost:8000/game/invite/')

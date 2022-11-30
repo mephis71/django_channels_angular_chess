@@ -3,8 +3,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
-from .serializers import RegistrationSerializer, LoginSerializer, UserSerializer, FriendRequestSerializer
-from users.models import User, FriendRequest
+from .serializers import RegistrationSerializer, LoginSerializer, UserSerializer, FriendRequestSerializer, UserProfileSerializer
+from users.models import User, FriendRequest, UserProfile
+from rich import print
 
 class RegistrationAPIView(APIView):
     permission_classes = (AllowAny,)
@@ -27,7 +28,7 @@ class LoginAPIView(APIView):
         user = request.data.get('user', {})
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
-        response = Response(status=status.HTTP_200_OK)
+        response = Response(data=UserSerializer(serializer.validated_data['user']).data, status=status.HTTP_200_OK)
         response.set_cookie(key='jwt', value=serializer.validated_data['token'], httponly=True, samesite=None)
         return response
 
@@ -43,7 +44,7 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = UserSerializer
 
-    def retrieve(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         serializer = self.serializer_class(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -89,5 +90,19 @@ class AcceptFriendRequestAPIView(APIView):
         else:
             friend_request.accept()
             return Response(status=status.HTTP_202_ACCEPTED)
+
+
+class UserProfileAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserProfileSerializer
+
+    def get(self, request, *args, **kwargs):
+        username = kwargs['username']
+        profile = UserProfile.objects.filter(username=username).first()
+        if profile is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            serializer = self.serializer_class(instance=profile)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
         

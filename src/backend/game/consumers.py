@@ -16,6 +16,7 @@ from rest_framework import exceptions
 
 class GameConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
+        print(self.scope)
         token = self.scope['cookies']['jwt']
         try:
             payload = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
@@ -188,6 +189,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
         game_obj.fen = new_fen
         game_obj.game_positions += ';' + new_fen
+        game_obj.move_timestamps += f';{game_obj.timer_white}-{game_obj.timer_black}'
+
         await database_sync_to_async(game_obj.save)()
         self.game_obj = game_obj
         trigger_timer_task(self.game_obj)
@@ -344,7 +347,7 @@ class InviteConsumer(AsyncJsonWebsocketConsumer):
 
 
 def to_timer_format(seconds):
-        s = seconds
+        s = int(seconds)
         m = s//60
         s = s - m*60
         if m < 10:

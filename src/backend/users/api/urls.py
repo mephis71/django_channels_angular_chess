@@ -3,6 +3,7 @@ from .views import *
 
 urlpatterns = [
     path('', UserRetrieveUpdateAPIView.as_view()),
+    path('profile/<str:username>', UserProfileAPIView.as_view()),
     path('register/', RegistrationAPIView.as_view()),
     path('login/', LoginAPIView.as_view()),
     path('logout/', LogoutAPIView.as_view()),

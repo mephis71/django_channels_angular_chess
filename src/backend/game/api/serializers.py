@@ -7,10 +7,11 @@ class GameSerializer(serializers.ModelSerializer):
     player_black = serializers.CharField()
     winner = serializers.CharField()
     game_positions = serializers.ListField(source='get_game_positions')
+    move_timestamps = serializers.ListField(source='get_move_timestamps')
     
     class Meta:
         model = Game
-        fields = ('id', 'player_white', 'player_black', 'winner', 'game_positions')
+        fields = ('id', 'player_white', 'player_black', 'winner', 'game_positions', 'move_timestamps')
 
 class GameHistorySerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)

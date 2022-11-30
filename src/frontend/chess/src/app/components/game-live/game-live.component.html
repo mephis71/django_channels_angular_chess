@@ -1,0 +1,43 @@
+<div class="container">
+    <div class="row">
+        <div class="col-10">
+            <div id="board">
+                <div id="endgameinfo" *ngIf="gameService.endgame_info">
+                    <p id="endgametext">{{gameService.endgame_info}}</p>
+                </div>
+                <div id="promotionbox" *ngIf="gameService.promoting">
+                    <div *ngFor="let piece of gameService.promotion_pieces"
+                    class="promotionpick"
+                    [ngStyle]="{'background-image': 'url(' + piece.img_url + ')'}"
+                    (click)="sendPromotionPick(piece.type)">
+                    </div>
+                </div>
+                <div cdkDropList
+                cdkDropListOrientation="horizontal">
+                    <div *ngFor="let piece of gameService.pieces; index as i;"
+                    cdkDrag
+                    class="field"
+                    id="{{i}}"
+                    [cdkDragDisabled]="piece.empty"
+                    [ngStyle]="!piece.empty? {'background-image': 'url(' + piece.img_url + ')'} : null"
+                    (cdkDragStarted)="onPick($event)"
+                    (cdkDragReleased)="onDrop($event)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-2">
+            <div class="wrapper">
+                <div class="player">{{game.player_black}}</div>
+                <div class="timer" id="timerblack">{{gameService.time_black}}</div>
+                <div class="timer" id="timerwhite">{{gameService.time_white}}</div>
+                <div class="player">{{game.player_white}}</div>
+                <div class="w-100"></div>
+                <button *ngIf="gameService.allow_draw_offer" id="offerdrawbutton" type="button" class="btn btn-primary" (click)="sendDrawOffer()">Offer a draw</button>
+                <button *ngIf="gameService.draw_offer_pending" id="acceptdrawbutton" type="button" class="btn btn-primary" (click)="acceptDrawOffer()">Accept draw</button>
+                <button *ngIf="gameService.draw_offer_pending" id="rejectdrawbutton" type="button" class="btn btn-primary" (click)="rejectDrawOffer()">Reject draw</button>
+            </div>
+        </div>
+    </div>
+</div>
