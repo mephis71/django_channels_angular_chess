@@ -3,7 +3,7 @@
       <a routerLink="/" class="navbar-brand">Home</a>
   
       <div>
-        <ul class="navbar-nav me-auto mb-2 mb-md-0" *ngIf="!authenticated">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0" *ngIf="!username">
           <li class="nav-item">
             <a routerLink="/login" class="nav-link active">Login</a>
           </li>
@@ -12,7 +12,7 @@
           </li>
         </ul>
     
-        <ul class="navbar-nav me-auto mb-2 mb-md-0" *ngIf="authenticated">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0" *ngIf="username">
           <li class="nav-item">
             <a [routerLink]="['/user', username]"class="nav-link active">{{username}}</a>
           </li>

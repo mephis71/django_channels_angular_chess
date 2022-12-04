@@ -8,9 +8,9 @@ class Piece:
         self.moved = moved
 
 class GameEngine:
-    def __init__(self, fen, game_positions):
-        self.fen = fen
-        self.game_positions = game_positions
+    def __init__(self, game_obj):
+        self.fen = game_obj.fen
+        self.game_positions = game_obj.get_game_positions()
         self.halfmoves = 0
         self.fullmoves = 0
         self.enpassant_sqr = '-'
@@ -19,8 +19,8 @@ class GameEngine:
         self.pieces = [None] * 64
         self.possible_moves = [False] * 64
         self.attacked_fields = [False] * 64
-        self.init_game_with_fen(fen)
-        self.update_pieces_with_fen(fen)  
+        self.init_game_with_fen(self.fen)
+        self.update_pieces_with_fen(self.fen)  
 
     def is_legal(self, p, t):
         # print('if the field is empty')
@@ -679,10 +679,10 @@ class GameEngine:
             output = 'draw-stalemate'
         return output
     
-    def promotion_handler(self, p, t, piece_type, current_turn):
-        self.pieces[p] = None
-        self.pieces[t] = Piece(current_turn, piece_type, False)
-        return self.end_move(p, t)
+    def promotion_handler(self, pick_id, drop_id, piece_type, turn):
+        self.pieces[pick_id] = None
+        self.pieces[drop_id] = Piece(turn, piece_type, False)
+        return self.end_move(pick_id, drop_id)
 
     def get_fen(self):
         return self.fen

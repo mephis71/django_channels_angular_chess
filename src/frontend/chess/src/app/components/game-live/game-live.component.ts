@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { GameLiveService } from '../../services/game-live.service';
 import { Emitters } from '../../emitters/emitters';
 import { User } from 'src/app/models/user';
@@ -16,27 +15,43 @@ import { Game } from 'src/app/models/game';
 export class GameLiveComponent implements OnInit, OnDestroy {
   user: User;
   game: Game;
+  board_orientation: string = 'white';
 
-  pick_id: number;
-  drop_id: number;
+  pick_id: number | null;
+  drop_id: number | null;
+  
 
   constructor(
+    private userService: UserService,
     public gameService: GameLiveService,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    this.userService.getUser().subscribe({
+      next:(res: any) => {
+        this.user = res;
+        Emitters.usernameEmitter.emit(this.user.username);
+      },
+      error:(err: any) => {
+        Emitters.usernameEmitter.emit(null);
+        console.log(err)
+      }
+    })
+
+
     this.route.params.subscribe(params => {
       this.gameService.getGame(params['id']).subscribe({
         next: game => {
           this.game = game;
+          this.setBoardOrientation();
         },
         error: err => {
           console.log(err)
         }
       })
     })
-    
+    this.gameService.clearVariables()
     this.gameService.openWebSocket()
   }
 
@@ -58,6 +73,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
       }
       this.gameService.sendMsg(JSON.stringify(msg))
     }
+    this.drop_id = this.pick_id = null;
   }
 
   sendPromotionPick(piece_type: string) {
@@ -98,5 +114,36 @@ export class GameLiveComponent implements OnInit, OnDestroy {
   @HostListener("window:keydown", ['$event'])
   scrollGame(event: KeyboardEvent) {
     this.gameService.scrollGame(event);
+  }
+
+  getPlayer(color: string) {
+    switch(color) {
+      case 'white':
+        return (this.game && this.game.player_white) ? this.game.player_white : null
+      case 'black':
+        return (this.game && this.game.player_black) ? this.game.player_black : null
+      default:
+        return null
+    }
+  }
+
+  setBoardOrientation() {
+    if (this.user.username == this.game.player_white) {
+      this.board_orientation = 'white';
+    }
+    else if(this.user.username == this.game.player_black) {
+      this.board_orientation = 'black';
+    }
+  }
+
+  rotateBoard() {
+    switch(this.board_orientation) {
+      case 'black':
+        this.board_orientation = 'white';
+        break;
+      case 'white':
+        this.board_orientation = 'black';
+        break;
+    }
   }
 }

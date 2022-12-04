@@ -3,9 +3,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django_chess.asgi import application
 from rich import print
-from collections import defaultdict
 from .consumers import GameConsumer
-from game.api.views import get_game
+from .getters import get_or_create_game
 
 User = get_user_model()
 
@@ -15,7 +14,7 @@ class WhiteWinsTest(TestCase):
         username_2 = 'test2'
         self.user_1 = User.objects.create(username=username_1)
         self.user_2 = User.objects.create(username=username_2)
-        self.game_obj = get_game(username_1, username_2)
+        self.game_obj = get_or_create_game(username_1, username_2)
         self.game_obj.assign_colors_randomly(username_1, username_2)
         self.game_id = self.game_obj.id
         

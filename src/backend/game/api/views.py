@@ -8,6 +8,7 @@ from channels.layers import get_channel_layer
 channel_layer = get_channel_layer()
 from asgiref.sync import async_to_sync
 from rich import print
+from game.getters import get_or_create_game
 
 class GameAPIView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -27,10 +28,9 @@ class GameInviteAcceptAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        print('test')
         player1 = request.data['invite_accept']['p1']
         player2 = request.data['invite_accept']['p2']
-        game_obj = get_game(player1, player2)
+        game_obj = get_or_create_game(player1, player2)
         game_obj.assign_colors_randomly(player1, player2)
         game_id = game_obj.id
         game_obj.save()
@@ -45,12 +45,9 @@ class GameInviteAcceptAPIView(APIView):
         async_to_sync(channel_layer.group_send)(
             "invite_group",
             {
-                "type": "invite_accept_broadcast",
+                "type": "basic_broadcast",
                 'text': msg
             }
         )
 
         return Response(status=status.HTTP_202_ACCEPTED)
-
-def get_game(username1, username2):
-    return Game.objects.get_or_new(username1, username2)

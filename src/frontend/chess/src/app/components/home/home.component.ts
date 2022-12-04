@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { User } from 'src/app/models/user';
@@ -32,10 +31,13 @@ export class HomeComponent implements OnInit, OnDestroy {
       next:(res: any) => {
         this.user = res;
         this.greet_message = `Hi ${this.user.username}`;
+        this.gameInviteService.clearVariables()
         this.gameInviteService.username = this.user.username;
         this.authenticated = true;
+        Emitters.usernameEmitter.emit(this.user.username);
       },
       error:(err: any) => {
+        Emitters.usernameEmitter.emit(null);
         console.log(err)
         this.greet_message = 'You are not logged in';
         this.authenticated = false;

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, HostListener } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Piece } from '../models/piece';
 import { Game } from '../models/game';
@@ -136,5 +136,15 @@ export class GameOverviewService {
   setTimers(pair: any) {
     this.time_white = pair[0]
     this.time_black = pair[1]
+  }
+
+  clearVariables() {
+    this.pieces = [];
+
+    this.time_white = '';
+    this.time_black = '';
+    
+    this.game_positions = [];
+    this.move_timestamps = [];
   }
 }

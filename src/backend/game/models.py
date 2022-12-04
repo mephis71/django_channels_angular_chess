@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Q
 from users.models import UserProfile
+from .utils import to_timer_format
 
 User = get_user_model()
 
@@ -43,6 +44,7 @@ class Game(models.Model):
     endgame_cause = models.TextField(null=True)
     game_start_time = models.DateTimeField(default=None, null=True)
     last_move_time = models.DateTimeField(default=None, null=True)
+    game_end_time = models.DateTimeField(default=None, null=True)
 
     objects = GameManager()
 
@@ -70,13 +72,13 @@ class Game(models.Model):
     def get_game_name(self):
         return f'game_{self.id}'        
 
-    def get_color(self, player):
-        if self.player_white.username == player:
+    def get_color(self, username):
+        if self.player_white.username == username:
             return 'white'
-        elif self.player_black.username == player:
+        elif self.player_black.username == username:
             return 'black'
         else:
-            raise Exception(f'Username not matched: {player}')
+            raise Exception(f'Username not matched: {username}')
     
     def assign_colors_randomly(self, username1, username2):
         user1 = User.objects.get(username=username1)
@@ -94,13 +96,3 @@ class Game(models.Model):
     def add_to_history(self):
         UserProfile.objects.get(pk=self.player_white.pk).game_history.add(self)
         UserProfile.objects.get(pk=self.player_black.pk).game_history.add(self)
-
-def to_timer_format(seconds):
-        s = int(seconds)
-        m = s//60
-        s = s - m*60
-        if m < 10:
-            m = f'0{m}'
-        if s < 10:
-            s = f'0{s}'
-        return f'{m}:{s}'

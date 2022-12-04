@@ -2,12 +2,24 @@
     <div class="row">
         <div class="col-10">
             <div id="board">
-                <div cdkDropList
+                <div *ngIf="board_orientation === 'white'"
+                cdkDropList
                 cdkDropListOrientation="horizontal">
                     <div *ngFor="let piece of gameService.pieces; index as i;"
                     cdkDrag
                     class="field"
-                    id="{{i}}"
+                    [attr.id]="i"
+                    [cdkDragDisabled]="piece.empty"
+                    [ngStyle]="!piece.empty? {'background-image': 'url(' + piece.img_url + ')'} : null">
+                    </div>
+                </div>
+                <div *ngIf="board_orientation === 'black'"
+                cdkDropList
+                cdkDropListOrientation="horizontal">
+                    <div *ngFor="let piece of gameService.pieces.reverse(); index as i;"
+                    cdkDrag
+                    class="field"
+                    [attr.id]="(gameService.pieces.length - i) - 1"
                     [cdkDragDisabled]="piece.empty"
                     [ngStyle]="!piece.empty? {'background-image': 'url(' + piece.img_url + ')'} : null">
                     </div>
@@ -16,12 +28,31 @@
         </div>
 
         <div class="col-2">
-            <div class="wrapper">
-                <div class="player">{{game.player_black}}</div>
+            <div *ngIf="board_orientation === 'white'" class="wrapper">
+                <div class="player">{{getPlayer('black')}}</div>
                 <div class="timer" id="timerblack">{{gameService.time_black}}</div>
                 <div class="timer" id="timerwhite">{{gameService.time_white}}</div>
-                <div class="player">{{game.player_white}}</div>
+                <div class="player">{{getPlayer('white')}}</div>
                 <div class="w-100"></div>
+                <button type="button" class="btn btn-primary" (click)="rotateBoard()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"></path>
+                    </svg>
+                    Rotate the board
+                </button>
+            </div>
+            <div *ngIf="board_orientation === 'black'" class="wrapper">
+                <div class="player">{{getPlayer('white')}}</div>
+                <div class="timer" id="timerwhite">{{gameService.time_white}}</div>
+                <div class="timer" id="timerblack">{{gameService.time_black}}</div>
+                <div class="player">{{getPlayer('black')}}</div>
+                <div class="w-100"></div>
+                <button type="button" class="btn btn-primary" (click)="rotateBoard()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"></path>
+                    </svg>
+                    Rotate the board
+                </button>
             </div>
         </div>
     </div>

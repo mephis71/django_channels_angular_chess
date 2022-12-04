@@ -16,7 +16,6 @@ export class GameInviteService {
   public openWebSocket() {
     this.ws = new WebSocket('ws://localhost:8000/game/invite/')
     this.ws.onopen = (event) => {
-      console.log('open:', event);
     };
 
     this.ws.onmessage = (event) => {
@@ -35,7 +34,6 @@ export class GameInviteService {
     };
 
     this.ws.onclose = (event) => {
-      console.log('close:', event);
     };
   }
 
@@ -45,5 +43,10 @@ export class GameInviteService {
 
   public sendMsg(msg: any) {
     this.ws.send(msg)
+  }
+
+  clearVariables() {
+    this.username = '';
+    this.invites = [];
   }
 }

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, HostListener } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Piece } from '../models/piece';
 import { Game } from '../models/game';
 import { Observable } from 'rxjs';
@@ -24,7 +24,6 @@ export class GameLiveService {
   draw_offer_pending = false;
   
   game_positions: string[] = [];
-  move_timestamps: string[] = [];
   game_positions_iterator: number;
 
   constructor(
@@ -36,12 +35,10 @@ export class GameLiveService {
     this.ws = new WebSocket(`ws://localhost:8000${path}`)
 
     this.ws.onopen = (event) => {
-      console.log('open:', event);
     };
 
     this.ws.onmessage = (event) => {
       var data = JSON.parse(event.data)
-      console.log(data)
 
       if(data.type == 'init') {
         this.game_positions = data.game_positions;
@@ -98,6 +95,8 @@ export class GameLiveService {
         }
         if(data.game_result == 'draw-mutual') {
           this.endgame_info = 'Draw - mutual agreement';
+          this.allow_draw_offer = false;
+          this.draw_offer_pending = false;
         }
         if(data.game_result == 'whitewins-oot') {
           this.endgame_info = 'White wins - out of time';
@@ -105,15 +104,17 @@ export class GameLiveService {
         if(data.game_result == 'blackwins-oot') {
           this.endgame_info = 'Black wins - out of time';
         }
+        if(data.game_result == 'blackwins-abandonment') {
+          this.endgame_info = 'Black wins - White abandoned the game';
+        }
+        if(data.game_result == 'whitewins-abandonment') {
+          this.endgame_info = 'White wins - Black abandoned the game';
+        }
       }
 
       if(data.type == 'draw_offer') {
         this.allow_draw_offer = false;
         this.draw_offer_pending = true;
-      }
-      if(data.type == 'draw_accept') {
-        this.allow_draw_offer = false;
-        this.draw_offer_pending = false;
       }
       if(data.type == 'draw_reject') {
         this.allow_draw_offer = true;
@@ -122,7 +123,6 @@ export class GameLiveService {
     };
 
     this.ws.onclose = (event) => {
-      console.log('close:', event);
     };
   }
 
@@ -240,5 +240,21 @@ export class GameLiveService {
       `http://localhost:8000/api/game/${id}`,
       {withCredentials: true}
     )
+  }
+
+  clearVariables() {
+    this.pieces = [];
+    this.promotion_pieces = [];
+
+    this.time_white = '';
+    this.time_black = '';
+
+    this.endgame_info = '';
+    this.player_color = '';
+
+    this.allow_draw_offer = true;
+    this.draw_offer_pending = false;
+    
+    this.game_positions = [];
   }
 }

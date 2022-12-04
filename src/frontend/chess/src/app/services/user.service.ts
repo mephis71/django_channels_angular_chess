@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, ɵɵsetComponentScope } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { Profile } from '../models/profile';
 import { HttpResponse } from '@angular/common/http';
 import { User } from '../models/user';

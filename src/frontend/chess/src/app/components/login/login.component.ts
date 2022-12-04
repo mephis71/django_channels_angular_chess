@@ -1,13 +1,8 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import { Emitters } from 'src/app/emitters/emitters';
-import { User } from 'src/app/models/user';
 import { UserService } from 'src/app/services/user.service';
-import { NavComponent } from '../nav/nav.component';
-
 
 @Component({
   selector: 'app-login',
@@ -38,11 +33,11 @@ export class LoginComponent implements OnInit {
     this.userService.login(this.form.getRawValue())
     .subscribe({
       next: res => {
-        Emitters.authEmitter.emit(true);
         Emitters.usernameEmitter.emit(res.body!.username);
         this.router.navigate(['/'])
       },
       error: err => {
+        Emitters.usernameEmitter.emit(null)
         this.username_error = this.password_error = this.non_field_error = ''
         for (const [k,v] of Object.entries(err.error)) {
           if (v instanceof Array) {
