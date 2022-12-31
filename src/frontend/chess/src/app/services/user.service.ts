@@ -79,10 +79,10 @@ export class UserService {
     )
   }
 
-  accept_game_invite(invite_accept: any): Observable<Object> {
+  accept_game_invite(invite: any): Observable<Object> {
     return this.http.post(
       'http://localhost:8000/api/game/invite_accept/',
-      {invite_accept},
+      {invite},
       {withCredentials:true}
     )
   }

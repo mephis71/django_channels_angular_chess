@@ -68,6 +68,9 @@ class UserProfile(models.Model):
         else:
             return self.profile_pic.url
 
+    def get_game_history(self):
+        return self.game_history.all().order_by('-game_end_time')
+
         
 class FriendRequest(models.Model):
     from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='from_user')

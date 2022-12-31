@@ -6,10 +6,10 @@ from django.contrib.auth import get_user_model
 from rich import print
 
 from .game_engine import GameEngine
-from .tasks import cancel_countdown_task, trigger_countdown_task, trigger_timer_task
-from .utils import init_JSON
+from .tasks import cancel_countdown_task, trigger_countdown_task, trigger_timer_task, cancel_timer_task
+from .utils import init_JSON, opposite_color
 from .getters import get_game_by_id
-from .game_functions import end_game, update_game, end_move, send_draw_offer, reject_draw_offer
+from .game_functions import *
 
 User = get_user_model()
 from rest_framework import exceptions
@@ -67,7 +67,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             elif game_result == 'promoting':
                 self.promotion_pick_id = pick_id
                 self.promotion_drop_id = drop_id
-                await self.send_json({"'type':'promoting'"})
+                await self.send_json({'type':'promoting'})
                 return   
             else:
                 self.game_obj = await update_game(self.game_obj, new_fen)
@@ -102,11 +102,48 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             await reject_draw_offer(self.game_obj)
             return
 
+        if type == 'move_cancel_request':
+            try:
+                await send_move_cancel_request(self.game_obj, self.channel_name, self.user.username)
+            except IndexError:
+                await self.send_json({'type':'move_cancel_error'})
+            return
+
+        if type == 'move_cancel_accept':
+            self.game_obj = await accept_move_cancel_request(self.game_obj)
+            cancel_timer_task(self.game_obj)
+            trigger_timer_task(self.game_obj)
+            return
+
+        if type == 'move_cancel_reject':
+            await reject_move_cancel_request(self.game_obj)
+            return
+
+        if type == 'resign':
+            winner_color = opposite_color(self.game_obj.get_color(self.user.username))
+            await end_game(self.game_obj, f'{winner_color}wins-resignment')
+
+        if type == 'rematch':
+            await send_rematch(self.game_obj, self.channel_name)
+            
+        if type == 'rematch_accept':
+            await accept_rematch(self.game_obj)
+
+        if type == 'rematch_reject':
+            await reject_rematch(self.game_obj, self.channel_name)
+
+
+
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
             self.game_room_name,
             self.channel_name
         )
+        # re-getting the game (without it, trigger_countdown_task function runs even when the game is finished, because after the endgame
+        # the consumers do not update the game_obj in the receive_json function(temporary, can be fixed by assigning the game in basic_broadcast()
+        # in the end_game() function))
+        self.game_obj = await get_game_by_id(self.game_id)
+
         if not self.game_obj.is_finished:
             trigger_countdown_task(self.game_obj, self.user.username)
         print('close_code:',close_code)
@@ -115,7 +152,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         data = event['text']
         await self.send_json(data)
 
-    async def draw_offer_broadcast(self, event):
+    async def one_way_broadcast(self, event):
         data = event['text']
         if data['sender_channel_name'] != self.channel_name:
             await self.send_json(data)
@@ -130,7 +167,7 @@ class InviteConsumer(AsyncJsonWebsocketConsumer):
         await self.channel_layer.group_send(
             'invite_group',
             {
-                'type': 'invite_broadcast',
+                'type': 'one_way_broadcast',
                 'text': msg
             }
         )
@@ -138,7 +175,7 @@ class InviteConsumer(AsyncJsonWebsocketConsumer):
     async def disconnect(self, close_code):
         print('close_code:',close_code)
 
-    async def invite_broadcast(self, msg):
+    async def one_way_broadcast(self, msg):
         msg = msg['text']
         if self.channel_name != msg['sender_channel_name']:
             await self.send_json(msg)

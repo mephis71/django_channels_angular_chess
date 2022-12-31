@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { GameInvite } from '../models/game_invite';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameInviteService {
   ws: WebSocket;
-  invites: string[] = []
+  invites: GameInvite[] = []
   username: string;
   
   constructor(
@@ -15,20 +16,24 @@ export class GameInviteService {
 
   public openWebSocket() {
     this.ws = new WebSocket('ws://localhost:8000/game/invite/')
+
     this.ws.onopen = (event) => {
     };
 
     this.ws.onmessage = (event) => {
       var data = JSON.parse(event.data)
-      if(data.type == 'invite'){
-        if(data.to == this.username) {
-          if(!this.invites.includes(data.from)) {
-            this.invites.push(data.from)
-          }
+      
+      if(data.type == 'invite' && data.to_user == this.username) {
+        if(!this.invites.some(e => e.from_user == data.from_user)) {
+          this.invites.push(data);
+        }
+        else {
+          this.invites = this.invites.filter(e => e.from_user != data.from_user)
+          this.invites.push(data)
         }
       }
 
-      if(data.type == 'invite_accept') {
+      if(data.type == 'invite_accept' && data.usernames.includes(this.username)) {
         this.router.navigate([`/game/live/${data.game_id}`])
       }
     };

@@ -10,7 +10,7 @@
 .field {
     width: 100px;
     height: 100px;
-    border: 1px solid black;
+    /* border: 1px solid black; */
     float: left;
 }
 
@@ -24,7 +24,7 @@
     text-align: center;
     line-height: 80px;
     font-size: 40px;
-    border: 3px solid black
+    /* border: 3px solid black */
 }
 
 .player {
@@ -33,7 +33,7 @@
     text-align: center;
     line-height: 80px;
     font-size: 30px;
-    border: 3px solid black
+    /* border: 3px solid black */
 }
 
 .btn {

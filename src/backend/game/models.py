@@ -10,17 +10,11 @@ from .utils import to_timer_format
 User = get_user_model()
 
 class GameManager(models.Manager):
-    def get_or_new(self, username1, username2):
-        qlookup1 = Q(player_white__username = username1) & Q(player_black__username = username2)
-        qlookup2 = Q(player_white__username = username2) & Q(player_black__username = username1)
-
-        qs = self.get_queryset().filter(qlookup1 | qlookup2).distinct()
-        if qs.count() != 0 and qs[0].is_finished == False:
-            return qs[0]
-        else:
-            obj = self.model()
-            obj.save()
-            return obj
+    def new_game(self, usernames, settings):
+        game_obj = self.model()
+        game_obj.apply_settings(usernames, settings)
+        game_obj.save()
+        return game_obj
 
 class Game(models.Model):
     # default values
@@ -46,7 +40,24 @@ class Game(models.Model):
     last_move_time = models.DateTimeField(default=None, null=True)
     game_end_time = models.DateTimeField(default=None, null=True)
 
+    duration = models.PositiveIntegerField(null=True)
+    random_colors = models.BooleanField(null=True)
+
+    _move_cancel_fen = models.TextField(null=True, default=None)
+
     objects = GameManager()
+
+    def apply_settings(self, usernames, settings):
+        if settings['random_colors']:
+            self.assign_colors_randomly(usernames)
+        else:
+            self.player_white = User.objects.get(username=settings['white'])
+            self.player_black = User.objects.get(username=settings['black'])
+
+        self.timer_white = self.timer_black = settings['duration'] * 60
+
+        self.duration = settings['duration']
+        self.random_colors = settings['random_colors']
 
     def get_game_positions(self):
         return self.game_positions.split(';')
@@ -58,6 +69,10 @@ class Game(models.Model):
             pair = pair.split('-')
             pair = [to_timer_format(pair[0]), to_timer_format(pair[1])]
             output.append(pair)
+        return output
+
+    def get_raw_move_timestamps(self):
+        output = self.move_timestamps.split(';')
         return output
 
     def get_turn(self):
@@ -80,19 +95,19 @@ class Game(models.Model):
         else:
             raise Exception(f'Username not matched: {username}')
     
-    def assign_colors_randomly(self, username1, username2):
-        user1 = User.objects.get(username=username1)
-        user2 = User.objects.get(username=username2)
+    def assign_colors_randomly(self, usernames):
+        user1 = User.objects.get(username=usernames[0])
+        user2 = User.objects.get(username=usernames[1])
         number = random.randint(1, 2)
-        print('losowanie:', number)
         if number == 1:
             self.player_white = user1 
             self.player_black = user2
         elif number == 2:
             self.player_white = user2
             self.player_black = user1
-        self.save()
 
     def add_to_history(self):
         UserProfile.objects.get(pk=self.player_white.pk).game_history.add(self)
         UserProfile.objects.get(pk=self.player_black.pk).game_history.add(self)
+
+    

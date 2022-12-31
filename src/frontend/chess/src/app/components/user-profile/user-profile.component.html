@@ -5,7 +5,10 @@
   <div *ngIf="profile" class="list-group w-auto">
       <h4>Game history</h4>
       <h6 *ngIf="profile.game_history.length == 0">Game history is empty</h6>
-      <a *ngFor="let game of profile.game_history" class="list-group-item list-group-item-action d-flex gap-3 py-3" [routerLink]="['/game', game.id]">
+      <a *ngFor="let game of profile.game_history" 
+      class="list-group-item list-group-item-action d-flex gap-3 py-3" 
+      [routerLink]="['/game', game.id]"
+      [ngStyle]="!game.winner ? {'background-color': 'white'} : game.winner != profile.username ? {'background-color': 'tomato'} : game.winner == profile.username ? {'background-color': 'lightgreen'} : null">
         <div class="d-flex gap-2 w-100 justify-content-between">
           <div>
             <h5 class="mb-0">{{game.player_white}} vs {{game.player_black}}</h5>

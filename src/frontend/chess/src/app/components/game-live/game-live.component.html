@@ -4,6 +4,9 @@
             <div id="board">
                 <div id="endgameinfo" *ngIf="gameService.endgame_info">
                     <p id="endgametext">{{gameService.endgame_info}}</p>
+                    <button *ngIf="gameService.show_rematch_button" class="btn btn-primary" (click)="sendRematch()">Rematch</button>
+                    <button *ngIf="gameService.rematch_offer_pending" class="btn btn-primary" (click)="acceptRematch()">Accept</button>
+                    <button *ngIf="gameService.rematch_offer_pending" class="btn btn-primary" (click)="rejectRematch()">Reject</button>
                 </div>
                 <div id="promotionbox" *ngIf="gameService.promoting">
                     <div *ngFor="let piece of gameService.promotion_pieces"
@@ -51,6 +54,12 @@
                 <button *ngIf="gameService.allow_draw_offer" id="offerdrawbutton" type="button" class="btn btn-primary" (click)="sendDrawOffer()">Offer a draw</button>
                 <button *ngIf="gameService.draw_offer_pending" id="acceptdrawbutton" type="button" class="btn btn-primary" (click)="acceptDrawOffer()">Accept draw</button>
                 <button *ngIf="gameService.draw_offer_pending" id="rejectdrawbutton" type="button" class="btn btn-primary" (click)="rejectDrawOffer()">Reject draw</button>
+                <button *ngIf="gameService.allow_move_cancel_request" id="requestmovecancelbutton" type="button" class="btn btn-primary" (click)="sendMoveCancelRequest()">Cancel move</button>
+                <button *ngIf="gameService.move_cancel_request_pending" id="acceptmovecancelbutton" type="button" class="btn btn-primary" (click)="acceptMoveCancelRequest()">Accept move cancel</button>
+                <button *ngIf="gameService.move_cancel_request_pending" id="rejectmovecancelbutton" type="button" class="btn btn-primary" (click)="rejectMoveCancelRequest()">Reject move cancel</button>
+                <button *ngIf="gameService.show_resign_button" id="resignbutton" type="button" class="btn btn-primary" (click)="resign()">Resign</button>
+                <button *ngIf="!gameService.show_resign_button" id="confirmresignbutton" type="button" class="btn btn-primary" (click)="confirmResign()">Confirm resign</button>
+                <button *ngIf="!gameService.show_resign_button" id="cancelresignbutton" type="button" class="btn btn-primary" (click)="cancelResign()">Cancel resign</button>
                 <button type="button" class="btn btn-primary" (click)="rotateBoard()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"></path>
@@ -67,6 +76,12 @@
                 <button *ngIf="gameService.allow_draw_offer" id="offerdrawbutton" type="button" class="btn btn-primary" (click)="sendDrawOffer()">Offer a draw</button>
                 <button *ngIf="gameService.draw_offer_pending" id="acceptdrawbutton" type="button" class="btn btn-primary" (click)="acceptDrawOffer()">Accept draw</button>
                 <button *ngIf="gameService.draw_offer_pending" id="rejectdrawbutton" type="button" class="btn btn-primary" (click)="rejectDrawOffer()">Reject draw</button>
+                <button *ngIf="gameService.allow_move_cancel_request" id="requestmovecancelbutton" type="button" class="btn btn-primary" (click)="sendMoveCancelRequest()">Cancel move</button>
+                <button *ngIf="gameService.move_cancel_request_pending" id="acceptmovecancelbutton" type="button" class="btn btn-primary" (click)="acceptMoveCancelRequest()">Accept move cancel</button>
+                <button *ngIf="gameService.move_cancel_request_pending" id="rejectmovecancelbutton" type="button" class="btn btn-primary" (click)="rejectMoveCancelRequest()">Reject move cancel</button>
+                <button *ngIf="gameService.show_resign_button" id="resignbutton" type="button" class="btn btn-primary" (click)="resign()">Resign</button>
+                <button *ngIf="!gameService.show_resign_button" id="confirmresignbutton" type="button" class="btn btn-primary" (click)="confirmResign()">Confirm resign</button>
+                <button *ngIf="!gameService.show_resign_button" id="cancelresignbutton" type="button" class="btn btn-primary" (click)="cancelResign()">Cancel resign</button>
                 <button type="button" class="btn btn-primary" (click)="rotateBoard()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"></path>
@@ -75,5 +90,8 @@
                 </button>
             </div>
         </div>
+
+        <p *ngIf="gameService.move_cancel_error">{{gameService.move_cancel_error}}</p>
+
     </div>
 </div>

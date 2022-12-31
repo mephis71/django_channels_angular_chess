@@ -2,10 +2,9 @@ import re
 from rich import print
 
 class Piece:
-    def __init__(self, color, type, moved):
+    def __init__(self, color, type):
         self.color = color
         self.type = type
-        self.moved = moved
 
 class GameEngine:
     def __init__(self, game_obj):
@@ -39,7 +38,7 @@ class GameEngine:
             moving_pawn = self.pieces[p]
             captured_pawn = self.pieces[self.prev_t]
 
-            self.pieces[t] = Piece(moving_pawn.color, moving_pawn.type, True)
+            self.pieces[t] = Piece(moving_pawn.color, moving_pawn.type)
             self.pieces[p]= None
             self.pieces[self.prev_t] = None
 
@@ -73,31 +72,31 @@ class GameEngine:
         else:
             self.halfmoves += 1
         
-        # if the move is castles
         moving_piece = self.pieces[p]
 
         # save the pieces position so it can be restored later in case the player is being checked after castles (rare)
         origin_pieces = self.pieces.copy()
         origin_attacked_fields = self.attacked_fields.copy() # <- probably not necessary
 
+        # if the move is castles
         if moving_piece.type == 'king' and abs(t - p) == 2:
             self.pieces[p] = None
             if t == 2:
-                self.pieces[t] = Piece(moving_piece.color, 'king', True)
+                self.pieces[t] = Piece(moving_piece.color, 'king')
                 self.pieces[0] = None
-                self.pieces[3] = Piece(moving_piece.color, 'rook', True)
+                self.pieces[3] = Piece(moving_piece.color, 'rook')
             elif t == 6:
-                self.pieces[t] = Piece(moving_piece.color, 'king', True)
+                self.pieces[t] = Piece(moving_piece.color, 'king')
                 self.pieces[7] = None
-                self.pieces[5] = Piece(moving_piece.color, 'rook', True)
+                self.pieces[5] = Piece(moving_piece.color, 'rook')
             elif t == 58:
-                self.pieces[t] = Piece(moving_piece.color, 'king', True)
+                self.pieces[t] = Piece(moving_piece.color, 'king')
                 self.pieces[56] = None
-                self.pieces[59] = Piece(moving_piece.color, 'rook', True)
+                self.pieces[59] = Piece(moving_piece.color, 'rook')
             elif t == 62:
-                self.pieces[t] = Piece(moving_piece.color, 'king', True)
+                self.pieces[t] = Piece(moving_piece.color, 'king')
                 self.pieces[63] = None
-                self.pieces[61] = Piece(moving_piece.color, 'rook', True)
+                self.pieces[61] = Piece(moving_piece.color, 'rook')
 
 
             # print('if the player is checked after castles')
@@ -108,13 +107,19 @@ class GameEngine:
             else:
                 self.enpassant_sqr = '-'
                 self.halfmoves += 1
-                game_result, new_fen = self.end_move(p, t)
+
+                if self.get_turn() == 'white':
+                    castles = 'King'
+                elif self.get_turn() == 'black':
+                    castles = 'king'
+
+                game_result, new_fen = self.end_move(p, t, castles)
                 return True, game_result, new_fen
 
         # print("at that point the move is legal")  
         # at that point the move is legal
         self.pieces[p] = None
-        self.pieces[t] = Piece(moving_piece.color, moving_piece.type, True)
+        self.pieces[t] = Piece(moving_piece.color, moving_piece.type)
         
         # pawn promotion here
         if (t < 8 or t >= 56) and self.pieces[t].type == 'pawn':
@@ -128,7 +133,26 @@ class GameEngine:
         else:
             self.enpassant_sqr = '-'
             
-        game_result, new_fen = self.end_move(p, t)
+        castles = None
+        if moving_piece.type == 'rook':
+            if moving_piece.color == 'white':
+                if p == 56:
+                    castles = 'Q'
+                elif p == 63:
+                    castles = 'K'
+            if moving_piece.color == 'black':
+                if p == 0:
+                    castles = 'q'
+                elif p == 7:
+                    castles = 'k'
+
+        elif moving_piece.type == 'king':
+            if moving_piece.color == 'white':
+                castles = 'King'
+            elif moving_piece.color == 'black':
+                castles = 'king'
+                
+        game_result, new_fen = self.end_move(p, t, castles)
         return True, game_result, new_fen
     
     def init_game_with_fen(self, fen):
@@ -164,44 +188,44 @@ class GameEngine:
                 position += int(letter)
                 continue
             if letter == 'p':
-                self.pieces[position] = Piece('black', 'pawn', False)
+                self.pieces[position] = Piece('black', 'pawn')
             if letter == 'n':
-                self.pieces[position] = Piece('black', 'knight', False)
+                self.pieces[position] = Piece('black', 'knight')
             if letter == 'b':
-                self.pieces[position] = Piece('black', 'bishop', False)
+                self.pieces[position] = Piece('black', 'bishop')
             if letter == 'r':
-                self.pieces[position] = Piece('black', 'rook', False)
+                self.pieces[position] = Piece('black', 'rook')
             if letter == 'q':
-                self.pieces[position] = Piece('black', 'queen', False)
+                self.pieces[position] = Piece('black', 'queen')
             if letter == 'k':
-                self.pieces[position] = Piece('black', 'king', False)
+                self.pieces[position] = Piece('black', 'king')
             if letter == 'P':
-                self.pieces[position] = Piece('white', 'pawn', False)
+                self.pieces[position] = Piece('white', 'pawn')
             if letter == 'N':
-                self.pieces[position] = Piece('white', 'knight', False)
+                self.pieces[position] = Piece('white', 'knight')
             if letter == 'B':
-                self.pieces[position] = Piece('white', 'bishop', False)
+                self.pieces[position] = Piece('white', 'bishop')
             if letter == 'R':
-                self.pieces[position] = Piece('white', 'rook', False)
+                self.pieces[position] = Piece('white', 'rook')
             if letter == 'Q':
-                self.pieces[position] = Piece('white', 'queen', False)
+                self.pieces[position] = Piece('white', 'queen')
             if letter == 'K':
-                self.pieces[position] = Piece('white', 'king', False)
+                self.pieces[position] = Piece('white', 'king')
             position += 1
         if fen_castles != '-':
             for letter in fen_castles:
                 if letter == 'K':
-                    self.pieces[60] = Piece('white', 'king', False)
-                    self.pieces[63] = Piece('white', 'rook', False)
+                    self.pieces[60] = Piece('white', 'king')
+                    self.pieces[63] = Piece('white', 'rook')
                 if letter == 'Q':
-                    self.pieces[60] = Piece('white', 'king', False)
-                    self.pieces[56] = Piece('white', 'rook', False)
+                    self.pieces[60] = Piece('white', 'king')
+                    self.pieces[56] = Piece('white', 'rook')
                 if letter == 'q':
-                    self.pieces[4] = Piece('black', 'king', False)
-                    self.pieces[0] = Piece('black', 'rook', False)
+                    self.pieces[4] = Piece('black', 'king')
+                    self.pieces[0] = Piece('black', 'rook')
                 if letter == 'k':
-                    self.pieces[4] = Piece('black', 'king', False)
-                    self.pieces[7] = Piece('black', 'rook', False)
+                    self.pieces[4] = Piece('black', 'king')
+                    self.pieces[7] = Piece('black', 'rook')
      
     def update_possible_moves(self, p):
         self.possible_moves = [False] * 64
@@ -234,7 +258,7 @@ class GameEngine:
             if p - 8 >= 0 and self.pieces[p - 8] == None:
                 self.possible_moves[p - 8] = True
                 # 2 fields up
-                if p - 16 >= 0 and self.pieces[p].moved == False and self.pieces[p - 16] == None:
+                if p - 16 >= 0 and (p >= 48 and p <= 55) and self.pieces[p - 16] == None:
                     self.possible_moves[p - 16] = True
             # diagonal up-left
             if p - 9 >= 0 and p % 8 != 0 and self.pieces[p - 9] != None and self.pieces[p - 9].color != c:
@@ -248,7 +272,7 @@ class GameEngine:
             if p + 8 < 64 and self.pieces[p + 8] == None:
                 self.possible_moves[p + 8] = True
                 # 2 fields down
-                if p + 16 < 64 and self.pieces[p].moved == False and self.pieces[p + 16] == None:
+                if p + 16 < 64 and (p >= 8 and p <= 15) and self.pieces[p + 16] == None:
                     self.possible_moves[p + 16] = True
             # diagonal down-right
             if p + 9 < 64 and p % 8 != 7 and self.pieces[p + 9] != None and self.pieces[p + 9].color != c:
@@ -473,50 +497,49 @@ class GameEngine:
                     self.king_fields(p)
 
     def castles(self, p):
-        if self.pieces[p].moved == False:
-            c = self.pieces[p].color
-            self.update_attacked_fields(self.opposite_color(self.get_turn()))
-            if c == 'white':
-                indexes_pieces = (57, 58, 59)
-                indexes_fields = (58, 59)
-                outcome_pieces = [self.pieces[i] for i in indexes_pieces]
-                outcome_fields = [self.attacked_fields[i] for i in indexes_fields]
+        c = self.pieces[p].color
+        self.update_attacked_fields(self.opposite_color(self.get_turn()))
+        if c == 'white':
+            indexes_pieces = (57, 58, 59)
+            indexes_fields = (58, 59)
+            outcome_pieces = [self.pieces[i] for i in indexes_pieces]
+            outcome_fields = [self.attacked_fields[i] for i in indexes_fields]
 
-                if all(x == None for x in outcome_pieces) == True and \
-                all(x == False for x in outcome_fields) == True and \
-                self.pieces[56] != None and self.pieces[56].color == c and self.pieces[56].moved == False:
-                    self.possible_moves[58] = True
+            if all(x == None for x in outcome_pieces) == True and \
+            all(x == False for x in outcome_fields) == True and \
+            self.pieces[56] != None and self.pieces[56].color == c:
+                self.possible_moves[58] = True
 
-                indexes = (61, 62)
-                
-                outcome_pieces = [self.pieces[i] for i in indexes]
-                outcome_fields = [self.attacked_fields[i] for i in indexes]
+            indexes = (61, 62)
+            
+            outcome_pieces = [self.pieces[i] for i in indexes]
+            outcome_fields = [self.attacked_fields[i] for i in indexes]
 
-                if all(x == None for x in outcome_pieces) == True and \
-                all(x == False for x in outcome_fields) == True and \
-                self.pieces[63] != None and self.pieces[63].color == c and self.pieces[63].moved == False:
-                    self.possible_moves[62] = True
+            if all(x == None for x in outcome_pieces) == True and \
+            all(x == False for x in outcome_fields) == True and \
+            self.pieces[63] != None and self.pieces[63].color == c:
+                self.possible_moves[62] = True
 
-            if c == 'black':
-                indexes_pieces = (1, 2, 3)
-                indexes_fields = (2, 3)
-                outcome_pieces = [self.pieces[i] for i in indexes_pieces]
-                outcome_fields = [self.attacked_fields[i] for i in indexes_fields]
+        if c == 'black':
+            indexes_pieces = (1, 2, 3)
+            indexes_fields = (2, 3)
+            outcome_pieces = [self.pieces[i] for i in indexes_pieces]
+            outcome_fields = [self.attacked_fields[i] for i in indexes_fields]
 
-                if all(x == None for x in outcome_pieces) == True and \
-                all(x == False for x in outcome_fields) == True and \
-                self.pieces[0] != None and self.pieces[0].color == c and self.pieces[0].moved == False:
-                    self.possible_moves[2] = True
+            if all(x == None for x in outcome_pieces) == True and \
+            all(x == False for x in outcome_fields) == True and \
+            self.pieces[0] != None and self.pieces[0].color == c:
+                self.possible_moves[2] = True
 
-                indexes = (5, 6)
-                
-                outcome_pieces = [self.pieces[i] for i in indexes]
-                outcome_fields = [self.attacked_fields[i] for i in indexes]
+            indexes = (5, 6)
+            
+            outcome_pieces = [self.pieces[i] for i in indexes]
+            outcome_fields = [self.attacked_fields[i] for i in indexes]
 
-                if all(x == None for x in outcome_pieces) == True and \
-                all(x == False for x in outcome_fields) == True and \
-                self.pieces[7] != None and self.pieces[7].color == c and self.pieces[7].moved == False:
-                    self.possible_moves[6] = True
+            if all(x == None for x in outcome_pieces) == True and \
+            all(x == False for x in outcome_fields) == True and \
+            self.pieces[7] != None and self.pieces[7].color == c:
+                self.possible_moves[6] = True
     
     def opposite_color(self, color):
         if color == 'white':
@@ -561,7 +584,7 @@ class GameEngine:
 
         return output
     
-    def update_fen(self):
+    def update_fen(self, castles):
         output = ""
         empty_spaces = 0
         
@@ -596,28 +619,32 @@ class GameEngine:
 
         output += ' '
 
-        castling = False
-        
-        if self.pieces[60] != None and self.pieces[60].type == 'king' and self.pieces[60].moved == False:
-            if self.pieces[63] != None and self.pieces[63].type == 'rook' and self.pieces[63].moved == False:
-                output += 'K'
-                castling = True
-            if self.pieces[56] != None and self.pieces[56].type == 'rook' and self.pieces[56].moved == False:
-                output += 'Q'
-                castling = True
+        fen_castles = self.fen.split()[2]
 
-        if self.pieces[4] != None and self.pieces[4].type == 'king' and self.pieces[4].moved == False:
-            if self.pieces[7] != None and self.pieces[7].type == 'rook' and self.pieces[7].moved == False:
-                output += 'k'
-                castling = True
-            if self.pieces[0] != None and self.pieces[0].type == 'rook' and self.pieces[0].moved == False:
-                output += 'q'
-                castling = True
+        if castles is not None:
+            fen_castles = [*fen_castles]
 
-        if castling == False:
+            if castles in ['Q', 'K', 'q', 'k']:
+                for val in fen_castles[:]:
+                    if val == castles:
+                        fen_castles.remove(val)
+
+            if castles == 'King':
+                for val in fen_castles[:]:
+                    if val in ['Q', 'K']:
+                        fen_castles.remove(val)
+
+            if castles == 'king':
+                for val in fen_castles[:]:
+                    if val in ['q', 'k']:
+                        fen_castles.remove(val)
+            
+            fen_castles = "".join(fen_castles)
+
+        if not fen_castles:
             output += '- '
         else:
-            output += ' '
+            output += fen_castles + ' '
         
         enpassant = '-'
 
@@ -627,13 +654,13 @@ class GameEngine:
         output += enpassant + ' ' + str(self.halfmoves) + ' ' + str(self.fullmoves)
         return output
 
-    def end_move(self, p, t):
+    def end_move(self, p, t, castles=None):
         if self.get_turn() == 'black':
             self.fullmoves += 1
         self.prev_p = p
         self.prev_t = t
         self.change_turn()
-        self.fen = self.update_fen()
+        self.fen = self.update_fen(castles)
         game_result = self.is_checkmated(self.get_turn())
         if game_result == False:
             if self.halfmoves == 50:
@@ -681,7 +708,7 @@ class GameEngine:
     
     def promotion_handler(self, pick_id, drop_id, piece_type, turn):
         self.pieces[pick_id] = None
-        self.pieces[drop_id] = Piece(turn, piece_type, False)
+        self.pieces[drop_id] = Piece(turn, piece_type)
         return self.end_move(pick_id, drop_id)
 
     def get_fen(self):

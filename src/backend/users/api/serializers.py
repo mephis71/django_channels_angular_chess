@@ -114,7 +114,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    game_history = GameHistorySerializer(many=True)
+    game_history = GameHistorySerializer(many=True, source='get_game_history')
     username = serializers.CharField()
 
     class Meta:

@@ -4,6 +4,7 @@ import { User } from 'src/app/models/user';
 import { UserService } from 'src/app/services/user.service';
 import { Emitters } from '../../emitters/emitters';
 import { GameInviteService } from '../../services/game-invite.service';
+import { GameInvite } from 'src/app/models/game_invite';
 
 @Component({
   selector: 'app-home',
@@ -11,13 +12,16 @@ import { GameInviteService } from '../../services/game-invite.service';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  form: FormGroup;
+  friend_request_form: FormGroup;
   authenticated = false;
   user: User;
 
   friend_request_message = '';
   greet_message = 'You are not logged in';
   friend_request_accept_message = '';
+
+  minutes: number = 5;
+  color: string = 'random';
 
   constructor(
     private userService: UserService,
@@ -44,7 +48,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
     })
 
-    this.form = this.formBuilder.group({
+    this.friend_request_form = this.formBuilder.group({
       to_username: ''
     })
 
@@ -56,7 +60,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   submit(): any {
-    this.userService.send_friend_request(this.form)
+    this.userService.send_friend_request(this.friend_request_form)
     .subscribe({
       next: res => {
         if (res.status == 201) {
@@ -91,20 +95,44 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   sendGameInvite(username: string) {
+    let white, black, random_colors;
+
+    switch(this.color) {
+      case 'white':
+        white = this.user.username;
+        black = username;
+        random_colors = false;
+        break;
+
+      case 'black':
+        white = username;
+        black = this.user.username;
+        random_colors = false;
+        break;
+
+      case 'random':
+        white = null;
+        black = null;
+        random_colors = true;
+        break;
+    }
+
     var invite = {
       "type": "invite",
-      "from": this.user.username,
-      "to": username
+      "from_user": this.user.username,
+      "to_user": username,
+      "settings": {
+        "white": white,
+        "black": black,
+        "random_colors": random_colors,
+        "duration": this.minutes
+      }
     }
     this.gameInviteService.sendMsg(JSON.stringify(invite));
   }
 
-  acceptGameInvite(username: string) { 
-    var invite_accept = {
-      "p1": this.user.username,
-      "p2": username 
-    }
-    this.userService.accept_game_invite(invite_accept)
+  acceptGameInvite(invite: GameInvite) { 
+    this.userService.accept_game_invite(invite)
     .subscribe()
   }
 }

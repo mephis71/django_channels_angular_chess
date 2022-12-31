@@ -60,12 +60,12 @@ export class GameLiveComponent implements OnInit, OnDestroy {
   }
 
   onPick(event: any) {
-    this.pick_id = event.event.target.id;
+    this.pick_id = parseInt(event.event.target.id);
   }
-
+ 
   onDrop(event: any) {
-    this.drop_id = event.event.target.id;
-    if(this.pick_id && this.drop_id && (this.pick_id != this.drop_id)) {
+    this.drop_id = parseInt(event.event.target.id);
+    if((this.pick_id != null && this.drop_id != null) && (this.pick_id != this.drop_id) && (typeof this.pick_id == 'number' && typeof this.drop_id == 'number') && (!isNaN(this.pick_id) && !isNaN(this.drop_id))) {
       let msg = {
         "type": "move",
         "pick_id": this.pick_id,
@@ -99,7 +99,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
     }
     this.gameService.sendMsg(JSON.stringify(msg));
     this.gameService.draw_offer_pending = false;
-
+    this.gameService.allow_draw_offer = false;
   }
 
   rejectDrawOffer() {
@@ -145,5 +145,73 @@ export class GameLiveComponent implements OnInit, OnDestroy {
         this.board_orientation = 'black';
         break;
     }
+  }
+
+  sendMoveCancelRequest() {
+    let msg = {
+      "type": "move_cancel_request"
+    }
+    this.gameService.sendMsg(JSON.stringify(msg));
+    this.gameService.allow_move_cancel_request = false;
+  }
+
+  acceptMoveCancelRequest() {
+    let msg = {
+      "type": "move_cancel_accept"
+    }
+    this.gameService.sendMsg(JSON.stringify(msg));
+    this.gameService.move_cancel_request_pending = false;
+    this.gameService.allow_move_cancel_request = false;
+  }
+
+  rejectMoveCancelRequest() {
+    let msg = {
+      "type": "move_cancel_reject"
+    }
+    this.gameService.sendMsg(JSON.stringify(msg));
+    this.gameService.move_cancel_request_pending = false;
+    this.gameService.allow_move_cancel_request = true;
+  }
+
+  resign() {
+    this.gameService.show_resign_button = false;
+  }
+
+  confirmResign() {
+    let msg = {
+      'type': 'resign'
+    }
+    this.gameService.sendMsg(JSON.stringify(msg));
+    this.gameService.show_resign_button = true;
+  }
+
+  cancelResign() {
+    this.gameService.show_resign_button = true;
+  }
+
+  sendRematch() {
+    let msg = {
+      'type': 'rematch'
+    }
+    this.gameService.sendMsg(JSON.stringify(msg))
+    this.gameService.show_rematch_button = false;
+  }
+
+  acceptRematch() {
+    let msg = {
+      'type': 'rematch_accept'
+    }
+    this.gameService.sendMsg(JSON.stringify(msg))
+    this.gameService.show_rematch_button = false;
+    this.gameService.rematch_offer_pending = false;
+  }
+
+  rejectRematch() {
+    let msg = {
+      'type': 'rematch_reject'
+    }
+    this.gameService.sendMsg(JSON.stringify(msg))
+    this.gameService.show_rematch_button = true;
+    this.gameService.rematch_offer_pending = false;
   }
 }

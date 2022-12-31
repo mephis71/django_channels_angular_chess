@@ -14,6 +14,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 import { GameOverviewComponent } from './components/game-overview/game-overview.component';
+import { MatSliderModule } from '@angular/material/slider'; 
+import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
   declarations: [
@@ -33,7 +35,9 @@ import { GameOverviewComponent } from './components/game-overview/game-overview.
     ReactiveFormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    DragDropModule
+    DragDropModule,
+    MatSliderModule,
+    MatRadioModule
   ],
   providers: [],
   bootstrap: [AppComponent]

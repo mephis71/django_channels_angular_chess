@@ -2,8 +2,6 @@ from channels.layers import get_channel_layer
 channel_layer = get_channel_layer()
 import asyncio
 from rich import print
-import datetime
-from datetime import timezone
 from .utils import to_timer_format, opposite_color
 from .game_functions import end_game
 
@@ -20,7 +18,6 @@ def trigger_timer_task(game_obj):
 async def realtime_timer_broadcast(game_obj):
     game_room_name = game_obj.get_game_name()
     turn = game_obj.get_turn()
-    timer = None
     if turn == 'white':
         timer = game_obj.timer_white
     elif turn == 'black':
@@ -50,9 +47,9 @@ async def realtime_timer_broadcast(game_obj):
             }
         )
 
-def cancel_countdown_task(game_obj, username):
+def cancel_timer_task(game_obj):
     game_room_name = game_obj.get_game_name()
-    task_name = f'{game_room_name}_countdown_{username}'
+    task_name = f'{game_room_name}_timer'
     for task in asyncio.Task.all_tasks():
         if task.get_name() == task_name:
             task.cancel()
@@ -69,15 +66,15 @@ async def endgame_countdown(game_obj, username):
         timer -= 1
         await asyncio.sleep(1)
         if timer == 0:
-            now = datetime.datetime.now(tz=timezone.utc)
-            time_dif = now - game_obj.last_move_time
-            time_dif_seconds = int(time_dif.seconds)
-            if game_obj.get_turn() == 'white':
-                game_obj.timer_white -= time_dif_seconds
-            elif game_obj.get_turn() == 'black':
-                game_obj.timer_black -= time_dif_seconds
-
             player_color = game_obj.get_color(username)
             game_result = f'{player_color}wins-abandonment'
             await end_game(game_obj, game_result)
     return
+
+def cancel_countdown_task(game_obj, username):
+    game_room_name = game_obj.get_game_name()
+    task_name = f'{game_room_name}_countdown_{username}'
+    for task in asyncio.Task.all_tasks():
+        if task.get_name() == task_name:
+            task.cancel()
+            return

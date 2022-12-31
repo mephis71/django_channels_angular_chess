@@ -65,4 +65,18 @@ def endgame_JSON(game_obj, game_result):
     }
     return data
 
-
+def move_cancel_JSON(game_obj):
+    fen = game_obj.fen
+    current_turn = game_obj.get_turn()
+    time_black = to_timer_format(game_obj.timer_black)
+    time_white = to_timer_format(game_obj.timer_white)
+    game_positions = game_obj.get_game_positions()
+    data = {
+        'type': 'move_cancel_accept',
+        'fen': fen,
+        'current_turn': current_turn,
+        'time_black': time_black,
+        'time_white': time_white,
+        'game_positions': game_positions
+    }
+    return data

@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Piece } from '../models/piece';
 import { Game } from '../models/game';
 import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -22,12 +23,22 @@ export class GameLiveService {
 
   allow_draw_offer = true;
   draw_offer_pending = false;
+
+  allow_move_cancel_request = true;
+  move_cancel_request_pending = false;
+  move_cancel_error: string;
+
+  show_resign_button = true;
+
+  show_rematch_button = true;
+  rematch_offer_pending = false;
   
   game_positions: string[] = [];
   game_positions_iterator: number;
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) { }
 
   public openWebSocket() {
@@ -77,6 +88,11 @@ export class GameLiveService {
         this.fenToPieces(this.game_positions[this.game_positions_iterator]);
         this.time_white = data.time_white;
         this.time_black = data.time_black;
+
+        this.draw_offer_pending = false;
+        this.allow_draw_offer = false;
+        this.allow_move_cancel_request = false;
+        this.move_cancel_request_pending = false;
         
         if(data.game_result == 'blackwins') {
           this.endgame_info = 'Black wins by checkmate';
@@ -95,8 +111,6 @@ export class GameLiveService {
         }
         if(data.game_result == 'draw-mutual') {
           this.endgame_info = 'Draw - mutual agreement';
-          this.allow_draw_offer = false;
-          this.draw_offer_pending = false;
         }
         if(data.game_result == 'whitewins-oot') {
           this.endgame_info = 'White wins - out of time';
@@ -110,15 +124,69 @@ export class GameLiveService {
         if(data.game_result == 'whitewins-abandonment') {
           this.endgame_info = 'White wins - Black abandoned the game';
         }
+        if(data.game_result == 'whitewins-resignment') {
+          this.endgame_info = 'White wins - Black resigned';
+        }
+        if(data.game_result == 'blackwins-resignment') {
+          this.endgame_info = 'Black wins - White resigned';
+        }
+        if(data.game_result == 'draw-abandonment') {
+          this.endgame_info = 'The game was abandoned';
+        }
+        
       }
 
       if(data.type == 'draw_offer') {
         this.allow_draw_offer = false;
         this.draw_offer_pending = true;
       }
+
       if(data.type == 'draw_reject') {
         this.allow_draw_offer = true;
         this.draw_offer_pending = false;
+      }
+
+      if(data.type == 'move_cancel_request') {
+        this.allow_move_cancel_request = false;
+        this.move_cancel_request_pending = true;
+      }
+
+      if(data.type == 'move_cancel_reject') {
+        this.allow_move_cancel_request = true;
+        this.move_cancel_request_pending = false;
+      }
+
+      if(data.type == 'move_cancel_accept') {
+        this.allow_move_cancel_request = true;
+        this.move_cancel_request_pending = false;
+        this.game_positions = data.game_positions;
+        this.game_positions_iterator = this.game_positions.length - 1;
+        this.fenToPieces(this.game_positions[this.game_positions_iterator]);
+        this.time_white = data.time_white;
+        this.time_black = data.time_black;
+      }
+
+      if(data.type == 'move_cancel_error') {
+        this.move_cancel_error = "You can't do that now";
+        this.allow_move_cancel_request = true;
+        this.move_cancel_request_pending = false;
+      }
+
+      if(data.type == 'rematch') {
+        this.rematch_offer_pending = true;
+      }
+
+      if(data.type == 'rematch_accept') {
+        this.clearVariables()
+        this.router.navigate([`/game/live/${data.game_id}`])
+        .then(() => {
+          window.location.reload()
+        })
+        
+      }
+
+      if(data.type == 'rematch_reject') {
+        this.show_rematch_button = true;
       }
     };
 
@@ -254,7 +322,16 @@ export class GameLiveService {
 
     this.allow_draw_offer = true;
     this.draw_offer_pending = false;
+
+    this.allow_move_cancel_request = true;
+    this.move_cancel_request_pending = false;
+    this.move_cancel_error = '';
     
     this.game_positions = [];
+
+    this.show_resign_button = true;
+
+    this.show_rematch_button = true;
+    this.rematch_offer_pending = false;
   }
 }

@@ -18,7 +18,8 @@ class GameHistorySerializer(serializers.ModelSerializer):
     player_white = serializers.CharField()
     player_black = serializers.CharField()
     winner = serializers.CharField()
+    game_end_time = serializers.DateTimeField()
     
     class Meta:
         model = Game
-        fields = ('id', 'player_white', 'player_black', 'winner')
+        fields = ('id', 'player_white', 'player_black', 'winner', 'game_end_time')
