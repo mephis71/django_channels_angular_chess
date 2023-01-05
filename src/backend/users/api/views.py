@@ -6,6 +6,8 @@ from rest_framework.generics import RetrieveUpdateAPIView
 from .serializers import RegistrationSerializer, LoginSerializer, UserSerializer, FriendRequestSerializer, UserProfileSerializer
 from users.models import User, FriendRequest, UserProfile
 from rich import print
+from game.api.serializers import GameSerializer
+from game.models import Game
 
 class RegistrationAPIView(APIView):
     permission_classes = (AllowAny,)
@@ -106,3 +108,15 @@ class UserProfileAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         
+class UserRunningGamesAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = GameSerializer
+
+    def get(self, request, *args, **kwargs):
+        username = request.user.username
+        qs = Game.objects.get_running_games(username)
+        if qs is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            serializer = self.serializer_class(instance=qs, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)

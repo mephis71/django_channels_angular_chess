@@ -102,20 +102,39 @@ export class GameOverviewService {
   }
 
   scrollGame(event: KeyboardEvent) {
-    if(event.key == 'ArrowDown') {
-      this.game_positions_iterator = 0;
+    let scrolling = false;
+
+    switch(event.key) {
+      case 'ArrowDown': {
+        this.game_positions_iterator = 0;
+        scrolling = true;
+        break;
+      }
+      case 'ArrowUp': {
+        this.game_positions_iterator = this.game_positions.length - 1;
+        scrolling = true;
+        break;
+      }
+      case 'ArrowLeft': {
+        if(this.game_positions_iterator != 0) {
+          this.game_positions_iterator -= 1;
+          scrolling = true;
+        }
+        break;
+      }
+      case 'ArrowRight': {
+        if(this.game_positions_iterator != this.game_positions.length - 1) {
+          this.game_positions_iterator += 1;
+          scrolling = true;
+        }
+        break;
+      }
     }
-    if(event.key == 'ArrowUp') {
-      this.game_positions_iterator = this.game_positions.length - 1;
+    
+    if(scrolling) {
+      this.fenToPieces(this.game_positions[this.game_positions_iterator]);
+      this.setTimers(this.move_timestamps[this.game_positions_iterator])
     }
-    if(event.key == 'ArrowLeft' && this.game_positions_iterator != 0) {
-      this.game_positions_iterator -= 1;
-    }
-    if(event.key == 'ArrowRight' && this.game_positions_iterator != this.game_positions.length - 1) {
-      this.game_positions_iterator += 1;
-    }
-    this.fenToPieces(this.game_positions[this.game_positions_iterator]);
-    this.setTimers(this.move_timestamps[this.game_positions_iterator])
   }
 
   getGame(id: number): Observable<Game> {

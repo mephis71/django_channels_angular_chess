@@ -97,9 +97,10 @@ async def end_game(game_obj, game_result):
     game_obj.game_end_time = now
     game_obj.is_running = False
     game_obj.is_finished = True
+    game_obj._game_result = game_result
     await database_sync_to_async(game_obj.save)()
     await database_sync_to_async(game_obj.add_to_history)()
-    msg = endgame_JSON(game_obj, game_result)
+    msg = endgame_JSON(game_obj)
     await channel_layer.group_send(
         game_room_name,
         {

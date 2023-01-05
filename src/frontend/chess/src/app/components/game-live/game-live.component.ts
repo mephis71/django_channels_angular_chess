@@ -5,6 +5,7 @@ import { User } from 'src/app/models/user';
 import { UserService } from 'src/app/services/user.service';
 import { ActivatedRoute } from '@angular/router';
 import { Game } from 'src/app/models/game';
+import { forkJoin, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-game-live',
@@ -19,7 +20,8 @@ export class GameLiveComponent implements OnInit, OnDestroy {
 
   pick_id: number | null;
   drop_id: number | null;
-  
+
+  private ngUnsubscribe = new Subject<void>();
 
   constructor(
     private userService: UserService,
@@ -28,35 +30,35 @@ export class GameLiveComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.userService.getUser().subscribe({
-      next:(res: any) => {
-        this.user = res;
-        Emitters.usernameEmitter.emit(this.user.username);
-      },
-      error:(err: any) => {
-        Emitters.usernameEmitter.emit(null);
-        console.log(err)
-      }
-    })
+    this.gameService.clearVariables()
 
-
-    this.route.params.subscribe(params => {
-      this.gameService.getGame(params['id']).subscribe({
-        next: game => {
-          this.game = game;
+    this.route.params.pipe(takeUntil(this.ngUnsubscribe))
+    .subscribe(params => {
+      forkJoin({
+        user: this.userService.getUser(),
+        game: this.gameService.getGame(params['id']) 
+      }).pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe({
+        next: value => {
+          this.user = value.user;
+          Emitters.usernameEmitter.emit(this.user.username);
+          this.game = value.game;
           this.setBoardOrientation();
         },
         error: err => {
-          console.log(err)
+          Emitters.usernameEmitter.emit(null);
+          console.log(err);
         }
       })
     })
-    this.gameService.clearVariables()
+
     this.gameService.openWebSocket()
   }
 
   ngOnDestroy(): void {
     this.gameService.closeWebSocket()
+    this.ngUnsubscribe.next()
+    this.ngUnsubscribe.complete()
   }
 
   onPick(event: any) {

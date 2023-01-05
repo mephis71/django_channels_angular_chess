@@ -11,7 +11,7 @@ class GameSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Game
-        fields = ('id', 'player_white', 'player_black', 'winner', 'game_positions', 'move_timestamps')
+        fields = ('id', 'player_white', 'player_black', 'winner', 'game_positions', 'move_timestamps')\
 
 class GameHistorySerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)

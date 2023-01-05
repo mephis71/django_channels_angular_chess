@@ -28,21 +28,27 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         except User.DoesNotExist:
             raise exceptions.AuthenticationFailed('No user matching this token was found.')
         else:
-            await self.accept()
-
             self.game_id = self.scope['url_route']['kwargs']['game_id']
             self.game_obj = await get_game_by_id(self.game_id)
+            self.game_room_name = self.game_obj.get_game_name()
+
+            if self.game_obj.is_finished:
+                await self.accept()
+                msg = endgame_JSON(self.game_obj)
+                await self.send_json(msg)
+                await self.close(code=4000)
+                return
+
+            await self.accept()
 
             cancel_countdown_task(self.game_obj, user.username)
 
-            self.game_room_name = self.game_obj.get_game_name()
-       
             await self.channel_layer.group_add(
                 self.game_room_name,
                 self.channel_name
             )
 
-            data = init_JSON(self.game_obj, user.username)
+            data = init_JSON(self.game_obj)
             self.game_engine = GameEngine(self.game_obj)
 
             await self.send_json(data)
@@ -53,7 +59,6 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
         self.game_engine = GameEngine(self.game_obj)
         type = msg['type']
-
         if type == 'move':
             color = self.game_obj.get_color(self.user.username)
             if color != self.game_obj.get_turn():
@@ -61,7 +66,6 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             pick_id = int(msg['pick_id'])
             drop_id = int(msg['drop_id'])
             is_legal_flag, game_result, new_fen = self.game_engine.is_legal(pick_id, drop_id)
-
             if is_legal_flag == False:
                 return
             elif game_result == 'promoting':
@@ -135,18 +139,22 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(
-            self.game_room_name,
-            self.channel_name
-        )
-        # re-getting the game (without it, trigger_countdown_task function runs even when the game is finished, because after the endgame
-        # the consumers do not update the game_obj in the receive_json function(temporary, can be fixed by assigning the game in basic_broadcast()
-        # in the end_game() function))
-        self.game_obj = await get_game_by_id(self.game_id)
+        if close_code == 1001 or close_code == None:
+            await self.channel_layer.group_discard(
+                self.game_room_name,
+                self.channel_name
+            )
+            # re-getting the game (without it, trigger_countdown_task function runs even when the game is finished, because after the endgame
+            # the consumers do not update the game_obj in the receive_json function(temporary, can be fixed by assigning the game in basic_broadcast()
+            # in the end_game() function))
+            self.game_obj = await get_game_by_id(self.game_id)
+            if not self.game_obj.is_finished:
+                trigger_countdown_task(self.game_obj, self.user.username)
 
-        if not self.game_obj.is_finished:
-            trigger_countdown_task(self.game_obj, self.user.username)
-        print('close_code:',close_code)
+        if close_code == 4000:
+            # 4000 - disconnecting after client connects to a game which has finished before
+            pass
+        print('game_close_code:',close_code)
 
     async def basic_broadcast(self, event):
         data = event['text']
@@ -173,7 +181,7 @@ class InviteConsumer(AsyncJsonWebsocketConsumer):
         )
 
     async def disconnect(self, close_code):
-        print('close_code:',close_code)
+        pass
 
     async def one_way_broadcast(self, msg):
         msg = msg['text']

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Profile } from '../models/profile';
 import { HttpResponse } from '@angular/common/http';
 import { User } from '../models/user';
+import { Game } from '../models/game';
 
 @Injectable({
   providedIn: 'root'
@@ -83,6 +84,13 @@ export class UserService {
     return this.http.post(
       'http://localhost:8000/api/game/invite_accept/',
       {invite},
+      {withCredentials:true}
+    )
+  }
+
+  getRunningGames(): Observable<Game[]> {
+    return this.http.get<Game[]>(
+      'http://localhost:8000/api/user/running_games',
       {withCredentials:true}
     )
   }

@@ -5,6 +5,9 @@ import { UserService } from 'src/app/services/user.service';
 import { Emitters } from '../../emitters/emitters';
 import { GameInviteService } from '../../services/game-invite.service';
 import { GameInvite } from 'src/app/models/game_invite';
+import { takeUntil, Subject } from 'rxjs';
+import { Game } from 'src/app/models/game';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -23,15 +26,20 @@ export class HomeComponent implements OnInit, OnDestroy {
   minutes: number = 5;
   color: string = 'random';
 
+  running_games: Game[];
+
+  private ngUnsubscribe = new Subject<void>();
+
   constructor(
     private userService: UserService,
     public gameInviteService: GameInviteService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private router: Router,
   ) { }
   
 
   ngOnInit(): void {
-    this.userService.getUser().subscribe({
+    this.userService.getUser().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
       next:(res: any) => {
         this.user = res;
         this.greet_message = `Hi ${this.user.username}`;
@@ -48,6 +56,16 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
     })
 
+    this.userService.getRunningGames().pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: val => {
+        console.log(val)
+        this.running_games = val;
+      },
+      error: err => {
+        console.log(err)
+      }
+    })
+
     this.friend_request_form = this.formBuilder.group({
       to_username: ''
     })
@@ -57,10 +75,12 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.gameInviteService.closeWebSocket();
+    this.ngUnsubscribe.next()
+    this.ngUnsubscribe.complete()
   }
 
   submit(): any {
-    this.userService.send_friend_request(this.friend_request_form)
+    this.userService.send_friend_request(this.friend_request_form).pipe(takeUntil(this.ngUnsubscribe))
     .subscribe({
       next: res => {
         if (res.status == 201) {
@@ -79,7 +99,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   acceptFriendRequest(id: number): any {
-    this.userService.accept_friend_request(id)
+    this.userService.accept_friend_request(id).pipe(takeUntil(this.ngUnsubscribe))
     .subscribe({
       next: res => {
         if(res.status == 202) {
@@ -132,7 +152,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   acceptGameInvite(invite: GameInvite) { 
-    this.userService.accept_game_invite(invite)
+    this.userService.accept_game_invite(invite).pipe(takeUntil(this.ngUnsubscribe))
     .subscribe()
+  }
+
+  goToGame(game_id: number) {
+    this.router.navigate([`/game/live/${game_id}`])
   }
 }

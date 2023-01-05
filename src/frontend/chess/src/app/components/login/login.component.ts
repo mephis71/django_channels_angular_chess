@@ -1,20 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Emitters } from 'src/app/emitters/emitters';
 import { UserService } from 'src/app/services/user.service';
-
+import { Subject, takeUntil } from 'rxjs';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   form: FormGroup;
   
   username_error = '';
   password_error = '';
   non_field_error = '';
+
+  private ngUnsubscribe = new Subject<void>();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -29,8 +31,13 @@ export class LoginComponent implements OnInit {
     })
   }
 
+  ngOnDestroy(): void {
+    this.ngUnsubscribe.next()
+    this.ngUnsubscribe.complete()
+  }
+
   submit(): any {
-    this.userService.login(this.form.getRawValue())
+    this.userService.login(this.form.getRawValue()).pipe(takeUntil(this.ngUnsubscribe))
     .subscribe({
       next: res => {
         Emitters.usernameEmitter.emit(res.body!.username);

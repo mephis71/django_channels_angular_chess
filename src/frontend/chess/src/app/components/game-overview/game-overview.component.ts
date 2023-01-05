@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GameOverviewService } from 'src/app/services/game-overview.service';
 import { HostListener } from '@angular/core';
@@ -6,16 +6,18 @@ import { Game } from 'src/app/models/game';
 import { UserService } from 'src/app/services/user.service';
 import { User } from 'src/app/models/user';
 import { Emitters } from 'src/app/emitters/emitters';
+import { forkJoin, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-game-overview',
   templateUrl: './game-overview.component.html',
   styleUrls: ['./game-overview.component.css']
 })
-export class GameOverviewComponent implements OnInit {
+export class GameOverviewComponent implements OnInit, OnDestroy {
   game: Game;
   user: User;
   board_orientation: string = 'white';
+  private ngUnsubscribe = new Subject<void>();
 
   constructor(
     private userService: UserService,
@@ -24,30 +26,32 @@ export class GameOverviewComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.userService.getUser().subscribe({
-      next:(res: any) => {
-        this.user = res;
-        Emitters.usernameEmitter.emit(this.user.username);
-      },
-      error:(err: any) => {
-        Emitters.usernameEmitter.emit(null);
-        console.log(err)
-      }
-    })
+    this.gameService.clearVariables();
 
-    this.route.params.subscribe(params => {
-      this.gameService.getGame(params['id']).subscribe({
-        next: game => {
-          this.game = game;
-          this.setBoardOrientation();
-          this.gameService.clearVariables();
+    this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {
+      forkJoin({
+        user: this.userService.getUser(),
+        game: this.gameService.getGame(params['id']) 
+      }).pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe({
+        next: value => {
+          this.user = value.user;
+          Emitters.usernameEmitter.emit(this.user.username);
+          this.game = value.game;
           this.gameService.setGame(this.game);
+          this.setBoardOrientation();
         },
         error: err => {
-          console.log(err)
+          Emitters.usernameEmitter.emit(null);
+          console.log(err);
         }
       })
     })
+  }
+
+  ngOnDestroy() {
+    this.ngUnsubscribe.next()
+    this.ngUnsubscribe.complete()
   }
 
   @HostListener("window:keydown", ['$event'])

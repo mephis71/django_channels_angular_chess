@@ -16,6 +16,10 @@ class GameManager(models.Manager):
         game_obj.save()
         return game_obj
 
+    def get_running_games(self, username):
+        qs = self.get_queryset().filter(Q(is_running=True) & (Q(player_white__username=username) | Q(player_black__username=username)))
+        return qs
+
 class Game(models.Model):
     # default values
     DEFAULT_GAME_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
@@ -44,6 +48,7 @@ class Game(models.Model):
     random_colors = models.BooleanField(null=True)
 
     _move_cancel_fen = models.TextField(null=True, default=None)
+    _game_result = models.TextField(null=True)
 
     objects = GameManager()
 
@@ -109,5 +114,7 @@ class Game(models.Model):
     def add_to_history(self):
         UserProfile.objects.get(pk=self.player_white.pk).game_history.add(self)
         UserProfile.objects.get(pk=self.player_black.pk).game_history.add(self)
+
+    
 
     
