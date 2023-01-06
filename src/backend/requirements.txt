@@ -1,0 +1,9 @@
+django
+daphne
+channels
+Pillow
+django_static_jquery_ui
+djangorestframework
+django-cors-headers
+PyJWT
+django-extensions

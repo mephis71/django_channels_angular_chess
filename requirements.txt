@@ -1,4 +1,0 @@
-django
-channels
-Pillow
-django_static_jquery_ui

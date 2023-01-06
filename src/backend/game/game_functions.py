@@ -13,7 +13,7 @@ async def end_game(game_obj, game_result):
     game_room_name = game_obj.get_game_name()
     now = datetime.datetime.now(tz=timezone.utc)
 
-    for task in asyncio.Task.all_tasks():
+    for task in asyncio.all_tasks():
             if task.get_name() == f'{game_room_name}_timer':
                 task.cancel()
 

@@ -14,6 +14,7 @@ INSTALLED_APPS = [
     'users',
     'game',
     'django_static_jquery_ui',
+    'daphne',
     'channels',
     'rest_framework',
     'django.contrib.admin',
@@ -23,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    "django_extensions",
 ]
 
 MIDDLEWARE = [

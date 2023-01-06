@@ -8,7 +8,7 @@ from .game_functions import end_game
 def trigger_timer_task(game_obj):
     game_room_name = game_obj.get_game_name()
     task_name = f'{game_room_name}_timer'
-    for task in asyncio.Task.all_tasks():
+    for task in asyncio.all_tasks():
         if task.get_name() == task_name:
             task.cancel()
             asyncio.create_task(realtime_timer_broadcast(game_obj), name=task_name)
@@ -50,7 +50,7 @@ async def realtime_timer_broadcast(game_obj):
 def cancel_timer_task(game_obj):
     game_room_name = game_obj.get_game_name()
     task_name = f'{game_room_name}_timer'
-    for task in asyncio.Task.all_tasks():
+    for task in asyncio.all_tasks():
         if task.get_name() == task_name:
             task.cancel()
             return
@@ -74,7 +74,7 @@ async def endgame_countdown(game_obj, username):
 def cancel_countdown_task(game_obj, username):
     game_room_name = game_obj.get_game_name()
     task_name = f'{game_room_name}_countdown_{username}'
-    for task in asyncio.Task.all_tasks():
+    for task in asyncio.all_tasks():
         if task.get_name() == task_name:
             task.cancel()
             return
