@@ -73,7 +73,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
         "pick_id": this.pick_id,
         "drop_id": this.drop_id
       }
-      this.gameService.sendMsg(JSON.stringify(msg))
+      this.gameService.sendMsg(msg)
     }
     this.drop_id = this.pick_id = null;
   }
@@ -83,7 +83,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
       "type": "promotion",
       "piece_type": piece_type
     }
-    this.gameService.sendMsg(JSON.stringify(msg));
+    this.gameService.sendMsg(msg);
     this.gameService.promoting = false;
   }
 
@@ -91,7 +91,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
     let msg = {
       "type": "draw_offer"
     }
-    this.gameService.sendMsg(JSON.stringify(msg));
+    this.gameService.sendMsg(msg);
     this.gameService.allow_draw_offer = false;
   }
 
@@ -99,7 +99,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
     let msg = {
       "type": "draw_accept"
     }
-    this.gameService.sendMsg(JSON.stringify(msg));
+    this.gameService.sendMsg(msg);
     this.gameService.draw_offer_pending = false;
     this.gameService.allow_draw_offer = false;
   }
@@ -108,7 +108,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
     let msg = {
       "type": "draw_reject"
     }
-    this.gameService.sendMsg(JSON.stringify(msg));
+    this.gameService.sendMsg(msg);
     this.gameService.draw_offer_pending = false;
     this.gameService.allow_draw_offer = true;
   }
@@ -153,7 +153,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
     let msg = {
       "type": "move_cancel_request"
     }
-    this.gameService.sendMsg(JSON.stringify(msg));
+    this.gameService.sendMsg(msg);
     this.gameService.allow_move_cancel_request = false;
   }
 
@@ -161,7 +161,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
     let msg = {
       "type": "move_cancel_accept"
     }
-    this.gameService.sendMsg(JSON.stringify(msg));
+    this.gameService.sendMsg(msg);
     this.gameService.move_cancel_request_pending = false;
     this.gameService.allow_move_cancel_request = false;
   }
@@ -170,7 +170,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
     let msg = {
       "type": "move_cancel_reject"
     }
-    this.gameService.sendMsg(JSON.stringify(msg));
+    this.gameService.sendMsg(msg);
     this.gameService.move_cancel_request_pending = false;
     this.gameService.allow_move_cancel_request = true;
   }
@@ -183,7 +183,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
     let msg = {
       'type': 'resign'
     }
-    this.gameService.sendMsg(JSON.stringify(msg));
+    this.gameService.sendMsg(msg);
     this.gameService.show_resign_button = true;
   }
 
@@ -195,7 +195,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
     let msg = {
       'type': 'rematch'
     }
-    this.gameService.sendMsg(JSON.stringify(msg))
+    this.gameService.sendMsg(msg)
     this.gameService.show_rematch_button = false;
   }
 
@@ -203,7 +203,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
     let msg = {
       'type': 'rematch_accept'
     }
-    this.gameService.sendMsg(JSON.stringify(msg))
+    this.gameService.sendMsg(msg)
     this.gameService.show_rematch_button = false;
     this.gameService.rematch_offer_pending = false;
   }
@@ -212,7 +212,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
     let msg = {
       'type': 'rematch_reject'
     }
-    this.gameService.sendMsg(JSON.stringify(msg))
+    this.gameService.sendMsg(msg)
     this.gameService.show_rematch_button = true;
     this.gameService.rematch_offer_pending = false;
   }

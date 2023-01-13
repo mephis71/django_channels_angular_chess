@@ -1,0 +1,26 @@
+<div class="list-group w-auto">
+  <h6>Game chat</h6>
+
+  <div class="list-group list-group-flush border-bottom scrollarea">
+    <div class="list-group-item list-group-item-action py-3 lh-tight"
+         *ngFor="let msg of chatService.messages">
+
+      <div class="d-flex w-100 align-items-center justify-content-between">
+        <strong class="mb-1">{{msg.username}}</strong>
+      </div>
+
+      <div class="col-10 mb-1 small message-text">
+        {{msg.text}}
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<form [formGroup]="message_form" id="messagebox">
+
+  <input class="form-control" formControlName="text" placeholder="Write a message" (submit)="sendChatMessage()" >
+  <button (click)="sendChatMessage()" class="btn btn-primary">Send</button>
+
+</form>

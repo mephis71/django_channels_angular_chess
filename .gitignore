@@ -2,5 +2,4 @@
 .vscode
 todo.txt
 db.sqlite3
-*__pycache__*
-*venv*
+**/__pycache__/

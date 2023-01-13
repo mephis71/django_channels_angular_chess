@@ -43,6 +43,7 @@ export class GameLiveService {
 
   public openWebSocket() {
     let path = window.location.pathname
+    
     this.ws = new WebSocket(`ws://localhost:8000${path}`)
 
     this.ws.onopen = (event) => {
@@ -202,7 +203,7 @@ export class GameLiveService {
   }
 
   public sendMsg(msg: any) {
-    this.ws.send(msg)
+    this.ws.send(JSON.stringify(msg))
   }
 
   fenToPieces(fen: string) {

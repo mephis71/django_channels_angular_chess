@@ -154,7 +154,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         if close_code == 4000:
             # 4000 - disconnecting after client connects to a game which has finished before
             pass
-        print('game_close_code:',close_code)
+        print('game_close_code:', close_code)
 
     async def basic_broadcast(self, event):
         data = event['text']
@@ -181,12 +181,54 @@ class InviteConsumer(AsyncJsonWebsocketConsumer):
         )
 
     async def disconnect(self, close_code):
-        pass
+        print('invite_close_code:', close_code)
 
     async def one_way_broadcast(self, msg):
         msg = msg['text']
         if self.channel_name != msg['sender_channel_name']:
             await self.send_json(msg)
+
+    async def basic_broadcast(self, msg):
+        msg = msg['text']
+        await self.send_json(msg)
+
+class GameChatConsumer(AsyncJsonWebsocketConsumer):
+    async def connect(self):
+        token = self.scope['cookies']['jwt']
+        try:
+            payload = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
+        except:
+            raise exceptions.AuthenticationFailed('Invalid authentication. Could not decode token.')
+        try:
+            user = await database_sync_to_async (User.objects.get)(pk=payload['id'])
+            self.user = user
+            self.username = self.user.username
+        except User.DoesNotExist:
+            raise exceptions.AuthenticationFailed('No user matching this token was found.')
+
+        await self.accept()
+
+        self.game_id = self.scope['url_route']['kwargs']['game_id']
+        self.game_obj = await get_game_by_id(self.game_id)
+        self.game_room_name = self.game_obj.get_game_name()
+
+        await self.channel_layer.group_add(
+                f'{self.game_room_name}_chat',
+                self.channel_name
+            )
+
+    async def receive_json(self, msg):
+        msg['username'] = self.username
+        await self.channel_layer.group_send(
+            f'{self.game_room_name}_chat',
+            {
+                'type': 'basic_broadcast',
+                'text': msg
+            }
+        )
+
+    async def disconnect(self, close_code):
+        print('game_chat_close_code:', close_code)
 
     async def basic_broadcast(self, msg):
         msg = msg['text']

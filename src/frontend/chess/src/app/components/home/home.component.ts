@@ -148,7 +148,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         "duration": this.minutes
       }
     }
-    this.gameInviteService.sendMsg(JSON.stringify(invite));
+    this.gameInviteService.sendMsg(invite);
   }
 
   acceptGameInvite(invite: GameInvite) { 

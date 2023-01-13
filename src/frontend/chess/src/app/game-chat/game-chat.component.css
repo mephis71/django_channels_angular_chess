@@ -1,0 +1,13 @@
+#messagebox {
+    position: absolute;
+    bottom: 0;
+}
+
+.scrollarea {
+    max-height: 680px;
+    overflow-y: auto;
+}
+
+.message-text {
+    word-wrap: break-word;
+}

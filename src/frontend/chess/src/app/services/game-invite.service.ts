@@ -47,7 +47,7 @@ export class GameInviteService {
   }
 
   public sendMsg(msg: any) {
-    this.ws.send(msg)
+    this.ws.send(JSON.stringify(msg))
   }
 
   clearVariables() {

@@ -16,6 +16,7 @@ import { UserProfileComponent } from './components/user-profile/user-profile.com
 import { GameOverviewComponent } from './components/game-overview/game-overview.component';
 import { MatSliderModule } from '@angular/material/slider'; 
 import { MatRadioModule } from '@angular/material/radio';
+import { GameChatComponent } from './game-chat/game-chat.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { MatRadioModule } from '@angular/material/radio';
     NavComponent,
     GameLiveComponent,
     UserProfileComponent,
-    GameOverviewComponent
+    GameOverviewComponent,
+    GameChatComponent
   ],
   imports: [
     BrowserModule,
