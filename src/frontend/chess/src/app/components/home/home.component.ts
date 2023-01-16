@@ -5,7 +5,7 @@ import { UserService } from 'src/app/services/user.service';
 import { Emitters } from '../../emitters/emitters';
 import { GameInviteService } from '../../services/game-invite.service';
 import { GameInvite } from 'src/app/models/game_invite';
-import { takeUntil, Subject } from 'rxjs';
+import { takeUntil, Subject, from, concatMap, switchMap } from 'rxjs';
 import { Game } from 'src/app/models/game';
 import { Router } from '@angular/router';
 
@@ -21,7 +21,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   friend_request_message = '';
   greet_message = 'You are not logged in';
-  friend_request_accept_message = '';
 
   minutes: number = 5;
   color: string = 'random';
@@ -80,7 +79,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   submit(): any {
-    this.userService.send_friend_request(this.friend_request_form).pipe(takeUntil(this.ngUnsubscribe))
+    this.userService.sendFriendRequest(this.friend_request_form).pipe(takeUntil(this.ngUnsubscribe))
     .subscribe({
       next: res => {
         if (res.status == 201) {
@@ -99,17 +98,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   acceptFriendRequest(id: number): any {
-    this.userService.accept_friend_request(id).pipe(takeUntil(this.ngUnsubscribe))
-    .subscribe({
-      next: res => {
-        if(res.status == 202) {
-          this.friend_request_accept_message = 'Friend request accepted';
-        }
+    this.userService.acceptFriendRequest(id).pipe(
+      switchMap(() => this.userService.getUser()),
+      takeUntil(this.ngUnsubscribe)
+    ).subscribe({
+      next: user => {
+        this.user = user;
       },
       error: err => {
-        if(err.status == 404) {
-          this.friend_request_accept_message = 'Friend request could not be found';
-        }
+        console.log(err);
       }
     })
   }
@@ -152,11 +149,65 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   acceptGameInvite(invite: GameInvite) { 
-    this.userService.accept_game_invite(invite).pipe(takeUntil(this.ngUnsubscribe))
+    this.userService.acceptGameInvite(invite).pipe(takeUntil(this.ngUnsubscribe))
     .subscribe()
   }
 
   goToGame(game_id: number) {
     this.router.navigate([`/game/live/${game_id}`])
   }
+
+  refreshUser() {
+    this.userService.getUser().pipe(takeUntil(this.ngUnsubscribe))
+    .subscribe({
+      next: user => {
+        this.user = user;
+      },
+      error: err => {
+        console.log(err);
+      }
+    })
+  }
+
+  removeFriend(friend_username: any) {
+    this.userService.removeFriend(friend_username).pipe(
+      switchMap(() => this.userService.getUser()),
+      takeUntil(this.ngUnsubscribe)
+    ).subscribe({
+      next: user => {
+        this.user = user;
+      },
+      error: err => {
+        console.log(err);
+      }
+    })
+
+    this.userService.removeFriend(friend_username).pipe(takeUntil(this.ngUnsubscribe))
+    .subscribe({
+      next: res => {
+        console.log(res);
+      },
+      error: err => {
+        console.log(err);
+      }
+    })
+  }
+
+  rejectGameInvite(invite: any) {
+    this.gameInviteService.invites = this.gameInviteService.invites.filter(e => e.from_user != invite.from_user);
+  }
+
+  rejectFriendRequest(friend_request_id: any) {
+    this.userService.rejectFriendRequest(friend_request_id).pipe(
+      switchMap(() => this.userService.getUser()),
+      takeUntil(this.ngUnsubscribe)
+    ).subscribe({
+      next: user => {
+        this.user = user;
+      },
+      error: err => {
+        console.log(err);
+      }
+    })
+  }  
 }

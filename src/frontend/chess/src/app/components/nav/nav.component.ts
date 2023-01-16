@@ -27,6 +27,7 @@ export class NavComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }
+  
   logout(): void {
     this.userService.logout().pipe(takeUntil(this.ngUnsubscribe))
     .subscribe({

@@ -177,6 +177,8 @@ export class GameLiveComponent implements OnInit, OnDestroy {
 
   resign() {
     this.gameService.show_resign_button = false;
+    this.gameService.show_resign_cancel_button = true;
+    this.gameService.show_resign_confirm_button = true;
   }
 
   confirmResign() {
@@ -184,11 +186,15 @@ export class GameLiveComponent implements OnInit, OnDestroy {
       'type': 'resign'
     }
     this.gameService.sendMsg(msg);
-    this.gameService.show_resign_button = true;
+    this.gameService.show_resign_button = false;
+    this.gameService.show_resign_cancel_button = false;
+    this.gameService.show_resign_confirm_button = false;
   }
 
   cancelResign() {
     this.gameService.show_resign_button = true;
+    this.gameService.show_resign_cancel_button = false;
+    this.gameService.show_resign_confirm_button = false;
   }
 
   sendRematch() {

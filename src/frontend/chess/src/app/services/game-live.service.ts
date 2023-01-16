@@ -29,6 +29,8 @@ export class GameLiveService {
   move_cancel_error: string;
 
   show_resign_button = true;
+  show_resign_confirm_button = false;
+  show_resign_cancel_button = false;
 
   show_rematch_button = true;
   rematch_offer_pending = false;
@@ -94,6 +96,9 @@ export class GameLiveService {
         this.allow_draw_offer = false;
         this.allow_move_cancel_request = false;
         this.move_cancel_request_pending = false;
+        this.show_resign_button = false;
+        this.show_resign_confirm_button = false;
+        this.show_resign_cancel_button = false;
         
         if(data.game_result == 'blackwins') {
           this.endgame_info = 'Black wins by checkmate';
@@ -353,6 +358,8 @@ export class GameLiveService {
     this.game_positions = [];
 
     this.show_resign_button = true;
+    this.show_resign_confirm_button = false;
+    this.show_resign_cancel_button = false;
 
     this.show_rematch_button = true;
     this.rematch_offer_pending = false;
