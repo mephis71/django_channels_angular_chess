@@ -80,3 +80,6 @@ class FriendRequest(models.Model):
         self.from_user.friends.add(self.to_user)
         self.to_user.friends.add(self.from_user)
         self.delete()
+    
+    def reject(self):
+        self.delete()

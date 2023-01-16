@@ -9,5 +9,7 @@ urlpatterns = [
     path('logout/', LogoutAPIView.as_view()),
     path('send_friend_request/', SendFriendRequestAPIView.as_view()),
     path('accept_friend_request/<int:id>', AcceptFriendRequestAPIView.as_view()),
-    path('running_games', UserRunningGamesAPIView.as_view())
+    path('reject_friend_request/<int:id>', RejectFriendRequestAPIView.as_view()),
+    path('running_games', UserRunningGamesAPIView.as_view()),
+    path('remove_friend/<str:friend_username>', RemoveFriendAPIView.as_view())
 ] 

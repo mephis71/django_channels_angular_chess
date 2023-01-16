@@ -93,6 +93,34 @@ class AcceptFriendRequestAPIView(APIView):
             friend_request.accept()
             return Response(status=status.HTTP_202_ACCEPTED)
 
+class RejectFriendRequestAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        friend_request_id = kwargs['id']
+        friend_request = FriendRequest.objects.filter(id=friend_request_id).first()
+        print(friend_request)
+        if friend_request is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            friend_request.reject()
+            return Response(status=status.HTTP_200_OK)
+
+class RemoveFriendAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        friend_username = kwargs['friend_username']
+        friend = User.objects.filter(username=friend_username).first()
+        if friend is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            user = request.user
+            user.friends.remove(friend)
+            friend.friends.remove(user)
+            return Response(status=status.HTTP_200_OK)
+
+
 
 class UserProfileAPIView(APIView):
     permission_classes = (IsAuthenticated,)
