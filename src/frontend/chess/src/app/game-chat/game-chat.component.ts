@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { ChatMessage } from '../models/chat_message';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { GameChatService } from '../services/game-chat.service';
 
 @Component({

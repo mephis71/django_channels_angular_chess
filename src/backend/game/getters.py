@@ -1,5 +1,7 @@
 from channels.db import database_sync_to_async
+
 from .models import Game
+
 
 @database_sync_to_async
 def get_game_by_id(game_id):

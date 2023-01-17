@@ -5,7 +5,7 @@ import { UserService } from 'src/app/services/user.service';
 import { Emitters } from '../../emitters/emitters';
 import { GameInviteService } from '../../services/game-invite.service';
 import { GameInvite } from 'src/app/models/game_invite';
-import { takeUntil, Subject, from, concatMap, switchMap } from 'rxjs';
+import { takeUntil, Subject, switchMap } from 'rxjs';
 import { Game } from 'src/app/models/game';
 import { Router } from '@angular/router';
 

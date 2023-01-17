@@ -1,5 +1,6 @@
-from rest_framework import serializers
 from game.models import Game
+from rest_framework import serializers
+
 
 class GameSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)

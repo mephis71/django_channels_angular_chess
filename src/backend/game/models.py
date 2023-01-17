@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Q
 from users.models import UserProfile
+
 from .utils import to_timer_format
 
 User = get_user_model()

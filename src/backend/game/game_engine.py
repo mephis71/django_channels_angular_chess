@@ -1,5 +1,5 @@
 import re
-from rich import print
+
 
 class Piece:
     def __init__(self, color, type):
@@ -554,7 +554,6 @@ class GameEngine:
             x.type if x is not None and x.color is color else None \
             for x in self.pieces
         ]
-        # print(type_list)
         king_position = type_list.index('king')
         if self.attacked_fields[king_position] == True:
             return True

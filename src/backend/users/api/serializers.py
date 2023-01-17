@@ -1,7 +1,7 @@
-from rest_framework import serializers
-from users.models import User, FriendRequest, UserProfile
 from django.contrib.auth import authenticate
 from game.api.serializers import GameHistorySerializer
+from rest_framework import serializers
+from users.models import FriendRequest, User, UserProfile
 
 
 class RegistrationSerializer(serializers.ModelSerializer):

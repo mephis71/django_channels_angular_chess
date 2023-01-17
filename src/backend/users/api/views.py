@@ -1,13 +1,16 @@
+from game.api.serializers import GameSerializer
+from game.models import Game
 from rest_framework import status
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveUpdateAPIView
-from .serializers import RegistrationSerializer, LoginSerializer, UserSerializer, FriendRequestSerializer, UserProfileSerializer
-from users.models import User, FriendRequest, UserProfile
-from rich import print
-from game.api.serializers import GameSerializer
-from game.models import Game
+from users.models import FriendRequest, User, UserProfile
+
+from .serializers import (FriendRequestSerializer, LoginSerializer,
+                          RegistrationSerializer, UserProfileSerializer,
+                          UserSerializer)
+
 
 class RegistrationAPIView(APIView):
     permission_classes = (AllowAny,)
@@ -99,7 +102,6 @@ class RejectFriendRequestAPIView(APIView):
     def post(self, request, *args, **kwargs):
         friend_request_id = kwargs['id']
         friend_request = FriendRequest.objects.filter(id=friend_request_id).first()
-        print(friend_request)
         if friend_request is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
         else:

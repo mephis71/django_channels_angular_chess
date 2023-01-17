@@ -3,13 +3,13 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from rich import print
 
 from .game_engine import GameEngine
-from .tasks import cancel_countdown_task, trigger_countdown_task, trigger_timer_task, cancel_timer_task
-from .utils import init_JSON, opposite_color
-from .getters import get_game_by_id
 from .game_functions import *
+from .getters import get_game_by_id
+from .tasks import (cancel_countdown_task, cancel_timer_task,
+                    trigger_countdown_task, trigger_timer_task)
+from .utils import init_JSON, opposite_color
 
 User = get_user_model()
 from rest_framework import exceptions
@@ -154,7 +154,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         if close_code == 4000:
             # 4000 - disconnecting after client connects to a game which has finished before
             pass
-        print('game_close_code:', close_code)
+        # print('game_close_code:', close_code)
 
     async def basic_broadcast(self, event):
         data = event['text']
@@ -181,7 +181,8 @@ class InviteConsumer(AsyncJsonWebsocketConsumer):
         )
 
     async def disconnect(self, close_code):
-        print('invite_close_code:', close_code)
+        pass
+        # print('invite_close_code:', close_code)
 
     async def one_way_broadcast(self, msg):
         msg = msg['text']
@@ -228,7 +229,8 @@ class GameChatConsumer(AsyncJsonWebsocketConsumer):
         )
 
     async def disconnect(self, close_code):
-        print('game_chat_close_code:', close_code)
+        pass
+        # print('game_chat_close_code:', close_code)
 
     async def basic_broadcast(self, msg):
         msg = msg['text']

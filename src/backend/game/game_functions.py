@@ -1,11 +1,12 @@
-from .getters import get_game_by_id
-from channels.db import database_sync_to_async
 import asyncio
 import datetime
 from datetime import timezone
-from .utils import endgame_JSON, move_JSON, move_cancel_JSON
-from game.getters import new_game
+
+from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
+from game.getters import new_game
+
+from .utils import endgame_JSON, move_cancel_JSON, move_JSON
 
 channel_layer = get_channel_layer()
 

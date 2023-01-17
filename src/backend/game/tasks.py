@@ -1,9 +1,11 @@
 from channels.layers import get_channel_layer
+
 channel_layer = get_channel_layer()
 import asyncio
-from rich import print
-from .utils import to_timer_format, opposite_color
+
 from .game_functions import end_game
+from .utils import opposite_color, to_timer_format
+
 
 def trigger_timer_task(game_obj):
     game_room_name = game_obj.get_game_name()
@@ -26,7 +28,8 @@ async def realtime_timer_broadcast(game_obj):
         try:
             raise Exception('Unindetified timer color')
         finally: 
-            print('turn:', turn)
+            # print('turn:', turn)
+            pass
     while timer >= 0:
         timer -= 1
         msg = {

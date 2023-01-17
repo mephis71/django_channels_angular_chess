@@ -1,14 +1,15 @@
-from rest_framework.response import Response
-from rest_framework import status
-from game.models import Game
-from game.api.serializers import GameSerializer
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from channels.layers import get_channel_layer
+from game.api.serializers import GameSerializer
+from game.models import Game
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 channel_layer = get_channel_layer()
 from asgiref.sync import async_to_sync
-from rich import print
 from game.getters import new_game
+
 
 class GameAPIView(APIView):
     permission_classes = (IsAuthenticated,)
