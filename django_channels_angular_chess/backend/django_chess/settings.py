@@ -123,8 +123,8 @@ REST_FRAMEWORK = {
     ),
 }
 
-STATIC_URL = '/static/static/'
-MEDIA_URL = '/static/media/'
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
 
-STATIC_ROOT = '/vol/web/static'
-MEDIA_ROOT = '/vol/web/media'
+STATIC_ROOT = '/static'
+MEDIA_ROOT = '/media'

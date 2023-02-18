@@ -7,8 +7,8 @@ services:
     ports:
      - "8000:8000"
     volumes:
-      - ./backend:/backend
-    command: sh -c "python manage.py runserver 127.0.0.1:8000"
+      - static:/static
+      - media:/media
     environment:
       - DEBUG=1
 
@@ -23,3 +23,8 @@ services:
     image: redis
     ports:
       - "6379:6379"
+
+volumes:
+ static:
+ media:
+ 
