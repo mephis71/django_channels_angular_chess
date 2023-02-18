@@ -14,7 +14,7 @@ export class GameChatService {
   public openWebSocket() {
     let path = window.location.pathname;
 
-    this.ws = new WebSocket(`ws://localhost:8000${path}/chat`);
+    this.ws = new WebSocket(`ws://0.0.0.0:8000${path}/chat`);
 
     this.ws.onopen = (event) => {
 

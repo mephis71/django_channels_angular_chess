@@ -11,6 +11,9 @@ services:
       - media:/media
     environment:
       - DEBUG=1
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
 
   frontend:
     container_name: frontend

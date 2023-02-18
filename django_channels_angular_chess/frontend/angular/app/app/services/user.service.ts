@@ -17,21 +17,21 @@ export class UserService {
 
   getUser(): Observable<User> {
     return this.http.get<User>(
-      'http://localhost:8000/api/user',
+      'http://0.0.0.0:8000/api/user',
       {withCredentials:true}
     )
   }
 
   getProfile(username: string): Observable<Profile> {
     return this.http.get<Profile>(
-      `http://localhost:8000/api/user/profile/${username}`,
+      `http://0.0.0.0:8000/api/user/profile/${username}`,
       {withCredentials:true}
     )
   }
 
   register(form: any) {
       return this.http.post(
-      'http://localhost:8000/api/user/register/',
+      'http://0.0.0.0:8000/api/user/register/',
       {user: form},
       {observe: 'response'}
     )
@@ -39,7 +39,7 @@ export class UserService {
 
   login(form: any): Observable<HttpResponse<User>> {
     return this.http.post<User>(
-      'http://localhost:8000/api/user/login/',
+      'http://0.0.0.0:8000/api/user/login/',
       {user: form},
       {
         withCredentials:true,
@@ -50,7 +50,7 @@ export class UserService {
 
   logout(): Observable<HttpResponse<any>> {
     return this.http.post(
-      'http://localhost:8000/api/user/logout/',
+      'http://0.0.0.0:8000/api/user/logout/',
       {},
       {
         withCredentials:true,
@@ -60,7 +60,7 @@ export class UserService {
   }
 
   sendFriendRequest(form: any): Observable<HttpResponse<any>> {
-    return this.http.post('http://localhost:8000/api/user/send_friend_request/',
+    return this.http.post('http://0.0.0.0:8000/api/user/send_friend_request/',
       form.getRawValue(),
       {
         withCredentials: true,
@@ -71,7 +71,7 @@ export class UserService {
 
   acceptFriendRequest(id: number): Observable<HttpResponse<any>> {
     return this.http.post(
-      `http://localhost:8000/api/user/accept_friend_request/${id}`,
+      `http://0.0.0.0:8000/api/user/accept_friend_request/${id}`,
       {},
       {
         withCredentials:true,
@@ -82,7 +82,7 @@ export class UserService {
 
   acceptGameInvite(invite: any): Observable<Object> {
     return this.http.post(
-      'http://localhost:8000/api/game/invite_accept/',
+      'http://0.0.0.0:8000/api/game/invite_accept/',
       {invite},
       {withCredentials:true}
     )
@@ -90,14 +90,14 @@ export class UserService {
 
   getRunningGames(): Observable<Game[]> {
     return this.http.get<Game[]>(
-      'http://localhost:8000/api/user/running_games',
+      'http://0.0.0.0:8000/api/user/running_games',
       {withCredentials:true}
     )
   }
 
   removeFriend(friend_username: string): Observable<Object> {
     return this.http.post(
-      `http://localhost:8000/api/user/remove_friend/${friend_username}`,
+      `http://0.0.0.0:8000/api/user/remove_friend/${friend_username}`,
       {},
       {withCredentials:true,
       observe: 'response'}
@@ -106,7 +106,7 @@ export class UserService {
 
   rejectFriendRequest(friend_request_id: number) {
     return this.http.post(
-      `http://localhost:8000/api/user/reject_friend_request/${friend_request_id}`,
+      `http://0.0.0.0:8000/api/user/reject_friend_request/${friend_request_id}`,
       {},
       {withCredentials: true,
       observe: 'response'}

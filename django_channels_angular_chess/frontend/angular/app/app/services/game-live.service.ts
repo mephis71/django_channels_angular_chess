@@ -46,7 +46,7 @@ export class GameLiveService {
   public openWebSocket() {
     let path = window.location.pathname
     
-    this.ws = new WebSocket(`ws://localhost:8000${path}`)
+    this.ws = new WebSocket(`ws://0.0.0.0:8000${path}`)
 
     this.ws.onopen = (event) => {
     };
@@ -337,7 +337,7 @@ export class GameLiveService {
 
   getGame(id: number): Observable<Game>  {
     return this.http.get<Game>(
-      `http://localhost:8000/api/game/${id}`,
+      `http://0.0.0.0:8000/api/game/${id}`,
       {withCredentials: true}
     )
   }

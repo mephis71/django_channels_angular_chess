@@ -137,7 +137,7 @@ export class GameOverviewService {
 
   getGame(id: number): Observable<Game> {
     return this.http.get<Game>(
-      `http://localhost:8000/api/game/${id}`,
+      `http://0.0.0.0:8000/api/game/${id}`,
       {withCredentials: true}
     )
   }

@@ -15,7 +15,7 @@ export class GameInviteService {
     ) { }
 
   public openWebSocket() {
-    this.ws = new WebSocket('ws://localhost:8000/game/invite/')
+    this.ws = new WebSocket('ws://0.0.0.0:8000/game/invite/')
 
     this.ws.onopen = (event) => {
     };
