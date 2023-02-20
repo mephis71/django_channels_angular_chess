@@ -19,7 +19,7 @@ services:
     container_name: frontend
     build: frontend
     ports:
-     - "4200:4200"
+     - "4200:80"
 
   redis:
     container_name: redis

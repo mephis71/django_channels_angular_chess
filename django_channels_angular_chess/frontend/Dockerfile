@@ -1,30 +1,20 @@
-FROM node:14.15-alpine as builder
+FROM node:lts-alpine AS builder
 
-# Set working directory.
-RUN mkdir /app
-WORKDIR /app
+WORKDIR /app/
 
-# Copy app dependecies.
-COPY angular/package.json angular/package-lock.json /app/angular/
+COPY angular/package.json ./
 
-# Install app dependecies.
-RUN npm install --prefix angular
+RUN npm install
 
-# Copy all files.
-COPY . /app
+COPY ./angular /app
 
-# Build app.
-RUN npm run build --prefix angular -- --output-path=./dist/out
+RUN npm run build
 
-FROM nginx:1.15.7-alpine
+FROM nginx:stable-alpine
 
-# Remove default nginx website
-RUN rm -rf /usr/share/nginx/html/*
+EXPOSE 80
 
-# Copy output directory from builder to nginx image.
-COPY --from=builder /app/angular/dist/out /usr/share/nginx/html
+COPY --from=builder /app/dist/chess/ /usr/share/nginx/html/
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy nginx configuration file.
-COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
-
-EXPOSE 4200
+CMD ["nginx", "-g", "daemon off;"]
