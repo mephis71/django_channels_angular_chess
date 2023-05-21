@@ -1,0 +1,6 @@
+.venv
+.vscode
+todo.txt
+db.sqlite3
+**/__pycache__/
+dump.rdb

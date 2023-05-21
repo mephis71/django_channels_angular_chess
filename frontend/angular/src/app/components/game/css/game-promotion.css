@@ -1,0 +1,19 @@
+#promotionbox {
+    display: flex;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 8 / 1;
+    text-align: center;
+    background-color: beige;
+    border: 10px solid black;
+    justify-content:space-evenly;
+}
+
+.promotionpick {
+    aspect-ratio: 1 / 1;
+    background-size: 100%;
+}
+
+.promotionpick:hover {
+    border: 5px solid black;
+}

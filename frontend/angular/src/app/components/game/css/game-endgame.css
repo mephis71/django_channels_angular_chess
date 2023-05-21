@@ -1,0 +1,13 @@
+#endgameinfo {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 8 / 1;
+    text-align: center;
+    background-color: beige;
+    border: 10px solid black;
+}
+
+#endgametext {
+    margin-left: auto;
+    margin-right: auto;
+}

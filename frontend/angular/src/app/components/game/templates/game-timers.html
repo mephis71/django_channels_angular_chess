@@ -1,0 +1,13 @@
+<div *ngIf="boardOrientation == Color.WHITE">
+    <div class="player">{{getPlayer(Color.BLACK)}}</div>
+    <div class="timer" id="timerblack">{{timeBlack}}</div>
+    <div class="timer" id="timerwhite">{{timeWhite}}</div>
+    <div class="player">{{getPlayer(Color.WHITE)}}</div>
+</div>
+
+<div *ngIf="boardOrientation == Color.BLACK">
+    <div class="player">{{getPlayer(Color.WHITE)}}</div>
+    <div class="timer" id="timerwhite">{{timeWhite}}</div>
+    <div class="timer" id="timerblack">{{timeBlack}}</div>
+    <div class="player">{{getPlayer(Color.BLACK)}}</div>
+</div>

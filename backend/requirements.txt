@@ -1,0 +1,10 @@
+django==4.2
+daphne==4.0.0
+channels==4.0.0
+Pillow==9.5.0
+djangorestframework==3.14.0
+django-cors-headers==3.14.0
+PyJWT==2.6.0
+django-extensions==3.2.1
+channels_redis==4.1.0
+stockfish==3.28.0

@@ -1,0 +1,29 @@
+
+<div id="board" *ngIf="boardOrientation == Color.WHITE"
+cdkDropList
+cdkDropListSortingDisabled
+cdkDropListOrientation="horizontal">
+    <div *ngFor="let piece of pieces; index as i;"
+    cdkDrag
+    class="piece"
+    [attr.id]="i"
+    [cdkDragDisabled]="piece.empty"
+    [ngStyle]="!piece.empty? {'background-image': 'url(' + piece.img_url + ')'} : null">
+    </div>
+</div>
+
+<div id="board" *ngIf="boardOrientation == Color.BLACK"
+cdkDropList
+cdkDropListSortingDisabled
+cdkDropListOrientation="horizontal">
+    <div *ngFor="let piece of pieces.slice().reverse(); index as i;"
+    cdkDrag
+    class="piece"
+    [attr.id]="(pieces.length - i) - 1"
+    [cdkDragDisabled]="piece.empty"
+    [ngStyle]="!piece.empty? {'background-image': 'url(' + piece.img_url + ')'} : null">
+    </div>
+</div>
+
+
+

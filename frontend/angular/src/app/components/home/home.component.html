@@ -1,0 +1,42 @@
+<div *ngIf="!authenticated" class="container">
+  <div class="row">
+    <div class="col">
+    </div>
+    <div class="col">
+      <h4 [ngStyle]="{'text-align': 'center'}">{{greetMessage}}</h4>
+    </div>
+    <div class="col">
+    </div>
+  </div>
+</div>
+
+<div *ngIf="authenticated" class="container">
+  <div class="row">
+
+    <div class="col">
+      <home-friends
+      class="home-section"
+      [user]="user"></home-friends>
+    </div>
+
+    <div class="col">
+      <h4 [ngStyle]="{'text-align': 'center'}">{{greetMessage}}</h4>
+      <home-game-invites
+      [user]="user"
+        class="home-section">
+      </home-game-invites>
+      <home-running-games
+        class="home-section">
+      </home-running-games>
+    </div>
+
+    <div class="col">
+      <home-game-settings
+      class="home-section"
+      [user]="user"></home-game-settings>
+      <home-freeboard-settings
+      class="home-section">
+      </home-freeboard-settings>
+    </div>
+
+</div>

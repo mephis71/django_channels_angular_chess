@@ -1,0 +1,17 @@
+<h4>Game settings</h4>
+<div *ngIf="minutes == 1">Duration: {{minutes}} minute</div>
+<div *ngIf="!(minutes == 1)">Duration: {{minutes}} minutes</div>
+
+<mat-slider thumbLabel
+  min="1" 
+  max="10" 
+  step="1"
+  [(ngModel)]="minutes">
+</mat-slider>
+
+<div>Color:</div>
+<mat-radio-group [(ngModel)]="color_choice">
+  <mat-radio-button value='random'>Random</mat-radio-button>
+  <mat-radio-button value='white'>White</mat-radio-button>
+  <mat-radio-button value='black'>Black</mat-radio-button>
+</mat-radio-group>

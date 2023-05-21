@@ -1,0 +1,27 @@
+<div class="container">
+    <div class="row">
+        <div class="col-6 order-2 col-md-2 order-md-first">
+        </div>
+        
+        <div class="col-12 order-first col-md-8 order-md-2">
+            <div class="text-center" *ngIf="gameError">{{gameError}}</div>
+            <game-overview-pieces
+            [game]="game"
+            [boardOrientation]="boardOrientation">
+            </game-overview-pieces>
+        </div>
+
+        <div class="col-12 order-3 col-md-2 order-md-last text-center">
+            <div class="game-overview-sidebar-right">
+                <game-stockfish class="mt-1 mt-md-0"></game-stockfish>
+                <game-overview-timers
+                [game]="game"
+                [boardOrientation]="boardOrientation"></game-overview-timers>
+                <game-rotate-board-button
+                [boardOrientation]="boardOrientation"
+                (rotateBoardEvent)="rotateBoard($event)">
+                </game-rotate-board-button>
+            </div>
+        </div>
+    </div>
+</div>

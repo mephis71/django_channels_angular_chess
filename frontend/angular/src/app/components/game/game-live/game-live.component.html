@@ -1,0 +1,44 @@
+<div class="container">
+    <div class="row">
+        <div class="col-6 order-2 col-md-2 order-md-first">
+            <game-live-chat>
+            </game-live-chat>
+        </div>
+        
+        <div class="col-12 order-first col-md-8 order-md-2">
+            <div class="text-center" *ngIf="gameError">{{gameError}}</div>
+            <game-live-pieces
+            [boardOrientation]="boardOrientation">
+            </game-live-pieces>
+        </div>
+
+        <div class="col-6 order-3 col-md-2 order-md-last">
+            <div class="game-live-sidebar-right">
+                <game-live-timers
+                class="sidebar-timers"
+                [game]="game"
+                [boardOrientation]="boardOrientation">
+                </game-live-timers>
+                <div>
+                    <game-live-buttons></game-live-buttons>
+                    <game-rotate-board-button
+                    [boardOrientation]="boardOrientation"
+                    (rotateBoardEvent)="rotateBoard($event)">
+                    </game-rotate-board-button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 order-second col-md-8 order-md-2">
+            <game-live-endgame>
+            </game-live-endgame>
+            
+            <game-live-promotion
+            [user]="user"
+            [game]="game">
+            </game-live-promotion>
+        </div>
+    </div>
+</div>

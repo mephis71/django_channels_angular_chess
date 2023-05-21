@@ -1,0 +1,37 @@
+<div class="container">
+    <div class="row">
+        <div class="col-6 order-2 col-md-2 order-md-first">
+        </div>
+        
+        <div class="col-12 order-first col-md-8 order-md-2">
+            <div class="text-center" *ngIf="gameError">{{gameError}}</div>
+            <game-freeboard-pieces
+            [boardOrientation]="boardOrientation">
+            </game-freeboard-pieces>
+        </div>
+
+        <div class="col-12 order-3 col-md-2 order-md-last text-center">
+            <div class="game-freeboard-sidebar-right">
+                <game-stockfish class="mt-1 mt-md-0">
+                </game-stockfish>
+                <game-rotate-board-button
+                class="mt-1"
+                [boardOrientation]="boardOrientation"
+                (rotateBoardEvent)="rotateBoard($event)">
+                </game-rotate-board-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 order-second col-md-8 order-md-2">
+            <game-freeboard-endgame>
+            </game-freeboard-endgame>
+            
+            <game-freeboard-promotion
+            [user]="user"
+            [game]="game">
+            </game-freeboard-promotion>
+        </div>
+    </div>
+</div>

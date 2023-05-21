@@ -1,0 +1,5 @@
+<h4>Freeboard</h4>
+<h6>Start a game from any FEN position (no input = default starting position).</h6>
+<button class="btn btn-primary w-100 mb-1" (click)="goToFreeBoard()">Free board</button>
+<input [(ngModel)]="freeboardFen" class="form-control" placeholder="FEN">
+<div class="align-self-center" *ngIf="freeboardMessage">{{freeboardMessage}}</div>

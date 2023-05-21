@@ -1,0 +1,21 @@
+#board {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    margin-left: auto;
+    margin-right: auto;
+    background-image: url("/assets/img/game_img/chessboard.jpg");
+    background-size: 100%;
+}
+
+.piece {
+    width: 12.5%;
+    height: 12.5%;
+    box-sizing: border-box;
+    background-size: 100%;
+}
+
+.piece:hover {
+    border: 3px solid blue;
+}

@@ -1,0 +1,19 @@
+<div class="container">
+  <div class="text-center" *ngIf="profileError">{{profileError}}</div>
+  <div *ngIf="profile" class="list-group w-auto">
+      <h2>{{profile.username}}</h2>
+      <h4>Game history</h4>
+      <h6 *ngIf="profile.game_history.length == 0">Game history is empty</h6>
+
+      <a *ngFor="let game of profile.game_history" 
+      class="list-group-item list-group-item-action d-flex py-3" 
+      [routerLink]="['/game', game.id]"
+      [ngStyle]="!game.winner ? {'background-color': 'white'} : game.winner != profile.username ? {'background-color': 'tomato'} : game.winner == profile.username ? {'background-color': 'lightgreen'} : null">
+        <div class="d-flex w-100 justify-content-between">
+          <div>{{game.player_white}} vs {{game.player_black}}</div>
+          <div *ngIf="game.winner">Winner: {{game.winner}}</div>
+          <div *ngIf="!game.winner">Draw</div>
+        </div>
+      </a>
+  </div>
+</div>

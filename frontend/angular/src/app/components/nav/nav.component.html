@@ -1,0 +1,13 @@
+<nav *ngIf="!user" class="navbar bg-dark gap-1 mb-4 justify-content-center">
+  <button routerLink="/" class="btn btn-primary align-self-start">Home</button>
+  <button routerLink="/login" class="btn btn-primary">Login</button>
+  <button routerLink="/register" class="btn btn-primary">Register</button>
+</nav>
+
+<nav *ngIf="user" class="navbar bg-dark gap-1 mb-4 justify-content-around">
+  <button routerLink="/" class="btn btn-primary align-self-start">Home</button>
+  <div class="d-flex gap-1">
+    <button [routerLink]="['/user', user.username]" class="btn btn-primary align-self-end">{{user.username}}</button>
+    <button routerLink="/login" class="btn btn-primary align-self-end" (click)="logout()">Logout</button>
+  </div>  
+</nav>

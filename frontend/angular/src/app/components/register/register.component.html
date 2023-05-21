@@ -1,0 +1,16 @@
+<div class="container">
+  <form [formGroup]="form" (submit)="submit()">
+      <h4 class="mb-3">Register</h4>
+
+      <input formControlName="username" class="form-control mb-1" placeholder="Username">
+      <h6 *ngIf="username_error">{{username_error}}</h6>
+      
+      <input formControlName="email" type="email" class="form-control mb-1" placeholder="Email">
+      <h6 *ngIf="email_error">{{email_error}}</h6>
+
+      <input formControlName="password" type="password" class="form-control mb-1" placeholder="Password">
+      <h6 *ngIf="password_error">{{password_error}}</h6>
+
+      <button class="w-100 btn btn-primary btn-lg" type="submit">Submit</button>
+  </form>
+</div>

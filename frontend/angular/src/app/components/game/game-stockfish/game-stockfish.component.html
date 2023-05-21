@@ -1,0 +1,6 @@
+<div class="d-flex flex-column">
+    <div *ngIf="showStockfish">
+        <div class="stockfish-eval">{{showStockfishEval(stockfishEval)}}</div>
+    </div>
+    <button class="btn btn-primary btn-lg" (click)="stockfishSwitch()">Show Stockfish Evaluation</button>
+</div>
