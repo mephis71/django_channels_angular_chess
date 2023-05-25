@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { Game } from '../models/game';
 import { Observable, share, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { DrawMessage, GameInvite, MoveMessage, GameResetMessage, MoveCancelMessage, PromotionPickMessage, RematchMessage, ResignMessage } from '../models/ws-messages';
+import { FreeBoardGameSettings } from '../models/freeboard-game';
 
 @Injectable({
   providedIn: 'root'
@@ -29,8 +31,32 @@ export class GameService {
     this.gameWsObservableReady.next();
   }
 
-  public sendGameMsg(msg: any) {
-    this.gameWs.send(JSON.stringify(msg))
+  public sendGameResetMsg(msg: GameResetMessage) {
+    this.gameWs.send(JSON.stringify(msg));
+  }
+
+  public sendGameMoveMsg(msg: MoveMessage) {
+    this.gameWs.send(JSON.stringify(msg));
+  }
+
+  public sendPromotionPickMsg(msg: PromotionPickMessage) {
+    this.gameWs.send(JSON.stringify(msg));
+  }
+
+  public sendMoveCancelMsg(msg: MoveCancelMessage) {
+    this.gameWs.send(JSON.stringify(msg));
+  }
+
+  public sendResignMsg(msg: ResignMessage) {
+    this.gameWs.send(JSON.stringify(msg));
+  }
+
+  public sendDrawMsg(msg: DrawMessage) {
+    this.gameWs.send(JSON.stringify(msg));
+  }
+
+  public sendRematchMsg(msg: RematchMessage) {
+    this.gameWs.send(JSON.stringify(msg));
   }
 
   public closeGameWebSocket() {
@@ -53,7 +79,7 @@ export class GameService {
     )
   }
 
-  createFreeBoardGame(settings: any): Observable<Game>  {
+  createFreeBoardGame(settings: FreeBoardGameSettings): Observable<Game>  {
     return this.http.post<Game>(
       `${this.apiUrl}/game/freeboard/`,
       {settings},
@@ -69,14 +95,11 @@ export class GameService {
       };
 
       this.gameWs.onclose = (event) => {
-        if (event.code == 4000){
-          observer.next(event);
-        }
       };
     }).pipe(share())
   }
 
-  acceptGameInvite(invite: any): Observable<Object> {
+  acceptGameInvite(invite: GameInvite): Observable<Object> {
     return this.http.post(
       `${this.apiUrl}/game/invite_accept/`,
       {invite},

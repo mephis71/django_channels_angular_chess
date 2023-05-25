@@ -1,17 +1,17 @@
 import jwt
-from stockfish import Stockfish
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from stockfish import Stockfish
 
-from .models import FreeBoardGame
 from .game_engine import GameEngine
 from .game_functions import *
 from .getters import get_freeboard_game_by_id, get_game_by_id
 from .tasks import (cancel_countdown_task, cancel_timer_task,
                     trigger_countdown_task, trigger_timer_task)
-from .utils import endgame_freeboard_JSON, init_JSON, init_freeboard_JSON, move_freeboard_JSON, opposite_color, move_JSON
+from .utils import (endgame_freeboard_JSON, init_freeboard_JSON, init_JSON,
+                    move_freeboard_JSON, opposite_color)
 
 User = get_user_model()
 
@@ -19,44 +19,35 @@ stockfish = Stockfish(path='/usr/games/stockfish')
 
 from rest_framework import exceptions
 
-
 class GameLiveConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         token = self.scope['cookies']['jwt']
-        try:
-            payload = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
-        except:
-            raise exceptions.AuthenticationFailed('Invalid authentication. Could not decode token.')
-        try:
-            user = await database_sync_to_async (User.objects.get)(pk=payload['id'])
-            self.user = user
-        except User.DoesNotExist:
-            raise exceptions.AuthenticationFailed('No user matching this token was found.')
-        else:
-            self.game_id = self.scope['url_route']['kwargs']['game_id']
-            self.game_obj = await get_game_by_id(self.game_id)
-            self.game_room_name = self.game_obj.get_game_name()
+        self.user = await get_user(token)
 
-            if self.game_obj.is_finished:
-                await self.accept()
-                msg = endgame_JSON(self.game_obj)
-                await self.send_json(msg)
-                await self.close(code=4000)
-                return
+        await self.accept()
 
-            await self.accept()
+        self.game_id = self.scope['url_route']['kwargs']['game_id']
+        self.game_obj = await get_game_by_id(self.game_id)
+        self.game_room_name = self.game_obj.get_game_name()
 
-            cancel_countdown_task(self.game_obj, user.username)
-
+        if self.game_obj.is_finished:
+            msg = endgame_JSON(self.game_obj)
+            await self.send_json(msg)
             await self.channel_layer.group_add(
                 self.game_room_name,
                 self.channel_name
             )
+            return
 
-            data = init_JSON(self.game_obj)
-            self.game_engine = GameEngine(self.game_obj)
+        cancel_countdown_task(self.game_obj, self.user.username)
 
-            await self.send_json(data)
+        await self.channel_layer.group_add(
+            self.game_room_name,
+            self.channel_name
+        )
+
+        data = init_JSON(self.game_obj)
+        await self.send_json(data)
 
     async def receive_json(self, msg):
         self.game_id = self.scope['url_route']['kwargs']['game_id']
@@ -66,74 +57,98 @@ class GameLiveConsumer(AsyncJsonWebsocketConsumer):
         type = msg['type']
 
         if type == 'move':
-            color = self.game_obj.get_color(self.user.username)
-            if color != self.game_obj.get_turn():
-                return
-            pick_id = int(msg['pick_id'])
-            drop_id = int(msg['drop_id'])
-            move_result = self.game_engine.is_legal(pick_id, drop_id)
-            self.castles = move_result['castles'] 
-            if move_result['is_legal_flag'] == False:
-                return
-            elif move_result['game_result'] == 'promoting':
-                self.promotion_pick_id = pick_id
-                self.promotion_drop_id = drop_id
-                await self.send_json({'type':'promoting'})
-                return   
-            else:
-                self.game_obj = await update_game(self.game_obj, move_result['new_fen'])
-                trigger_timer_task(self.game_obj)
-                if move_result['game_result'] != False:
-                    await end_game(self.game_obj, move_result['game_result'])
-                else:
-                    await end_move(self.game_obj)
+            await self.handle_move(msg)
 
         elif type == 'promotion':
-            turn = self.game_obj.get_turn()
-            piece_type = msg['piece_type']
-            game_result, new_fen = self.game_engine.promotion_handler(self.promotion_pick_id, self.promotion_drop_id, piece_type, turn, self.castles)
-            self.castles = None
-            self.game_obj = await update_game(self.game_obj, new_fen)
+            await self.handle_promotion(msg)
+
+        elif type == 'draw':
+            await self.handle_draw(msg)
+
+        elif type == 'move_cancel':
+            await self.handle_move_cancel(msg)
+
+        elif type == 'resign':
+            await self.handle_resign()
+
+        elif type == 'rematch':
+            await self.handle_rematch(msg)
+
+    async def handle_move(self, msg):
+        color = self.game_obj.get_color(self.user.username)
+        if color != self.game_obj.get_turn():
+            return
+        pick_id = int(msg['pick_id'])
+        drop_id = int(msg['drop_id'])
+        
+        move_result = self.game_engine.is_legal(pick_id, drop_id)
+        self.castles = move_result['castles'] 
+        if move_result['is_legal_flag'] == False:
+            return
+        elif move_result['game_result'] == 'promoting':
+            self.promotion_pick_id = pick_id
+            self.promotion_drop_id = drop_id
+            await self.send_json({'type':'promoting'})
+            return   
+        else:
+            self.game_obj = await update_game(self.game_obj, move_result['new_fen'])
             trigger_timer_task(self.game_obj)
-            if game_result != False:
-                await end_game(self.game_obj, game_result)
+            if move_result['game_result'] != False:
+                await end_game(self.game_obj, move_result['game_result'])
+            else:
+                await end_move(self.game_obj)
 
-            await end_move(self.game_obj)
+    async def handle_promotion(self, msg):
+        turn = self.game_obj.get_turn()
+        piece_type = msg['piece_type']
+        game_result, new_fen = self.game_engine.promotion_handler(self.promotion_pick_id, self.promotion_drop_id, piece_type, turn, self.castles)
+        self.castles = None
+        self.game_obj = await update_game(self.game_obj, new_fen)
+        trigger_timer_task(self.game_obj)
+        if game_result != False:
+            await end_game(self.game_obj, game_result)    
+        await end_move(self.game_obj)
 
-        elif type == 'draw_offer':
+    async def handle_draw(self, msg):
+        action = msg['action']
+        if action == 'offer':
             await send_draw_offer(self.game_obj, self.channel_name)
 
-        elif type == 'draw_accept':
+        elif action == 'accept':
             await end_game(self.game_obj, 'draw-mutual')
 
-        elif type == 'draw_reject':
+        elif action == 'reject':
             await reject_draw_offer(self.game_obj)
 
-        elif type == 'move_cancel_request':
+    async def handle_move_cancel(self, msg):
+        action = msg['action']
+        if action == 'request':
             try:
                 await send_move_cancel_request(self.game_obj, self.channel_name, self.user.username)
             except IndexError:
                 await self.send_json({'type':'move_cancel_error'})
 
-        elif type == 'move_cancel_accept':
+        elif action == 'accept':
             self.game_obj = await accept_move_cancel_request(self.game_obj)
             cancel_timer_task(self.game_obj)
             trigger_timer_task(self.game_obj)
 
-        elif type == 'move_cancel_reject':
-            await reject_move_cancel_request(self.game_obj)
+        elif action == 'reject':
+                await reject_move_cancel_request(self.game_obj)  
 
-        elif type == 'resign':
-            winner_color = opposite_color(self.game_obj.get_color(self.user.username))
-            await end_game(self.game_obj, f'{winner_color}wins-resignment')
+    async def handle_resign(self):
+        winner_color = opposite_color(self.game_obj.get_color(self.user.username))
+        await end_game(self.game_obj, f'{winner_color}wins-resignment')
 
-        elif type == 'rematch':
+    async def handle_rematch(self, msg):
+        action = msg['action']
+        if action == 'offer':
             await send_rematch(self.game_obj, self.channel_name)
-            
-        elif type == 'rematch_accept':
+
+        elif action == 'accept':
             await accept_rematch(self.game_obj)
 
-        elif type == 'rematch_reject':
+        elif action == 'reject':
             await reject_rematch(self.game_obj, self.channel_name)
 
     async def disconnect(self, close_code):
@@ -149,9 +164,6 @@ class GameLiveConsumer(AsyncJsonWebsocketConsumer):
             if not self.game_obj.is_finished:
                 trigger_countdown_task(self.game_obj, self.user.username)
 
-        elif close_code == 4000:
-            # 4000 - disconnecting after client connects to a game which has finished before
-            pass
         # print('game_close_code:', close_code)
 
     async def basic_broadcast(self, event):
@@ -194,16 +206,7 @@ class InviteConsumer(AsyncJsonWebsocketConsumer):
 class GameChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         token = self.scope['cookies']['jwt']
-        try:
-            payload = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
-        except:
-            raise exceptions.AuthenticationFailed('Invalid authentication. Could not decode token.')
-        try:
-            user = await database_sync_to_async (User.objects.get)(pk=payload['id'])
-            self.user = user
-            self.username = self.user.username
-        except User.DoesNotExist:
-            raise exceptions.AuthenticationFailed('No user matching this token was found.')
+        self.user = await get_user(token)
 
         await self.accept()
 
@@ -217,7 +220,6 @@ class GameChatConsumer(AsyncJsonWebsocketConsumer):
             )
 
     async def receive_json(self, msg):
-        msg['username'] = self.username
         await self.channel_layer.group_send(
             f'{self.game_room_name}_chat',
             {
@@ -240,15 +242,19 @@ class StockfishConsumer(AsyncJsonWebsocketConsumer):
 
     async def receive_json(self, msg):
         type = msg['type']
+        
         if type == 'position':
-            fen = msg['value']
-            stockfish.set_fen_position(fen)
-            evaluation = stockfish.get_evaluation()
-            best_move = stockfish.get_best_move()
-            await self.send_json({
-                'type': 'stockfish_position',
-                'eval': evaluation
-            })
+            await self.handle_position(msg)
+
+    async def handle_position(self, msg):
+        fen = msg['fen']
+        stockfish.set_fen_position(fen)
+        evaluation = stockfish.get_evaluation()
+        best_move = stockfish.get_best_move()
+        await self.send_json({
+            'type': 'stockfish_position',
+            'eval': evaluation
+        })
 
     async def disconnect(self, close_code):
         pass
@@ -257,25 +263,15 @@ class StockfishConsumer(AsyncJsonWebsocketConsumer):
 class GameFreeBoardConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         token = self.scope['cookies']['jwt']
-        try:
-            payload = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
-        except:
-            raise exceptions.AuthenticationFailed('Invalid authentication. Could not decode token.')
-        try:
-            user = await database_sync_to_async (User.objects.get)(pk=payload['id'])
-            self.user = user
-        except User.DoesNotExist:
-            raise exceptions.AuthenticationFailed('No user matching this token was found.')
-        else:
-            self.game_id = self.scope['url_route']['kwargs']['game_id']
-            self.game_obj = await get_freeboard_game_by_id(self.game_id)
+        self.user = await get_user(token)
+        
+        await self.accept()
+        
+        self.game_id = self.scope['url_route']['kwargs']['game_id']
+        self.game_obj = await get_freeboard_game_by_id(self.game_id)
 
-            await self.accept()
-
-            data = init_freeboard_JSON(self.game_obj)
-            self.game_engine = GameEngine(self.game_obj)
-
-            await self.send_json(data)
+        data = init_freeboard_JSON(self.game_obj)
+        await self.send_json(data)
 
     async def receive_json(self, msg):
         self.game_id = self.scope['url_route']['kwargs']['game_id']
@@ -284,55 +280,75 @@ class GameFreeBoardConsumer(AsyncJsonWebsocketConsumer):
         type = msg['type']
 
         if type == 'move':
-            # TODO: move it to handle_move()
-            pick_id = int(msg['pick_id'])
-            drop_id = int(msg['drop_id'])
-            move_result = self.game_engine.is_legal(pick_id, drop_id)
-            self.castles = move_result['castles']
-            if move_result['is_legal_flag'] == False:
-                return
-            elif move_result['game_result'] == 'promoting':
-                self.promotion_pick_id = pick_id
-                self.promotion_drop_id = drop_id
-                await self.send_json({
-                    'type':'promoting',
-                    'turn': self.game_obj.get_turn()
-                    })
-                return   
-            else:
-                self.game_obj = await update_freeboard_game(self.game_obj, move_result['new_fen'])
-                if move_result['game_result'] != False:
-                    await end_freeboard_game(self.game_obj, move_result['game_result'])
-                    data = endgame_freeboard_JSON(self.game_obj)
-                    await self.send_json(data)
-                else:
-                    data = move_freeboard_JSON(self.game_obj)
-                    await self.send_json(data)
+            await self.handle_move(msg)
 
         elif type == 'promotion':
-            # TODO: move it to handle_promotion()
-            turn = self.game_obj.get_turn()
-            piece_type = msg['piece_type']
-            # TODO: pass castles in promotion handler
-            game_result, new_fen = self.game_engine.promotion_handler(self.promotion_pick_id, self.promotion_drop_id, piece_type, turn, self.castles)
-            self.castles = None
-            self.game_obj = await update_freeboard_game(self.game_obj, new_fen)
-            if game_result != False:
-                await end_freeboard_game(self.game_obj, game_result)
-                data = endgame_freeboard_JSON(self.game_obj)
-                await self.send_json(data)
-
-            data = move_freeboard_JSON(self.game_obj)
-            await self.send_json(data)
+            await self.handle_promotion(msg)
         
         elif type == 'reset':
-            self.game_obj.reset()
-            await database_sync_to_async(self.game_obj.save)()
-            data = init_freeboard_JSON(self.game_obj)
-            await self.send_json(data)
+            await self.handle_reset()
             
+
+    async def handle_move(self, msg):
+        pick_id = int(msg['pick_id'])
+        drop_id = int(msg['drop_id'])
+        move_result = self.game_engine.is_legal(pick_id, drop_id)
+        self.castles = move_result['castles']
+        if move_result['is_legal_flag'] == False:
+            return
+        elif move_result['game_result'] == 'promoting':
+            self.promotion_pick_id = pick_id
+            self.promotion_drop_id = drop_id
+            await self.send_json({
+                'type':'promoting',
+                'turn': self.game_obj.get_turn()
+                })
+            return   
+        else:
+            self.game_obj = await update_freeboard_game(self.game_obj, move_result['new_fen'])
+            if move_result['game_result'] != False:
+                await end_freeboard_game(self.game_obj, move_result['game_result'])
+                data = endgame_freeboard_JSON(self.game_obj)
+                await self.send_json(data)
+            else:
+                data = move_freeboard_JSON(self.game_obj)
+                await self.send_json(data)
+
+    async def handle_promotion(self, msg):
+        turn = self.game_obj.get_turn()
+        piece_type = msg['piece_type']
+        game_result, new_fen = self.game_engine.promotion_handler(self.promotion_pick_id, self.promotion_drop_id, piece_type, turn, self.castles)
+        self.castles = None
+        self.game_obj = await update_freeboard_game(self.game_obj, new_fen)
+        if game_result != False:
+            await end_freeboard_game(self.game_obj, game_result)
+            data = endgame_freeboard_JSON(self.game_obj)
+            await self.send_json(data)
+
+        data = move_freeboard_JSON(self.game_obj)
+        await self.send_json(data)
+    
+    async def handle_reset(self):
+        self.game_obj.reset()
+        await database_sync_to_async(self.game_obj.save)()
+        data = init_freeboard_JSON(self.game_obj)
+        await self.send_json(data)
+
     async def disconnect(self, close_code):
         await database_sync_to_async (self.game_obj.delete)()
         # await database_sync_to_async(print)(FreeBoardGame.objects.all())
 
         # print('game_close_code:', close_code)
+
+
+
+async def get_user(token):
+    try:
+        payload = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
+    except:
+        raise exceptions.AuthenticationFailed('Invalid authentication. Could not decode token.')
+    try:
+        user = await database_sync_to_async (User.objects.get)(pk=payload['id'])
+    except User.DoesNotExist:
+        raise exceptions.AuthenticationFailed('No user matching this token was found.')
+    return user

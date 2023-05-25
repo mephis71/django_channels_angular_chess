@@ -92,6 +92,10 @@ async def end_game(game_obj, game_result):
             move_timestamps[-1] = f'{game_obj.timer_white}-{game_obj.timer_black}'
             game_obj.move_timestamps = ";".join(move_timestamps)
             game_obj.endgame_cause = 'RESIGNMENT'
+            if game_result == 'whitewins-resignment':
+                game_obj.winner = game_obj.player_white
+            elif game_result == 'blackwins-resignment':
+                game_obj.winner = game_obj.player_black
         else:
             game_obj.endgame_cause = 'DRAW (ABANDONED)'
             game_result = 'draw-abandonment'

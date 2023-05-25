@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { DrawMessage, MoveCancelMessage, ResignMessage } from 'src/app/models/ws-messages';
 import { GameService } from 'src/app/services/game.service';
 
 @Component({
@@ -36,7 +37,7 @@ export class GameLiveButtonsComponent implements OnInit, OnDestroy {
   }
   
   ngOnDestroy(): void {
-    let subs = [this.gameWsSub, this.wsSubjectSub]
+    const subs = [this.gameWsSub, this.wsSubjectSub]
     for(let sub of subs) {
       if(sub) {
         sub.unsubscribe()
@@ -92,27 +93,21 @@ export class GameLiveButtonsComponent implements OnInit, OnDestroy {
 
 
   sendMoveCancelRequest() {
-    let msg = {
-      "type": "move_cancel_request"
-    }
-    this.gameService.sendGameMsg(msg);
+    const msg = new MoveCancelMessage('request');
+    this.gameService.sendMoveCancelMsg(msg);
     this.allowMoveCancelRequest = false;
   }
 
   acceptMoveCancelRequest() {
-    let msg = {
-      "type": "move_cancel_accept"
-    }
-    this.gameService.sendGameMsg(msg);
+    const msg = new MoveCancelMessage('accept');
+    this.gameService.sendMoveCancelMsg(msg);
     this.moveCancelRequestPending = false;
     this.allowMoveCancelRequest = false;
   }
 
   rejectMoveCancelRequest() {
-    let msg = {
-      "type": "move_cancel_reject"
-    }
-    this.gameService.sendGameMsg(msg);
+    const msg = new MoveCancelMessage('reject');
+    this.gameService.sendMoveCancelMsg(msg);
     this.moveCancelRequestPending = false;
     this.allowMoveCancelRequest = true;
   }
@@ -124,10 +119,8 @@ export class GameLiveButtonsComponent implements OnInit, OnDestroy {
   }
 
   confirmResign() {
-    let msg = {
-      'type': 'resign'
-    }
-    this.gameService.sendGameMsg(msg);
+    const msg = new ResignMessage();
+    this.gameService.sendResignMsg(msg);
     this.showResignButton = false;
     this.showResignCancelButton = false;
     this.showResignConfirmButton = false;
@@ -140,27 +133,21 @@ export class GameLiveButtonsComponent implements OnInit, OnDestroy {
   }
 
   sendDrawOffer() {
-    let msg = {
-      "type": "draw_offer"
-    }
-    this.gameService.sendGameMsg(msg);
+    const msg = new DrawMessage('offer');
+    this.gameService.sendDrawMsg(msg);
     this.allowDrawOffer = false;
   }
 
   acceptDrawOffer() {
-    let msg = {
-      "type": "draw_accept"
-    }
-    this.gameService.sendGameMsg(msg);
+    const msg = new DrawMessage('accept');
+    this.gameService.sendDrawMsg(msg);
     this.drawOfferPending = false;
     this.allowDrawOffer = false;
   }
 
   rejectDrawOffer() {
-    let msg = {
-      "type": "draw_reject"
-    }
-    this.gameService.sendGameMsg(msg);
+    const msg = new DrawMessage('offer');
+    this.gameService.sendDrawMsg(msg);
     this.drawOfferPending = false;
     this.allowDrawOffer = true;
   }

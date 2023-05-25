@@ -46,7 +46,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
             next: game => {
               this.setGame(game);
               this.gameService.gameObjectReady.next(game);
-              let path = `game/live/${this.game.id}`
+              const path = `game/live/${this.game.id}`
               this.gameService.openGameWebsocket(path);
               this.gameError = '';
             },
@@ -66,7 +66,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.gameService.closeGameWebSocket();
-    let subs = [this.gameWsSub, this.gameWsSubjectSub]
+    const subs = [this.gameWsSub, this.gameWsSubjectSub]
     for(let sub of subs) {
       if (sub) {
         sub.unsubscribe()

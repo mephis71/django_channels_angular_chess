@@ -37,7 +37,7 @@ class GameInviteAcceptAPIView(APIView):
         game_id = game_obj.id
 
         msg = {
-            'type': 'invite_accept',
+            'type': 'game_invite_accept',
             'usernames': usernames,
             'game_id': game_id
         }

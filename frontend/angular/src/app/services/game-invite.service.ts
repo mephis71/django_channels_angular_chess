@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Observable, share, Subject } from 'rxjs';
+import { GameInvite } from '../models/ws-messages';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,7 @@ export class GameInviteService {
     }
   }
 
-  public sendMsg(msg: any) {
+  public sendGameInvite(msg: GameInvite) {
     this.inviteWs.send(JSON.stringify(msg))
   }
 

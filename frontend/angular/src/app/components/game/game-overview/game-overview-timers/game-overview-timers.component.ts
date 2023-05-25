@@ -38,7 +38,7 @@ export class GameOverviewTimersComponent implements OnInit, OnDestroy, OnChanges
   }
 
   ngOnDestroy(): void {
-    let subs = [this.gamePositionsIteratorSub]
+    const subs = [this.gamePositionsIteratorSub]
     for(let sub of subs) {
       if(sub) {
         sub.unsubscribe()
@@ -46,7 +46,7 @@ export class GameOverviewTimersComponent implements OnInit, OnDestroy, OnChanges
     }
   }
 
-  setTimers(moveTimestamp: any) {
+  setTimers(moveTimestamp: string[]) {
     this.timeWhite = moveTimestamp[0]
     this.timeBlack = moveTimestamp[1]
   }

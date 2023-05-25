@@ -1,8 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Game } from 'src/app/models/game';
-import { GameInvite } from 'src/app/models/game_invite';
+import { GameInvite } from 'src/app/models/ws-messages';
 import { User } from 'src/app/models/user';
 import { GameInviteService } from 'src/app/services/game-invite.service';
 import { GameService } from 'src/app/services/game.service';
@@ -34,13 +33,13 @@ export class HomeGameInvitesComponent implements OnInit, OnDestroy{
       }
     })
 
-    let path = 'game/invite';
+    const path = 'game/invite';
     this.gameInviteService.openInviteWebSocket(path);
   }
 
   ngOnDestroy(): void {
     this.gameInviteService.closeWebSocket();
-    let subs = [this.inviteWsSub, this.inviteWsSubjectSub]
+    const subs = [this.inviteWsSub, this.inviteWsSubjectSub]
     for(let sub of subs) {
       if(sub) {
         sub.unsubscribe()
@@ -51,7 +50,7 @@ export class HomeGameInvitesComponent implements OnInit, OnDestroy{
   getInviteWsSub(): Subscription {
     return this.gameInviteService.inviteWsObservable.subscribe({
       next: data => {
-        if(data.type == 'invite' && data.to_user == this.user.username) {
+        if(data.type == 'game_invite' && data.to_user == this.user.username) {
           if(!this.invites.some(e => e.from_user == data.from_user)) {
             this.invites.push(data);
           }
@@ -61,7 +60,7 @@ export class HomeGameInvitesComponent implements OnInit, OnDestroy{
           }
         }
   
-        if(data.type == 'invite_accept' && data.usernames.includes(this.user.username)) {
+        if(data.type == 'game_invite_accept' && data.usernames.includes(this.user.username)) {
           this.router.navigate([`/game/live/${data.game_id}`]).then(() => {
             window.location.reload()
           })
@@ -74,7 +73,7 @@ export class HomeGameInvitesComponent implements OnInit, OnDestroy{
     this.gameService.acceptGameInvite(invite).subscribe()
   }
 
-  rejectGameInvite(invite: any) {
+  rejectGameInvite(invite: GameInvite) {
     this.invites = this.invites.filter(e => e.from_user != invite.from_user);
   }
 }

@@ -3,14 +3,14 @@
 <div *ngIf="!(minutes == 1)">Duration: {{minutes}} minutes</div>
 
 <mat-slider thumbLabel
+  [(ngModel)]="minutes"
   min="1" 
   max="10" 
-  step="1"
-  [(ngModel)]="minutes">
+  step="1">
 </mat-slider>
 
 <div>Color:</div>
-<mat-radio-group [(ngModel)]="color_choice">
+<mat-radio-group [(ngModel)]="colorChoice">
   <mat-radio-button value='random'>Random</mat-radio-button>
   <mat-radio-button value='white'>White</mat-radio-button>
   <mat-radio-button value='black'>Black</mat-radio-button>

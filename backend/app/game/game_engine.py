@@ -67,7 +67,12 @@ class GameEngine:
                 self.halfmoves = 0
 
                 game_result, new_fen = self.end_move(p, t)
-                return True, game_result, new_fen
+                return {
+                    'is_legal_flag': True,
+                    'game_result': game_result,
+                    'new_fen': new_fen,
+                    'castles': None
+                }
 
         self.update_possible_moves(p)
         

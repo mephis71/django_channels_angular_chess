@@ -30,7 +30,7 @@ export class HomeFriendsComponent implements OnInit {
     })
   }
 
-  sendFriendRequest(): any {
+  sendFriendRequest(): void {
     this.userService.sendFriendRequest(this.friendRequestUsername).subscribe({
       next: res => {
         if (res.status == 200) {
@@ -48,13 +48,13 @@ export class HomeFriendsComponent implements OnInit {
       })
   }
 
-  acceptFriendRequest(id: number): any {
+  acceptFriendRequest(id: number): void {
     this.userService.acceptFriendRequest(id).subscribe(() => {
       this.refreshUser();
     })
   }
 
-  rejectFriendRequest(friend_request_id: any) {
+  rejectFriendRequest(friend_request_id: number) {
     this.userService.rejectFriendRequest(friend_request_id).subscribe(() => {
       this.refreshUser();
     })
@@ -66,7 +66,7 @@ export class HomeFriendsComponent implements OnInit {
     })
   }
 
-  removeFriend(friend_username: any) {
+  removeFriend(friend_username: string) {
     this.userService.removeFriend(friend_username).subscribe(() => {
       this.refreshUser();
     })

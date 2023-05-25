@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { GameChatService } from 'src/app/services/game-chat.service';
-import { ChatMessage } from 'src/app/models/chat_message';
+import { ChatMessage } from 'src/app/models/ws-messages';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { User } from 'src/app/models/user';
 
 @Component({
   selector: 'game-live-chat',
@@ -11,15 +11,15 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./game-live-chat.component.css']
 })
 export class GameLiveChatComponent implements OnInit, OnDestroy {
+  @Input() user: User;
   chatWsSub: Subscription;
   chatWsSubjectSub: Subscription;
 
   messages: ChatMessage[] = [];
-  message_form: FormGroup;
+  chatMessageInput: string;
   
   constructor(
     private chatService: GameChatService,
-    private formBuilder: FormBuilder,
     private route: ActivatedRoute
   ) { }
 
@@ -30,19 +30,15 @@ export class GameLiveChatComponent implements OnInit, OnDestroy {
       }
     })
 
-    this.message_form = this.formBuilder.group({
-      text: null,
-    })
-
     this.route.params.subscribe(params => {
-      let path = `game/live/${params['id']}/chat`
+      const path = `game/live/${params['id']}/chat`
       this.chatService.openChatWebSocket(path);
     })
   }
 
   ngOnDestroy(): void {
     this.chatService.closeWebSocket()
-    let subs = [this.chatWsSub, this.chatWsSubjectSub]
+    const subs = [this.chatWsSub, this.chatWsSubjectSub]
     for(let sub of subs) {
       if(sub) {
         sub.unsubscribe()
@@ -59,11 +55,11 @@ export class GameLiveChatComponent implements OnInit, OnDestroy {
   }
 
   sendChatMessage() {
-    let msg = this.message_form.getRawValue()
-    if(msg.text) {
-      this.chatService.sendMsg(msg)
-      this.message_form.reset()
+    if(this.chatMessageInput && this.user) {
+      const msg = new ChatMessage(this.user.username, this.chatMessageInput);
+      this.chatService.sendChatMsg(msg);
+      this.chatMessageInput = '';
     }
   }
-
+  
 }

@@ -36,7 +36,7 @@ export class GameFreeBoardComponent implements OnInit, OnDestroy {
             next: game => {
               this.setGame(game);
               this.gameService.gameObjectReady.next(game);
-              let path = `game/freeboard/${this.game.id}`
+              const path = `game/freeboard/${this.game.id}`
               this.gameService.openGameWebsocket(path);
               this.gameError = '';
             },

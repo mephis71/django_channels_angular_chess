@@ -11,14 +11,13 @@ from .serializers import (FriendRequestSerializer, LoginSerializer,
                           RegistrationSerializer, UserProfileSerializer,
                           UserSerializer)
 
-
 class RegistrationAPIView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = RegistrationSerializer
 
     def post(self, request):
-        user = request.data.get('user', {})
-        serializer = self.serializer_class(data=user)
+        register_info = request.data.get('register_info', {})
+        serializer = self.serializer_class(data=register_info)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(status=status.HTTP_201_CREATED)
@@ -30,8 +29,8 @@ class LoginAPIView(APIView):
     serializer_class = LoginSerializer
 
     def post(self, request):
-        user = request.data.get('user', {})
-        serializer = self.serializer_class(data=user)
+        login_info = request.data.get('login_info', {})
+        serializer = self.serializer_class(data=login_info)
         serializer.is_valid(raise_exception=True)
         response = Response(data=UserSerializer(serializer.validated_data['user']).data, status=status.HTTP_200_OK)
         response.set_cookie(key='jwt', value=serializer.validated_data['token'], httponly=True, samesite=None)

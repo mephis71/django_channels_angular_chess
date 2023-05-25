@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { GameResetMessage } from 'src/app/models/ws-messages';
 import { GameService } from 'src/app/services/game.service';
 
 @Component({
@@ -19,11 +20,9 @@ export class GameFreeBoardEndgameComponent implements OnInit, OnDestroy {
   ) {}
 
   resetGame() {
-    let msg = {
-      'type': 'reset'
-    }
-    this.endgameInfo = ''
-    this.gameService.sendGameMsg(msg)
+    const msg = new GameResetMessage();
+    this.gameService.sendGameResetMsg(msg);
+    this.endgameInfo = '';
   }
 
   ngOnInit(): void {
@@ -35,7 +34,7 @@ export class GameFreeBoardEndgameComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    let subs = [this.gameWsSub, this.wsSubjectSub]
+    const subs = [this.gameWsSub, this.wsSubjectSub]
     for(let sub of subs) {
       if (sub) {
         sub.unsubscribe()

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
+import { RegisterInfo } from 'src/app/models/register-info';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -9,11 +10,12 @@ import { UserService } from 'src/app/services/user.service';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-  form: FormGroup;
+  registerForm: FormGroup;
+  registerInfo: RegisterInfo
 
-  username_error = '';
-  password_error = '';
-  email_error = '';
+  usernameError = '';
+  passwordError = '';
+  emailError = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -22,35 +24,40 @@ export class RegisterComponent implements OnInit {
     ) { }
 
   ngOnInit(): void {
-    this.form = this.formBuilder.group({
+    this.registerForm = this.formBuilder.group({
       username: '',
       email: '',
       password: ''
     })
   }
   
-  submit(): void {
-    this.userService.register(this.form.getRawValue())
+  sendRegisterInfo(): void {
+    this.registerInfo = this.registerForm.getRawValue()
+    this.userService.register(this.registerInfo)
     .subscribe({
       next: () => {
         this.router.navigate(['/login'])
       },
       error: err => {
-        this.username_error = this.password_error = this.email_error = ''
+        this.clearErrors();
         for (const [k,v] of Object.entries(err.error)) {
           if (v instanceof Array) {
             if(k == 'username') {
-              this.username_error = v[0]
+              this.usernameError = v[0]
             }
             if(k == 'password') {
-              this.password_error = v[0]
+              this.passwordError = v[0]
             }
             if(k == 'email') {
-              this.email_error = v[0]
+              this.emailError = v[0]
             }
           }
         }
       }
     })
+  }
+
+  clearErrors(): void {
+    this.usernameError = this.passwordError = this.emailError = ''
   }
 }

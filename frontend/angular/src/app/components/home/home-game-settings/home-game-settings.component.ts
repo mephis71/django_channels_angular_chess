@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { GameInvite, IGameInviteSettings } from 'src/app/models/ws-messages';
 import { User } from 'src/app/models/user';
 import { GameInviteService } from 'src/app/services/game-invite.service';
 import { GameService } from 'src/app/services/game.service';
@@ -14,8 +15,11 @@ export class HomeGameSettingsComponent implements OnInit {
   @Input() user: User;
   gameInviteSubjectSub: Subscription;
 
+  colorChoice: string = 'random'
+  white_player: string | null;
+  black_player: string | null;
+  randomColors: boolean
   minutes: number = 5;
-  color_choice: string = 'random'
 
   constructor(
     private gameService: GameService,
@@ -31,38 +35,34 @@ export class HomeGameSettingsComponent implements OnInit {
   }
 
   sendGameInvite(username: string) {
-    let white, black, random_colors;
-    switch(this.color_choice) {
+    switch(this.colorChoice) {
       case 'white':
-        white = this.user.username;
-        black = username;
-        random_colors = false;
+        this.white_player = this.user.username;
+        this.black_player = username;
+        this.randomColors = false;
         break;
 
       case 'black':
-        white = username;
-        black = this.user.username;
-        random_colors = false;
+        this.white_player = username;
+        this.black_player = this.user.username;
+        this.randomColors = false;
         break;
 
       case 'random':
-        white = null;
-        black = null;
-        random_colors = true;
+        this.white_player, this.black_player = null;
+        this.randomColors = true;
         break;
     }
-    var invite = {
-      "type": "invite",
-      "from_user": this.user.username,
-      "to_user": username,
-      "settings": {
-        "white": white,
-        "black": black,
-        "random_colors": random_colors,
-        "duration": this.minutes
-      }
-    }
-    this.gameInviteService.sendMsg(invite);
-  }
 
+    const settings: IGameInviteSettings = {
+      white: this.white_player,
+      black: this.black_player,
+      random_colors: this.randomColors,
+      duration: this.minutes
+    }
+
+    const invite = new GameInvite(this.user.username, username, settings)
+
+    this.gameInviteService.sendGameInvite(invite);
+  }
 }

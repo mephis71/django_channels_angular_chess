@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Observable, Subject } from 'rxjs';
 import { share } from 'rxjs';
+import { ChatMessage } from '../models/ws-messages';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +29,7 @@ export class GameChatService {
     }
   }
 
-  public sendMsg(msg:any) {
+  public sendChatMsg(msg: ChatMessage) {
     this.chatWs.send(JSON.stringify(msg))
   }
 

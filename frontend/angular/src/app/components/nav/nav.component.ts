@@ -23,7 +23,7 @@ export class NavComponent implements OnInit, OnDestroy {
   } 
 
   ngOnDestroy(): void {
-    let subs = [this.userSub]
+    const subs = [this.userSub]
     for(let sub of subs) {
       if(sub) {
         sub.unsubscribe()

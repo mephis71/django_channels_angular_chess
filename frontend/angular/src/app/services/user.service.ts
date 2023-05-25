@@ -4,8 +4,9 @@ import { Observable, Subject } from 'rxjs';
 import { Profile } from '../models/profile';
 import { HttpResponse } from '@angular/common/http';
 import { User } from '../models/user';
-import { Game } from '../models/game';
 import { environment } from 'src/environments/environment';
+import { LoginInfo } from '../models/login-info';
+import { RegisterInfo } from '../models/register-info';
 
 @Injectable({
   providedIn: 'root'
@@ -32,18 +33,18 @@ export class UserService {
     )
   }
 
-  register(form: any) {
+  register(registerInfo: RegisterInfo) {
       return this.http.post(
       `${this.apiUrl}/user/register/`,
-      {user: form},
+      {register_info: registerInfo},
       {observe: 'response'}
     )
   }
 
-  login(form: any): Observable<HttpResponse<User>> {
+  login(loginInfo: LoginInfo): Observable<HttpResponse<User>> {
     return this.http.post<User>(
       `${this.apiUrl}/user/login/`,
-      {user: form},
+      {login_info: loginInfo},
       {
         withCredentials:true,
         observe: 'response'

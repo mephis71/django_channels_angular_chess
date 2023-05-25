@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { DrawMessage, RematchMessage } from 'src/app/models/ws-messages';
 import { GameService } from 'src/app/services/game.service';
 
 @Component({
@@ -29,7 +30,7 @@ export class GameLiveEndgameComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    let subs = [this.gameWsSub, this.wsSubjectSub]
+    const subs = [this.gameWsSub, this.wsSubjectSub]
     for(let sub of subs) {
       if(sub) {
         sub.unsubscribe()
@@ -38,27 +39,21 @@ export class GameLiveEndgameComponent implements OnInit, OnDestroy {
   }
 
   sendRematch() {
-    let msg = {
-      'type': 'rematch'
-    }
-    this.gameService.sendGameMsg(msg)
+    const msg = new RematchMessage('offer');
+    this.gameService.sendRematchMsg(msg)
     this.showRematchButton = false;
   }
 
   acceptRematch() {
-    let msg = {
-      'type': 'rematch_accept'
-    }
-    this.gameService.sendGameMsg(msg)
+    const msg = new RematchMessage('accept');
+    this.gameService.sendRematchMsg(msg)
     this.showRematchButton = false;
     this.rematchOfferPending = false;
   }
 
   rejectRematch() {
-    let msg = {
-      'type': 'rematch_reject'
-    }
-    this.gameService.sendGameMsg(msg)
+    const msg = new RematchMessage('reject');
+    this.gameService.sendRematchMsg(msg)
     this.showRematchButton = true;
     this.rematchOfferPending = false;
   }
@@ -116,9 +111,6 @@ export class GameLiveEndgameComponent implements OnInit, OnDestroy {
           else if(data.type == 'rematch_reject') {
             this.showRematchButton = true;
           }
-        }
-        else if('code' in data && data.code == 4000) {
-          this.showRematchButton = false;
         }
       }
     });

@@ -1,8 +1,7 @@
-
 <div id="board" *ngIf="boardOrientation == Color.WHITE"
 cdkDropList
 cdkDropListSortingDisabled
-cdkDropListOrientation="horizontal">
+cdkDropListOrientation="vertical">
     <div *ngFor="let piece of pieces; index as i;"
     cdkDrag
     class="piece"
@@ -15,7 +14,7 @@ cdkDropListOrientation="horizontal">
 <div id="board" *ngIf="boardOrientation == Color.BLACK"
 cdkDropList
 cdkDropListSortingDisabled
-cdkDropListOrientation="horizontal">
+cdkDropListOrientation="vertical">
     <div *ngFor="let piece of pieces.slice().reverse(); index as i;"
     cdkDrag
     class="piece"

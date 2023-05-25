@@ -34,7 +34,7 @@ export class GameStockfishComponent implements OnInit{
     this.gameObjectSubjectSub = this.gameService.gameObjectReady.subscribe({
       next: game => {
         this.game = game;
-        let path = `game/stockfish`
+        const path = `game/stockfish`
         this.stockfishService.openStockfishWebsocket(path, game);
         }
     })
@@ -42,7 +42,7 @@ export class GameStockfishComponent implements OnInit{
 
 
   ngOnDestroy(): void {
-    let subs = [this.stockfishWsSub, this.gameObjectSubjectSub, this.stockfishWsSubjectSub]
+    const subs = [this.stockfishWsSub, this.gameObjectSubjectSub, this.stockfishWsSubjectSub]
     for(let sub of subs) {
       if (sub) {
         sub.unsubscribe()

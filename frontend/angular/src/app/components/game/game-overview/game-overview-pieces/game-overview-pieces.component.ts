@@ -8,6 +8,7 @@ import { Emitters } from 'src/app/emitters/emitters';
 import { Game } from 'src/app/models/game';
 import { Subscription } from 'rxjs';
 import { StockfishService } from 'src/app/services/stockfish.service';
+import { StockfishPositionMessage } from 'src/app/models/ws-messages';
 
 @Component({
   selector: 'game-overview-pieces',
@@ -71,11 +72,8 @@ export class GameOverviewPiecesComponent implements OnChanges {
     if(scrolling) {
       this.pieces = fenToPieces(this.gamePositions[this.gamePositionsIterator]);
       Emitters.gamePositionsIteratorEmitter.emit(this.gamePositionsIterator);
-      let msg = {
-        "type": "position",
-        "value": this.gamePositions[this.gamePositionsIterator]
-      }
-      this.stockfishService.sendStockfishMsg(msg)
+      const msg = new StockfishPositionMessage(this.gamePositions[this.gamePositionsIterator]);
+      this.stockfishService.sendStockfishPositionMsg(msg)
     }
   }
 }

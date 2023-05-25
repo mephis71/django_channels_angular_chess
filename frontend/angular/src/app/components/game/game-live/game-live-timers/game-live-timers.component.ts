@@ -34,7 +34,7 @@ export class GameLiveTimersComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    let subs = [this.wsSubjectSub, this.gameWsSub]
+    const subs = [this.wsSubjectSub, this.gameWsSub]
     for(let sub of subs) {
       if(sub) {
         sub.unsubscribe()

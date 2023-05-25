@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Emitters } from 'src/app/emitters/emitters';
+import { LoginInfo } from 'src/app/models/login-info';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -10,11 +10,12 @@ import { UserService } from 'src/app/services/user.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  form: FormGroup;
-  
-  username_error = '';
-  password_error = '';
-  non_field_error = '';
+  loginForm: FormGroup;
+  loginInfo: LoginInfo
+
+  usernameError = '';
+  passwordError = '';
+  nonFieldError = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -23,36 +24,40 @@ export class LoginComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.form = this.formBuilder.group({
+    this.loginForm = this.formBuilder.group({
       username: '',
       password: ''
     })
   }
 
-  submit(): any {
-    this.userService.login(this.form.getRawValue())
+  sendLoginForm(): void {
+    this.loginInfo = this.loginForm.getRawValue();
+    this.userService.login(this.loginInfo)
     .subscribe({
       next: () => {
         this.router.navigate(['/'])
       },
       error: err => {
         this.userService.refreshUser.next(null)
-        this.username_error = this.password_error = this.non_field_error = ''
+        this.clearErrors();
         for (const [k,v] of Object.entries(err.error)) {
           if (v instanceof Array) {
             if(k == 'username') {
-              this.username_error = v[0]
+              this.usernameError = v[0]
             }
             if(k == 'password') {
-              this.password_error = v[0]
+              this.passwordError = v[0]
             }
             if(k == 'non_field_errors') {
-              this.non_field_error = v[0]
+              this.nonFieldError = v[0]
             }
           }
         }
       }
-    })
+    }) 
   }
 
+  clearErrors(): void {
+    this.usernameError = this.passwordError = this.nonFieldError = ''
+  }
 }

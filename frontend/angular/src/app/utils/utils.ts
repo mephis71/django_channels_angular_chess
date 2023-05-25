@@ -21,7 +21,7 @@ export function fenToPieces(fen: string): Piece[] {
         }
         continue;
       }
-      let pieceInfo = letterToColorPieceType(letter);
+      const pieceInfo = letterToColorPieceType(letter);
       pieces.push(new Piece(pieceInfo[0], pieceInfo[1], false));
     }
     return pieces;

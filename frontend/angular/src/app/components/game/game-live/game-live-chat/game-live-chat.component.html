@@ -7,8 +7,8 @@
     </div>
   </div>
 
-  <form class="d-flex flex-column" [formGroup]="message_form">
-    <input class="form-control form-control-lg mb-1" formControlName="text" placeholder="Write a message" (submit)="sendChatMessage()" >
-    <button (click)="sendChatMessage()" class="btn btn-lg btn-primary">Send</button>
+  <form class="d-flex flex-column">
+    <input [(ngModel)]="chatMessageInput" name="message" class="form-control form-control-lg mb-1" placeholder="Write a message" (submit)="sendChatMessage()">
+    <button class="btn btn-lg btn-primary" (click)="sendChatMessage()">Send</button>
   </form>
 </div>

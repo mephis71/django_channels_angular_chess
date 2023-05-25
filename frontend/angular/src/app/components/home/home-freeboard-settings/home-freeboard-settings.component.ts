@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { FreeBoardGameSettings } from 'src/app/models/freeboard-game';
 import { GameService } from 'src/app/services/game.service';
 
 @Component({
@@ -17,12 +18,12 @@ export class HomeFreeboardSettingsComponent {
   ) {}
 
   goToFreeBoard() {
-    let settings = {
-      'fen': this.freeboardFen
+    if(!this.freeboardFen) {
+      this.freeboardFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
     }
-    if (!settings.fen) {
-      settings.fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-    } 
+    
+    const settings = new FreeBoardGameSettings(this.freeboardFen);
+
     this.gameService.createFreeBoardGame(settings).subscribe({
       next: res => {
         this.router.navigate([`/freeboard/${res.id}`])

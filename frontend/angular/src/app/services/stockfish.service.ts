@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, share, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Game } from '../models/game';
+import { StockfishPositionMessage } from '../models/ws-messages';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +27,7 @@ export class StockfishService {
     this.stockfishWsObservableReady.next();
   }
 
-  public sendStockfishMsg(msg: any) {
+  public sendStockfishPositionMsg(msg: StockfishPositionMessage) {
     this.stockfishWs.send(JSON.stringify(msg))
   }
 
@@ -39,11 +40,8 @@ export class StockfishService {
   createStockfishWsObservable(game: Game): Observable<any> {
     return new Observable((observer) => {
       this.stockfishWs.onopen = (event) => {
-        let msg = {
-          'type': 'position',
-          'value': game.game_positions[game.game_positions.length - 1]
-        }
-        this.sendStockfishMsg(msg)
+        const msg = new StockfishPositionMessage(game.game_positions[game.game_positions.length - 1])
+        this.sendStockfishPositionMsg(msg)
       }
       this.stockfishWs.onmessage = (event) => {
         var data = JSON.parse(event.data);

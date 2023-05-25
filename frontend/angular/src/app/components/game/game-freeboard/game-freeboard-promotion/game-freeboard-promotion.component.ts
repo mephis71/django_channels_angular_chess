@@ -5,6 +5,7 @@ import { GameService } from 'src/app/services/game.service';
 import { Piece } from 'src/app/models/piece';
 import { Game } from 'src/app/models/game';
 import { User } from 'src/app/models/user';
+import { PromotionPickMessage } from 'src/app/models/ws-messages';
 
 @Component({
   selector: 'game-freeboard-promotion',
@@ -47,7 +48,7 @@ export class GameFreeBoardPromotionComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    let subs = [this.gameWsSub, this.wsSubjectSub]
+    const subs = [this.gameWsSub, this.wsSubjectSub]
     for(let sub of subs) {
       if (sub) {
         sub.unsubscribe()
@@ -56,16 +57,13 @@ export class GameFreeBoardPromotionComponent implements OnInit, OnDestroy {
   }
 
   sendPromotionPick(pieceType: PieceType) {
-    let msg = {
-      "type": "promotion",
-      "piece_type": pieceType
-    }
-    this.gameService.sendGameMsg(msg);
+    const msg = new PromotionPickMessage(pieceType);
+    this.gameService.sendPromotionPickMsg(msg);
     this.promoting = false;
   }
 
   createPromotionPieces(color: Color): void {
-    let piece_types = [PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT];
+    const piece_types = [PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT];
     for(let i=0; i<4; i++) {
       this.promotionPieces.push(new Piece(color, piece_types[i], false))
     }

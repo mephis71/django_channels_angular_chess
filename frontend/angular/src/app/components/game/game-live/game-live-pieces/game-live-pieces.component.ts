@@ -5,6 +5,8 @@ import { GameService } from 'src/app/services/game.service';
 import { HostListener } from '@angular/core';
 import { fenToPieces } from 'src/app/utils/utils';
 import { Subscription } from 'rxjs';
+import { MoveMessage } from 'src/app/models/ws-messages';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'game-live-pieces',
@@ -54,7 +56,7 @@ export class GameLivePiecesComponent implements OnInit, OnDestroy {
   
 
   ngOnDestroy(): void {
-    let subs = [this.gameWsSub, this.wsSubjectSub]
+    const subs = [this.gameWsSub, this.wsSubjectSub]
     for(let sub of subs) {
       if(sub) {
         sub.unsubscribe()
@@ -62,19 +64,17 @@ export class GameLivePiecesComponent implements OnInit, OnDestroy {
     }
   }
 
-  onPick(event: any) {
-    this.pick_id = parseInt(event.event.target.id);
+  onPick(event: MouseEvent | TouchEvent) {
+    const pick_id = (event.target as HTMLInputElement)?.id;
+    this.pick_id = pick_id ? parseInt(pick_id) : null;
   }
  
-  onDrop(event: any) {
-    this.drop_id = parseInt(event.event.target.id);
-    if((this.pick_id != null && this.drop_id != null) && (this.pick_id != this.drop_id) && (typeof this.pick_id == 'number' && typeof this.drop_id == 'number') && (!isNaN(this.pick_id) && !isNaN(this.drop_id))) {
-      let msg = {
-        "type": "move",
-        "pick_id": this.pick_id,
-        "drop_id": this.drop_id
-      }
-      this.gameService.sendGameMsg(msg)
+  onDrop(event: CdkDragDrop<any>) {
+    const drop_id = document.elementFromPoint(event.dropPoint.x, event.dropPoint.y)?.id;
+    this.drop_id = drop_id ? parseInt(drop_id) : null;
+    if((this.pick_id && this.drop_id) && (this.pick_id != this.drop_id)) {
+      const msg = new MoveMessage(this.pick_id, this.drop_id);
+      this.gameService.sendGameMoveMsg(msg)
     }
     this.drop_id = this.pick_id = null;
   }
