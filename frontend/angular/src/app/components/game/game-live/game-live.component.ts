@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { GameService } from 'src/app/services/game.service';
-import { User } from 'src/app/models/user';
+import { IUser, User } from 'src/app/models/user';
 import { UserService } from 'src/app/services/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Game } from 'src/app/models/game';
@@ -38,9 +38,9 @@ export class GameLiveComponent implements OnInit, OnDestroy {
     })
 
     this.userService.getUser().subscribe({
-      next: user => {
-        this.setUser(user);
-        this.userService.refreshUser.next(user);
+      next: (user: IUser) => {
+        this.user = new User(user);
+        this.userService.refreshUser.next(this.user);
         this.route.params.subscribe(params => {
           this.gameService.getGame(params['id']).subscribe({
             next: game => {
@@ -72,10 +72,6 @@ export class GameLiveComponent implements OnInit, OnDestroy {
         sub.unsubscribe()
       }
     }
-  }
-
-  setUser(user: User) {
-    this.user = user;
   }
 
   setGame(game: Game) {

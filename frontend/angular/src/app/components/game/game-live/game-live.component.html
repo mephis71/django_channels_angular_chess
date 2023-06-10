@@ -1,8 +1,8 @@
 <div class="container">
     <div class="row">
         <div class="col-6 order-2 col-md-2 order-md-first">
-            <game-live-chat
-            [user]="user">
+            <game-live-chat *ngIf="user"
+            [username]="user.username">
             </game-live-chat>
         </div>
         
@@ -36,8 +36,8 @@
             <game-live-endgame>
             </game-live-endgame>
             
-            <game-live-promotion
-            [user]="user"
+            <game-live-promotion *ngIf="user"
+            [username]="user.username"
             [game]="game">
             </game-live-promotion>
         </div>

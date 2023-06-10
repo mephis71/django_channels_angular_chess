@@ -1,8 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { User } from 'src/app/models/user';
+import { FriendRequest, IUser, User } from 'src/app/models/user';
 import { UserService } from 'src/app/services/user.service';
-import { Emitters } from '../../emitters/emitters';
-import { Color } from 'src/app/enums/pieces';
 
 @Component({
   selector: 'app-home',
@@ -21,11 +19,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   
   ngOnInit(): void {
     this.userService.getUser().subscribe({
-      next:(user: User) => {
-        this.user = user;
+      next:(user: IUser) => {
+        this.user = new User(user);
         this.greetMessage = `Hi ${this.user.username}`;
         this.authenticated = true;
-        this.userService.refreshUser.next(user)
+        this.userService.refreshUser.next(this.user)
       },
       error:(err: any) => {
         this.userService.refreshUser.next(null)

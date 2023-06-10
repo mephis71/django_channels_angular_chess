@@ -42,6 +42,7 @@ export class GameStockfishComponent implements OnInit{
 
 
   ngOnDestroy(): void {
+    this.stockfishService.closeStockfishWebSocket();
     const subs = [this.stockfishWsSub, this.gameObjectSubjectSub, this.stockfishWsSubjectSub]
     for(let sub of subs) {
       if (sub) {

@@ -14,15 +14,20 @@
   <div class="row">
 
     <div class="col">
+      <home-add-friend
+      class="home-section"></home-add-friend>
+      <home-friend-requests
+      class="home-section"
+      [friendRequests]="user.friendRequests"></home-friend-requests>
       <home-friends
       class="home-section"
-      [user]="user"></home-friends>
+      [friends]="user.friends"></home-friends>
     </div>
 
     <div class="col">
       <h4 [ngStyle]="{'text-align': 'center'}">{{greetMessage}}</h4>
-      <home-game-invites
-      [user]="user"
+      <home-game-invites *ngIf="user"
+        [username]="user.username"
         class="home-section">
       </home-game-invites>
       <home-running-games
@@ -31,9 +36,9 @@
     </div>
 
     <div class="col">
-      <home-game-settings
+      <home-game-settings *ngIf="user"
       class="home-section"
-      [user]="user"></home-game-settings>
+      [username]="user.username"></home-game-settings>
       <home-freeboard-settings
       class="home-section">
       </home-freeboard-settings>

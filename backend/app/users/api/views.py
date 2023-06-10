@@ -11,6 +11,11 @@ from .serializers import (FriendRequestSerializer, LoginSerializer,
                           RegistrationSerializer, UserProfileSerializer,
                           UserSerializer)
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
+channel_layer = get_channel_layer()
+
 class RegistrationAPIView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = RegistrationSerializer
@@ -78,10 +83,28 @@ class SendFriendRequestAPIView(APIView):
             }
             serializer = self.serializer_class(data=data)
             if serializer.is_valid(raise_exception=True):
-                serializer.save()   
+                serializer.save()
+                self.send_ws_msg(serializer.instance)
                 return Response(status=status.HTTP_200_OK)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+    def send_ws_msg(self, data):
+        to_user = data.to_user.username
+        from_user = data.from_user.username
+        id = data.id
+
+        async_to_sync(channel_layer.group_send)(
+            f'{to_user}_system',
+            {
+                'type': 'system_message',
+                'text': {
+                    'type': 'friend_request',
+                    'username': from_user,
+                    'id': id
+                }
+            }
+        )
 
 class AcceptFriendRequestAPIView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -92,8 +115,27 @@ class AcceptFriendRequestAPIView(APIView):
         if friend_request is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
         else:
+            friend = friend_request.from_user
             friend_request.accept()
-            return Response(status=status.HTTP_200_OK)
+            self.send_ws_msg(friend.username, friend_request.to_user)
+            data = {
+                'friend_username': friend.username,
+                'is_online': friend.is_online
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        
+    def send_ws_msg(self, msg_target, user):
+        async_to_sync(channel_layer.group_send)(
+            f'{msg_target}_system',
+            {
+                'type': 'system_message',
+                'text': {
+                    'type': 'add_friend',
+                    'friend_username': user.username,
+                    'is_online': user.is_online
+                }
+            }
+        )
 
 class RejectFriendRequestAPIView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -119,7 +161,20 @@ class RemoveFriendAPIView(APIView):
             user = request.user
             user.friends.remove(friend)
             friend.friends.remove(user)
+            self.send_ws_msg(friend.username, user.username)
             return Response(status=status.HTTP_200_OK)
+        
+    def send_ws_msg(self, msg_target, username):
+        async_to_sync(channel_layer.group_send)(
+            f'{msg_target}_system',
+            {
+                'type': 'system_message',
+                'text': {
+                    'type': 'remove_friend',
+                    'friend_username': username
+                }
+            }
+        )
 
 
 

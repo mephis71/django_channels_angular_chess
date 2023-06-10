@@ -3,7 +3,6 @@ import { GameChatService } from 'src/app/services/game-chat.service';
 import { ChatMessage } from 'src/app/models/ws-messages';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { User } from 'src/app/models/user';
 
 @Component({
   selector: 'game-live-chat',
@@ -11,7 +10,7 @@ import { User } from 'src/app/models/user';
   styleUrls: ['./game-live-chat.component.css']
 })
 export class GameLiveChatComponent implements OnInit, OnDestroy {
-  @Input() user: User;
+  @Input() username: string;
   chatWsSub: Subscription;
   chatWsSubjectSub: Subscription;
 
@@ -55,8 +54,8 @@ export class GameLiveChatComponent implements OnInit, OnDestroy {
   }
 
   sendChatMessage() {
-    if(this.chatMessageInput && this.user) {
-      const msg = new ChatMessage(this.user.username, this.chatMessageInput);
+    if(this.chatMessageInput && this.username) {
+      const msg = new ChatMessage(this.username, this.chatMessageInput);
       this.chatService.sendChatMsg(msg);
       this.chatMessageInput = '';
     }

@@ -35,6 +35,9 @@ import { HomeGameSettingsComponent } from './components/home/home-game-settings/
 import { HomeFreeboardSettingsComponent } from './components/home/home-freeboard-settings/home-freeboard-settings.component';
 import { HomeGameInvitesComponent } from './components/home/home-game-invites/home-game-invites.component';
 import { HomeRunningGamesComponent } from './components/home/home-running-games/home-running-games.component';
+import { HomeAddFriendComponent } from './components/home/home-add-friend/home-add-friend.component';
+import { HomeFriendRequestsComponent } from './components/home/home-friend-requests/home-friend-requests.component';
+import { OnlineStatusComponent } from './components/online-status/online-status.component';
 
 @NgModule({
   declarations: [
@@ -65,6 +68,9 @@ import { HomeRunningGamesComponent } from './components/home/home-running-games/
     HomeFreeboardSettingsComponent,
     HomeGameInvitesComponent,
     HomeRunningGamesComponent,
+    HomeAddFriendComponent,
+    HomeFriendRequestsComponent,
+    OnlineStatusComponent,
   ],
   imports: [
     BrowserModule,

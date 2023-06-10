@@ -1,9 +1,8 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { GameInvite } from 'src/app/models/ws-messages';
-import { User } from 'src/app/models/user';
-import { GameInviteService } from 'src/app/services/game-invite.service';
+import { InviteService } from 'src/app/services/game-invite.service';
 import { GameService } from 'src/app/services/game.service';
 
 @Component({
@@ -12,33 +11,31 @@ import { GameService } from 'src/app/services/game.service';
   styleUrls: ['./home-game-invites.component.css']
 })
 export class HomeGameInvitesComponent implements OnInit, OnDestroy{
-  @Input() user: User;
-
+  @Input() username: string;
   inviteWsSub: Subscription;
   inviteWsSubjectSub: Subscription;
 
   invites: GameInvite[] = []
 
   constructor(
-    private gameInviteService: GameInviteService,
+    private inviteService: InviteService,
     private router: Router,
     private gameService: GameService,
-    private route: ActivatedRoute,
   ){}
 
   ngOnInit(): void {
-    this.inviteWsSubjectSub = this.gameInviteService.inviteWsObservableReady.subscribe({
+    this.inviteWsSubjectSub = this.inviteService.inviteWsObservableReady.subscribe({
       next: () => {
         this.inviteWsSub = this.getInviteWsSub();
       }
     })
 
-    const path = 'game/invite';
-    this.gameInviteService.openInviteWebSocket(path);
+    const path = 'invites';
+    this.inviteService.openInviteWebSocket(path);
   }
 
   ngOnDestroy(): void {
-    this.gameInviteService.closeWebSocket();
+    this.inviteService.closeWebSocket();
     const subs = [this.inviteWsSub, this.inviteWsSubjectSub]
     for(let sub of subs) {
       if(sub) {
@@ -48,19 +45,21 @@ export class HomeGameInvitesComponent implements OnInit, OnDestroy{
   }
 
   getInviteWsSub(): Subscription {
-    return this.gameInviteService.inviteWsObservable.subscribe({
+    return this.inviteService.inviteWsObservable.subscribe({
       next: data => {
-        if(data.type == 'game_invite' && data.to_user == this.user.username) {
+        if(data.type == 'game_invite') {
+          // if there is no invite from that user, add it
           if(!this.invites.some(e => e.from_user == data.from_user)) {
             this.invites.push(data);
           }
+          // if there is, switch it with the incoming one (e.g. different settings)
           else {
             this.invites = this.invites.filter(e => e.from_user != data.from_user)
             this.invites.push(data)
           }
         }
   
-        if(data.type == 'game_invite_accept' && data.usernames.includes(this.user.username)) {
+        else if(data.type == 'game_invite_accept') {
           this.router.navigate([`/game/live/${data.game_id}`]).then(() => {
             window.location.reload()
           })

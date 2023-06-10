@@ -11,6 +11,7 @@ class User(AbstractUser):
     password = models.CharField(max_length=100)
     email = models.EmailField(max_length=100)
     friends = models.ManyToManyField('User')
+    is_online = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username

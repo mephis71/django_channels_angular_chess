@@ -6,11 +6,12 @@ import { GameInvite } from '../models/ws-messages';
 @Injectable({
   providedIn: 'root'
 })
-export class GameInviteService {
+export class InviteService {
   inviteWs: WebSocket;
   inviteWsObservable: Observable<any>;
 
   public inviteWsObservableReady = new Subject<void>();
+  public addNewFriend = new Subject<string>();
   
   private wsUrl = environment.wsUrl;
   

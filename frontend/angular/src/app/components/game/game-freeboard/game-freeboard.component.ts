@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { User } from 'src/app/models/user';
+import { IUser, User } from 'src/app/models/user';
 import { UserService } from 'src/app/services/user.service';
 import { Game } from 'src/app/models/game';
 import { Color } from 'src/app/enums/pieces';
@@ -28,9 +28,9 @@ export class GameFreeBoardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.userService.getUser().subscribe({
-      next: user => {
-        this.setUser(user);
-        this.userService.refreshUser.next(user);
+      next: (user: IUser) => {
+        this.user = new User(user)
+        this.userService.refreshUser.next(this.user);
         this.route.params.subscribe(params => {
           this.gameService.getFreeBoardGame(params['id']).subscribe({
             next: game => {
@@ -56,10 +56,6 @@ export class GameFreeBoardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.gameService.closeGameWebSocket();
-  }
-
-  setUser(user: User) {
-    this.user = user;
   }
 
   setGame(game: Game) {

@@ -44,7 +44,7 @@ export class StockfishService {
         this.sendStockfishPositionMsg(msg)
       }
       this.stockfishWs.onmessage = (event) => {
-        var data = JSON.parse(event.data);
+        const data = JSON.parse(event.data);
         observer.next(data);
       };
 

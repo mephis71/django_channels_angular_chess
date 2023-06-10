@@ -1,4 +1,3 @@
-from stockfish import Stockfish
 from channels.layers import get_channel_layer
 from game.api.serializers import FreeBoardGameSerializer, GameSerializer, FreeBoardGameCreateSerializer
 from game.models import Game, FreeBoardGame
@@ -9,7 +8,7 @@ from rest_framework.views import APIView
 
 channel_layer = get_channel_layer()
 from asgiref.sync import async_to_sync
-from game.getters import new_game
+from utils.getters import new_game
 
 class GameAPIView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -42,10 +41,11 @@ class GameInviteAcceptAPIView(APIView):
             'game_id': game_id
         }
 
-        async_to_sync(channel_layer.group_send)(
-            "invite_group",
+        for username in usernames:
+            async_to_sync(channel_layer.group_send)(
+            f"{username}_system",
             {
-                "type": "basic_broadcast",
+                "type": "system_message",
                 'text': msg
             }
         )

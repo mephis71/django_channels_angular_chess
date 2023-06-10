@@ -23,8 +23,8 @@ export class UserProfileComponent implements OnInit {
   ngOnInit(): void {
     this.userService.getUser().subscribe({
       next: user => {
-        this.setUser(user);
-        this.userService.refreshUser.next(user);
+        this.setUser(new User(user));
+        this.userService.refreshUser.next(this.user);
         this.route.params.subscribe(params => {
           this.userService.getProfile(params['username']).subscribe({
             next: profile => {

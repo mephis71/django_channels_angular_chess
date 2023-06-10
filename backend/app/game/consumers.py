@@ -1,28 +1,25 @@
-import jwt
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from stockfish import Stockfish
 
 from .game_engine import GameEngine
 from .game_functions import *
-from .getters import get_freeboard_game_by_id, get_game_by_id
+from utils.getters import get_freeboard_game_by_id, get_game_by_id
 from .tasks import (cancel_countdown_task, cancel_timer_task,
                     trigger_countdown_task, trigger_timer_task)
 from .utils import (endgame_freeboard_JSON, init_freeboard_JSON, init_JSON,
                     move_freeboard_JSON, opposite_color)
+from utils.getters import get_user_with_jwt
 
 User = get_user_model()
 
 stockfish = Stockfish(path='/usr/games/stockfish')
 
-from rest_framework import exceptions
-
 class GameLiveConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         token = self.scope['cookies']['jwt']
-        self.user = await get_user(token)
+        self.user = await get_user_with_jwt(token)
 
         await self.accept()
 
@@ -175,38 +172,10 @@ class GameLiveConsumer(AsyncJsonWebsocketConsumer):
         if data['sender_channel_name'] != self.channel_name:
             await self.send_json(data)
 
-class InviteConsumer(AsyncJsonWebsocketConsumer):
-    groups = ['invite_group']
-    async def connect(self):
-        await self.accept()
-
-    async def receive_json(self, msg):
-        msg['sender_channel_name'] = self.channel_name
-        await self.channel_layer.group_send(
-            'invite_group',
-            {
-                'type': 'one_way_broadcast',
-                'text': msg
-            }
-        )
-
-    async def disconnect(self, close_code):
-        pass
-        # print('invite_close_code:', close_code)
-
-    async def one_way_broadcast(self, msg):
-        msg = msg['text']
-        if self.channel_name != msg['sender_channel_name']:
-            await self.send_json(msg)
-
-    async def basic_broadcast(self, msg):
-        msg = msg['text']
-        await self.send_json(msg)
-
 class GameChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         token = self.scope['cookies']['jwt']
-        self.user = await get_user(token)
+        self.user = await get_user_with_jwt(token)
 
         await self.accept()
 
@@ -263,7 +232,7 @@ class StockfishConsumer(AsyncJsonWebsocketConsumer):
 class GameFreeBoardConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         token = self.scope['cookies']['jwt']
-        self.user = await get_user(token)
+        self.user = await get_user_with_jwt(token)
         
         await self.accept()
         
@@ -339,16 +308,3 @@ class GameFreeBoardConsumer(AsyncJsonWebsocketConsumer):
         # await database_sync_to_async(print)(FreeBoardGame.objects.all())
 
         # print('game_close_code:', close_code)
-
-
-
-async def get_user(token):
-    try:
-        payload = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
-    except:
-        raise exceptions.AuthenticationFailed('Invalid authentication. Could not decode token.')
-    try:
-        user = await database_sync_to_async (User.objects.get)(pk=payload['id'])
-    except User.DoesNotExist:
-        raise exceptions.AuthenticationFailed('No user matching this token was found.')
-    return user

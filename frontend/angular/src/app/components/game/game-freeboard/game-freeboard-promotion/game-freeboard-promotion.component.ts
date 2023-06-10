@@ -4,7 +4,6 @@ import { Color, PieceType } from 'src/app/enums/pieces';
 import { GameService } from 'src/app/services/game.service';
 import { Piece } from 'src/app/models/piece';
 import { Game } from 'src/app/models/game';
-import { User } from 'src/app/models/user';
 import { PromotionPickMessage } from 'src/app/models/ws-messages';
 
 @Component({
@@ -14,7 +13,6 @@ import { PromotionPickMessage } from 'src/app/models/ws-messages';
 })
 export class GameFreeBoardPromotionComponent implements OnInit, OnDestroy {
   @Input() game: Game;
-  @Input() user: User | null;
 
   gameWsSub: Subscription;
   wsSubjectSub: Subscription;

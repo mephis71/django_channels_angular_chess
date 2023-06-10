@@ -65,7 +65,7 @@ class LoginSerializer(serializers.Serializer):
 class FriendRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendRequest
-        fields = ('from_user', 'to_user')
+        fields = ('id', 'from_user', 'to_user')
     
     def validate(self, data):
         to_user = data.get('to_user')

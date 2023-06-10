@@ -8,13 +8,15 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_chess.settings')
 
 django_asgi_app = get_asgi_application()
 
-from game.consumers import GameChatConsumer, GameLiveConsumer, InviteConsumer, StockfishConsumer, GameFreeBoardConsumer
+from game.consumers import GameChatConsumer, GameLiveConsumer, StockfishConsumer, GameFreeBoardConsumer
+from users.consumers import InviteConsumer, OnlineStatusConsumer
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
     "websocket": AuthMiddlewareStack(
         URLRouter([
-            path("ws/game/invite", InviteConsumer.as_asgi()),
+            path("ws/invites", InviteConsumer.as_asgi()),
+            path("ws/online_status", OnlineStatusConsumer.as_asgi()),
             re_path(r"^ws/game/live/(?P<game_id>[0-9]+)$", GameLiveConsumer.as_asgi()),
             re_path(r"^ws/game/live/(?P<game_id>[0-9]+)/chat", GameChatConsumer.as_asgi()),
             re_path(r"^ws/game/stockfish", StockfishConsumer.as_asgi()),
