@@ -4,7 +4,7 @@ Chess multiplayer web app made using Django, Django REST Framework, Django Chann
 
 You can scroll through the game (both real-time and while reviewing a game in the game history) using keyboard arrows.
 
-Demo is available at http://212.127.78.21/
+Demo is available at http://212.127.78.5/
 
 ## How to run the app
 ```
