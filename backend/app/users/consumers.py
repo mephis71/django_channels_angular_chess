@@ -1,6 +1,8 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from utils.getters import get_user_with_jwt, get_user_with_pk, get_friends_usernames, get_friends_online_status
 from channels.db import database_sync_to_async
+from .utils import broadcast_online_status
+from .tasks import start_disconnect_countdown, cancel_disconnect_countdown
 
 class InviteConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
@@ -39,6 +41,8 @@ class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
 
         await self.accept()
 
+        cancel_disconnect_countdown(self.user.username)
+
         await self.channel_layer.group_add(
             f'{self.user.username}_system',
             self.channel_name
@@ -59,14 +63,11 @@ class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
         await self.set_online_status(user, status)
 
         friends_usernames = await get_friends_usernames(self.user)
-        await self.broadcast_online_status(status, friends_usernames)
+        await broadcast_online_status(user.username, status, friends_usernames)
 
     async def disconnect(self, close_code):
-        user = await get_user_with_pk(self.user.pk)
-        await self.set_online_status(user, 'offline')
-
-        friends_usernames = await get_friends_usernames(self.user)
-        await self.broadcast_online_status('offline', friends_usernames)
+        self.user = await get_user_with_pk(self.user.pk)
+        start_disconnect_countdown(self.user)
 
     @database_sync_to_async
     def set_online_status(self, user, status):
@@ -75,21 +76,6 @@ class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
         elif status == 'offline':
             user.is_online = False
         user.save()
-
-    async def broadcast_online_status(self, status, friends_usernames):
-        data = {
-            'type': 'status',
-            'username': self.user.username,
-            'status': status
-        }
-        for username in friends_usernames:
-            await self.channel_layer.group_send(
-                f'{username}_system',
-                {
-                    'type': 'system_message',
-                    'text': data
-                }
-            )
 
     async def system_message(self, msg):
         msg = msg['text']
