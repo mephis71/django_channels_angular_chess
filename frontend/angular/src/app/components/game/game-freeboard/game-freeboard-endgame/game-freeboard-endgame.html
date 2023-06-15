@@ -1,4 +1,4 @@
 <div id="endgameinfo" *ngIf="endgameInfo">
     <h4 id="endgametext">{{endgameInfo}}</h4>
-    <button *ngIf="showResetButton" class="btn btn-primary" (click)="resetGame()">Reset</button>
+    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="showResetButton"  (click)="resetGame()">Reset</button>
 </div>

@@ -64,12 +64,6 @@ export class HomeFriendRequestsComponent implements OnInit, OnDestroy {
     this.friendRequests = this.friendRequests.filter(e => e.id != id);
   }
 
-  refreshUser() {
-    this.userService.getUser().subscribe((user: IUser) => {
-      this.userService.refreshUser.next(new User(user))
-    })
-  }
-
   getInviteWsSub(): Subscription {
     return this.inviteService.inviteWsObservable.subscribe({
       next: data => {

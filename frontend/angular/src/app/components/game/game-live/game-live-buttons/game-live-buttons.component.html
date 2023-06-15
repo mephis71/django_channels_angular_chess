@@ -1,15 +1,15 @@
 <div class="d-flex flex-column">
-    <button *ngIf="allowDrawOffer" id="offerdrawbutton" type="button" class="btn btn-lg btn-primary mb-1" (click)="sendDrawOffer()">Offer a draw</button>
-    <button *ngIf="drawOfferPending" id="acceptdrawbutton" type="button" class="btn btn-lg btn-primary mb-1" (click)="acceptDrawOffer()">Accept draw</button>
-    <button *ngIf="drawOfferPending" id="rejectdrawbutton" type="button" class="btn btn-lg btn-primary mb-1" (click)="rejectDrawOffer()">Reject draw</button>
+    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="allowDrawOffer" id="offerdrawbutton" (click)="sendDrawOffer()">Offer a draw</button>
+    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="drawOfferPending" id="acceptdrawbutton" (click)="acceptDrawOffer()">Accept draw</button>
+    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="drawOfferPending" id="rejectdrawbutton" (click)="rejectDrawOffer()">Reject draw</button>
 
-    <button *ngIf="allowMoveCancelRequest" id="requestmovecancelbutton" type="button" class="btn btn-lg btn-primary mb-1" (click)="sendMoveCancelRequest()">Cancel move</button>
-    <button *ngIf="moveCancelRequestPending" id="acceptmovecancelbutton" type="button" class="btn btn-lg btn-primary mb-1" (click)="acceptMoveCancelRequest()">Accept move cancel</button>
-    <button *ngIf="moveCancelRequestPending" id="rejectmovecancelbutton" type="button" class="btn btn-lg btn-primary mb-1" (click)="rejectMoveCancelRequest()">Reject move cancel</button>
+    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="allowMoveCancelRequest" id="requestmovecancelbutton" (click)="sendMoveCancelRequest()">Cancel move</button>
+    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="moveCancelRequestPending" id="acceptmovecancelbutton" (click)="acceptMoveCancelRequest()">Accept move cancel</button>
+    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="moveCancelRequestPending" id="rejectmovecancelbutton" (click)="rejectMoveCancelRequest()">Reject move cancel</button>
 
-    <button *ngIf="showResignButton" id="resignbutton" type="button" class="btn btn-lg btn-primary mb-1" (click)="resign()">Resign</button>
-    <button *ngIf="showResignConfirmButton" id="confirmresignbutton" type="button" class="btn btn-lg btn-primary mb-1" (click)="confirmResign()">Confirm resign</button>
-    <button *ngIf="showResignCancelButton" id="cancelresignbutton" type="button" class="btn btn-lg btn-primary mb-1" (click)="cancelResign()">Cancel resign</button>
+    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="showResignButton" id="resignbutton" (click)="resign()">Resign</button>
+    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="showResignConfirmButton" id="confirmresignbutton" (click)="confirmResign()">Confirm resign</button>
+    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="showResignCancelButton" id="cancelresignbutton" (click)="cancelResign()">Cancel resign</button>
 
     <div *ngIf="moveCancelError">{{moveCancelError}}</div>
 </div>

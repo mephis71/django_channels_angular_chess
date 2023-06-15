@@ -19,13 +19,7 @@ class GameSerializer(serializers.ModelSerializer):
 
 class FreeBoardGameSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
-    game_positions = serializers.ListField(source='get_game_positions')
-
-    class Meta:
-        model = Game
-        fields = ('id', 'game_positions')
-
-class FreeBoardGameCreateSerializer(serializers.ModelSerializer):
+    game_positions = serializers.ListField(source='get_game_positions', read_only=True)
     fen = serializers.CharField()
 
     def validate(self, settings):
@@ -33,13 +27,13 @@ class FreeBoardGameCreateSerializer(serializers.ModelSerializer):
         if not stockfish.is_fen_valid(fen):
             raise serializers.ValidationError({"fen": "Given FEN is not valid."})
         return settings
-    
+
     def create(self, validated_data):
         return FreeBoardGame.objects.new_freeboard_game(validated_data)
-    
+
     class Meta:
         model = FreeBoardGame
-        fields= ('fen',)
+        fields = ('id', 'game_positions', 'fen')
 
 class GameHistorySerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)

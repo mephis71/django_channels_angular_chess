@@ -5,7 +5,7 @@ from stockfish import Stockfish
 
 from .game_engine import GameEngine
 from .game_functions import *
-from utils.getters import get_freeboard_game_by_id, get_game_by_id
+from utils.getters import get_freeboard_game_by_user, get_game_by_id
 from .tasks import (cancel_countdown_task, cancel_timer_task,
                     trigger_countdown_task, trigger_timer_task)
 from .utils import (endgame_freeboard_JSON, init_freeboard_JSON, init_JSON,
@@ -236,15 +236,13 @@ class GameFreeBoardConsumer(AsyncJsonWebsocketConsumer):
         
         await self.accept()
         
-        self.game_id = self.scope['url_route']['kwargs']['game_id']
-        self.game_obj = await get_freeboard_game_by_id(self.game_id)
+        self.game_obj = await get_freeboard_game_by_user(self.user)
 
         data = init_freeboard_JSON(self.game_obj)
         await self.send_json(data)
 
     async def receive_json(self, msg):
-        self.game_id = self.scope['url_route']['kwargs']['game_id']
-        self.game_obj = await get_freeboard_game_by_id(self.game_id)
+        self.game_obj = await get_freeboard_game_by_user(self.user)
         self.game_engine = GameEngine(self.game_obj)
         type = msg['type']
 
@@ -304,7 +302,6 @@ class GameFreeBoardConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(data)
 
     async def disconnect(self, close_code):
-        await database_sync_to_async (self.game_obj.delete)()
-        # await database_sync_to_async(print)(FreeBoardGame.objects.all())
-
+        pass
+    
         # print('game_close_code:', close_code)

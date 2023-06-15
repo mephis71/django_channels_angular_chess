@@ -1,13 +1,13 @@
-<nav *ngIf="!user" class="navbar bg-dark gap-1 mb-4 justify-content-center">
-  <button routerLink="/" class="btn btn-primary align-self-start">Home</button>
-  <button routerLink="/login" class="btn btn-primary">Login</button>
-  <button routerLink="/register" class="btn btn-primary">Register</button>
-</nav>
+<mat-toolbar *ngIf="!user" class="gap-1 mb-4 justify-content-center">
+  <button mat-stroked-button color="primary" class="text-wrap" routerLink="/" >Home</button>
+  <button mat-stroked-button color="primary" class="text-wrap" routerLink="/login" >Login</button>
+  <button mat-stroked-button color="primary" class="text-wrap" routerLink="/register" >Register</button>
+</mat-toolbar>
 
-<nav *ngIf="user" class="navbar bg-dark gap-1 mb-4 justify-content-around">
-  <button routerLink="/" class="btn btn-primary align-self-start">Home</button>
+<mat-toolbar *ngIf="user" class="gap-1 mb-4 justify-content-around">
+  <button mat-stroked-button color="primary" class="text-wrap" routerLink="/" >Home</button>
   <div class="d-flex gap-1">
-    <button [routerLink]="['/user', user.username]" class="btn btn-primary align-self-end">{{user.username}}</button>
-    <button routerLink="/login" class="btn btn-primary align-self-end" (click)="logout()">Logout</button>
+    <button mat-stroked-button color="primary" class="text-wrap" [routerLink]="['/user', user.username]" >{{user.username}}</button>
+    <button mat-stroked-button color="primary" class="text-wrap" routerLink="/login"  (click)="logout()">Logout</button>
   </div>  
-</nav>
+</mat-toolbar>

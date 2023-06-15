@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Color } from 'src/app/enums/pieces';
 import { Piece } from 'src/app/models/piece';
 import { GameService } from 'src/app/services/game.service';
@@ -38,6 +38,7 @@ export class GameLivePiecesComponent implements OnInit, OnDestroy {
         this.gameWsSub = this.getGameWsSub();
       }
     })
+
   }
 
   getGameWsSub(): Subscription {

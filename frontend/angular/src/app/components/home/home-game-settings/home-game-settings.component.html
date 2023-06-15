@@ -1,6 +1,8 @@
-<h4>Game settings</h4>
-<div *ngIf="minutes == 1">Duration: {{minutes}} minute</div>
-<div *ngIf="!(minutes == 1)">Duration: {{minutes}} minutes</div>
+<h4 class="text-center">Game settings</h4>
+
+<div class="text-center" *ngIf="minutes == 1">Duration: {{minutes}} minute</div>
+<div class="text-center" *ngIf="!(minutes == 1)">Duration: {{minutes}} minutes</div>
+
 
 <mat-slider thumbLabel
   [(ngModel)]="minutes"
@@ -9,8 +11,8 @@
   step="1">
 </mat-slider>
 
-<div>Color:</div>
-<mat-radio-group [(ngModel)]="colorChoice">
+<div class="text-center">Color:</div>
+<mat-radio-group [(ngModel)]="colorChoice" class="d-flex justify-content-between">
   <mat-radio-button value='random'>Random</mat-radio-button>
   <mat-radio-button value='white'>White</mat-radio-button>
   <mat-radio-button value='black'>Black</mat-radio-button>

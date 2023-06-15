@@ -11,6 +11,16 @@
             <game-live-pieces
             [boardOrientation]="boardOrientation">
             </game-live-pieces>
+            
+            <div class="w-100"> 
+                <game-live-endgame>
+                </game-live-endgame>
+                
+                <game-live-promotion *ngIf="user"
+                [username]="user.username"
+                [game]="game">
+                </game-live-promotion>
+            </div>
         </div>
 
         <div class="col-6 order-3 col-md-2 order-md-last">
@@ -31,15 +41,5 @@
         </div>
     </div>
 
-    <div class="row justify-content-center">
-        <div class="col-12 order-second col-md-8 order-md-2">
-            <game-live-endgame>
-            </game-live-endgame>
-            
-            <game-live-promotion *ngIf="user"
-            [username]="user.username"
-            [game]="game">
-            </game-live-promotion>
-        </div>
-    </div>
+    
 </div>

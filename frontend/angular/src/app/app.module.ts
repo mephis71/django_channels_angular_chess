@@ -14,8 +14,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 import { GameOverviewComponent } from './components/game/game-overview/game-overview.component';
-import { MatSliderModule } from '@angular/material/slider'; 
-import { MatRadioModule } from '@angular/material/radio';
+
+import { MatLegacySliderModule as MatSliderModule } from '@angular/material/legacy-slider'; 
+import { MatLegacyRadioModule as MatRadioModule } from '@angular/material/legacy-radio';
+import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button'
+import { MatToolbarModule } from '@angular/material/toolbar';
+
 import { GameLiveChatComponent } from './components/game/game-live/game-live-chat/game-live-chat.component';
 import { GameLivePiecesComponent } from './components/game/game-live/game-live-pieces/game-live-pieces.component';
 import { GameLivePromotionComponent } from './components/game/game-live/game-live-promotion/game-live-promotion.component';
@@ -81,7 +85,9 @@ import { OnlineStatusComponent } from './components/online-status/online-status.
     BrowserAnimationsModule,
     DragDropModule,
     MatSliderModule,
-    MatRadioModule
+    MatRadioModule,
+    MatButtonModule,
+    MatToolbarModule
   ],
   providers: [],
   bootstrap: [AppComponent]

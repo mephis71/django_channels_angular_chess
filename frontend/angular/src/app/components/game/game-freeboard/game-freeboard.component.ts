@@ -23,7 +23,6 @@ export class GameFreeBoardComponent implements OnInit, OnDestroy {
   constructor(
     private userService: UserService,
     private gameService: GameService,
-    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
@@ -31,21 +30,19 @@ export class GameFreeBoardComponent implements OnInit, OnDestroy {
       next: (user: IUser) => {
         this.user = new User(user)
         this.userService.refreshUser.next(this.user);
-        this.route.params.subscribe(params => {
-          this.gameService.getFreeBoardGame(params['id']).subscribe({
-            next: game => {
-              this.setGame(game);
-              this.gameService.gameObjectReady.next(game);
-              const path = `game/freeboard/${this.game.id}`
-              this.gameService.openGameWebsocket(path);
-              this.gameError = '';
-            },
-            error: err =>{
-              if(err.status == 404) {
-                this.gameError = 'The game was not found';
-              }
+        this.gameService.getFreeBoardGame().subscribe({
+          next: game => {
+            this.setGame(game);
+            this.gameService.gameObjectReady.next(game);
+            const path = `game/freeboard`
+            this.gameService.openGameWebsocket(path);
+            this.gameError = '';
+          },
+          error: err =>{
+            if(err.status == 404) {
+              this.gameError = 'The game was not found';
             }
-          })
+          }
         })
       },
       error: err => {

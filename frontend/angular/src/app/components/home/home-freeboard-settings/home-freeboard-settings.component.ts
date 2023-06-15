@@ -26,7 +26,7 @@ export class HomeFreeboardSettingsComponent {
 
     this.gameService.createFreeBoardGame(settings).subscribe({
       next: res => {
-        this.router.navigate([`/freeboard/${res.id}`])
+        this.router.navigate([`/freeboard`])
       },
       error: err => {
         this.freeboardMessage = err.error.fen[0]

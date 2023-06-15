@@ -13,8 +13,8 @@ def get_game_by_id(game_id):
     return Game.objects.select_related("player_white", "player_black").get(id=game_id)
 
 @database_sync_to_async
-def get_freeboard_game_by_id(game_id):
-    return FreeBoardGame.objects.get(id=game_id)
+def get_freeboard_game_by_user(user):
+    return user.freeboard_game
 
 def new_game(usernames, settings):
     game_obj = Game.objects.new_game(usernames, settings)

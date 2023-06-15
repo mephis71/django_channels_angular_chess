@@ -15,7 +15,7 @@ const routes: Routes = [
   {path: 'game/:id', component:GameOverviewComponent},
   {path: 'game/live/:id', component:GameLiveComponent},
   {path: 'user/:username', component:UserProfileComponent},
-  {path: 'freeboard/:id', component:GameFreeBoardComponent}
+  {path: 'freeboard', component:GameFreeBoardComponent}
 ];
 
 @NgModule({

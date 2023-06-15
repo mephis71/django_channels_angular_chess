@@ -1,6 +1,6 @@
 from channels.layers import get_channel_layer
-from game.api.serializers import FreeBoardGameSerializer, GameSerializer, FreeBoardGameCreateSerializer
-from game.models import Game, FreeBoardGame
+from game.api.serializers import FreeBoardGameSerializer, GameSerializer
+from game.models import Game
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -57,23 +57,21 @@ class GameFreeBoardAPIView(APIView):
     serializer_class = FreeBoardGameSerializer
 
     def get(self, request, *args, **kwargs):
-        game_id = kwargs['id']
-        try:
-            game_obj = FreeBoardGame.objects.get(id=game_id)
-        except FreeBoardGame.DoesNotExist:
+        game_obj = request.user.freeboard_game
+        if not game_obj:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = self.serializer_class(game_obj)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            serializer = self.serializer_class(game_obj)
+            return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request):
         settings = request.data['settings']
-        serializer = FreeBoardGameCreateSerializer(data=settings)
-        if serializer.is_valid():
-            game_obj = serializer.save()   
-            serializer = self.serializer_class(game_obj)
+        serializer = self.serializer_class(data=settings)
+        if serializer.is_valid(raise_exception=True):
+            game_obj = serializer.save()
+            request.user.freeboard_game = game_obj
+            request.user.save(update_fields=['freeboard_game'])
             return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         
+ 

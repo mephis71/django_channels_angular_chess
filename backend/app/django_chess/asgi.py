@@ -20,7 +20,7 @@ application = ProtocolTypeRouter({
             re_path(r"^ws/game/live/(?P<game_id>[0-9]+)$", GameLiveConsumer.as_asgi()),
             re_path(r"^ws/game/live/(?P<game_id>[0-9]+)/chat", GameChatConsumer.as_asgi()),
             re_path(r"^ws/game/stockfish", StockfishConsumer.as_asgi()),
-            re_path(r"^ws/game/freeboard/(?P<game_id>[0-9]+)", GameFreeBoardConsumer.as_asgi()),
+            re_path(r"^ws/game/freeboard", GameFreeBoardConsumer.as_asgi()),
         ])
     )
 })

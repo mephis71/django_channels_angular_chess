@@ -1,11 +1,28 @@
 .player {
-    font-size: 25px;
+    font-size: 20px;
     font-weight: 12;
     text-align: center;
 }
 
+@media (min-width: 992px) {
+    .player {
+        font-size: 25px;
+        font-weight: 12;
+        text-align: center;
+    }
+}
+
 .timer {
-    font-size: 50px;
+    font-size: 40px;
     font-weight: 12;
     text-align: center;
 }
+
+@media (min-width: 992px) {
+    .timer {
+        font-size: 50px;
+        font-weight: 12;
+        text-align: center;
+    }
+}
+

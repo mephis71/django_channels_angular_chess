@@ -1,14 +1,16 @@
 <div class="container">
-  <form [formGroup]="loginForm">
-      <h4 class="mb-3">Sign in</h4>
+  <form class="d-flex-column text-center" [formGroup]="loginForm">
 
+      <h4 class="mb-3">Sign in</h4>
+      
       <input formControlName="username" type="username" class="form-control mb-1" placeholder="Username">
       <h6 *ngIf="usernameError">{{usernameError}}</h6>
 
       <input formControlName="password" type="password" class="form-control mb-1" placeholder="Password">
       <h6 *ngIf="passwordError">{{passwordError}}</h6>
       
-      <button class="w-100 btn btn-primary btn-lg" (click)="sendLoginForm()">Sign in</button>
+      <button mat-stroked-button color="primary" (click)="sendLoginForm()">Login</button>
       <h6 *ngIf="nonFieldError">{{nonFieldError}}</h6>
+
   </form>
 </div>

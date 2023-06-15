@@ -12,6 +12,7 @@ class User(AbstractUser):
     email = models.EmailField(max_length=100)
     friends = models.ManyToManyField('User')
     is_online = models.BooleanField(default=False)
+    freeboard_game = models.ForeignKey('game.FreeBoardGame', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.username

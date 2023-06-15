@@ -72,9 +72,9 @@ export class GameService {
     )
   }
 
-  getFreeBoardGame(id: number): Observable<Game>  {
+  getFreeBoardGame(): Observable<Game>  {
     return this.http.get<Game>(
-      `${this.apiUrl}/game/freeboard/${id}`,
+      `${this.apiUrl}/game/freeboard`,
       {withCredentials: true}
     )
   }
