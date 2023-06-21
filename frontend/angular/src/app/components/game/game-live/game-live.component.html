@@ -11,16 +11,6 @@
             <game-live-pieces
             [boardOrientation]="boardOrientation">
             </game-live-pieces>
-            
-            <div class="w-100"> 
-                <game-live-endgame>
-                </game-live-endgame>
-                
-                <game-live-promotion *ngIf="user"
-                [username]="user.username"
-                [game]="game">
-                </game-live-promotion>
-            </div>
         </div>
 
         <div class="col-6 order-3 col-md-2 order-md-last">
@@ -30,16 +20,26 @@
                 [game]="game"
                 [boardOrientation]="boardOrientation">
                 </game-live-timers>
-                <div>
-                    <game-live-buttons></game-live-buttons>
-                    <game-rotate-board-button
-                    [boardOrientation]="boardOrientation"
-                    (rotateBoardEvent)="rotateBoard($event)">
-                    </game-rotate-board-button>
-                </div>
+
+                <game-live-buttons></game-live-buttons>
+                
+                <game-rotate-board-button
+                [boardOrientation]="boardOrientation"
+                (rotateBoardEvent)="rotateBoard($event)">
+                </game-rotate-board-button>
             </div>
         </div>
     </div>
 
-    
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8"> 
+            <game-live-endgame>
+            </game-live-endgame>
+            
+            <game-live-promotion *ngIf="user"
+            [username]="user.username"
+            [game]="game">
+            </game-live-promotion>
+        </div>
+    </div>
 </div>

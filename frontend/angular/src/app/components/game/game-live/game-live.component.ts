@@ -1,10 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, NgZone } from '@angular/core';
 import { GameService } from 'src/app/services/game.service';
 import { IUser, User } from 'src/app/models/user';
 import { UserService } from 'src/app/services/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Game } from 'src/app/models/game';
-import { Subscription } from 'rxjs';
+import { Subscription, take } from 'rxjs';
 import { Color } from 'src/app/enums/pieces';
 
 @Component({
@@ -27,9 +27,10 @@ export class GameLiveComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private gameService: GameService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
   ) {}
 
+    
   ngOnInit(): void {
     this.gameWsSubjectSub = this.gameService.gameWsObservableReady.subscribe({
       next: () => {

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { Color } from 'src/app/enums/pieces';
 import { Piece } from 'src/app/models/piece';
 import { GameService } from 'src/app/services/game.service';
@@ -7,13 +7,15 @@ import { fenToPieces } from 'src/app/utils/utils';
 import { Subscription } from 'rxjs';
 import { MoveMessage } from 'src/app/models/ws-messages';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { Renderer2, ElementRef } from '@angular/core';
+import { CssService } from 'src/app/services/css.service';
 
 @Component({
   selector: 'game-live-pieces',
   templateUrl: './game-live-pieces.component.html',
   styleUrls: ['./../../css/game-pieces.css']
 })
-export class GameLivePiecesComponent implements OnInit, OnDestroy {
+export class GameLivePiecesComponent implements OnInit, OnDestroy, AfterViewInit {
   public Color = Color;
   
   @Input() boardOrientation: Color;
@@ -29,8 +31,24 @@ export class GameLivePiecesComponent implements OnInit, OnDestroy {
   gamePositionsIterator: number;
 
   constructor(
-    private gameService: GameService
+    private gameService: GameService,
+    private renderer: Renderer2,
+    private el: ElementRef,
+    private cssService: CssService
   ) {}
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.broadcastBoardHeight();
+    }, 200)
+    this.renderer.listen(window, 'resize', event => {
+      this.broadcastBoardHeight();
+    })
+  }
+
+  broadcastBoardHeight(): void {
+    this.cssService.boardHeightBroadcast.next(this.el.nativeElement.offsetHeight)
+  }
 
   ngOnInit(): void {
     this.wsSubjectSub = this.gameService.gameWsObservableReady.subscribe({
@@ -38,7 +56,6 @@ export class GameLivePiecesComponent implements OnInit, OnDestroy {
         this.gameWsSub = this.getGameWsSub();
       }
     })
-
   }
 
   getGameWsSub(): Subscription {
