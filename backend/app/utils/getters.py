@@ -17,8 +17,7 @@ def get_freeboard_game_by_user(user):
     return user.freeboard_game
 
 def new_game(usernames, settings):
-    game_obj = Game.objects.new_game(usernames, settings)
-    return Game.objects.select_related("player_white", "player_black").get(id=game_obj.id)
+    return Game.objects.new_game(usernames, settings)
 
 async def get_user_with_jwt(token):
     try:

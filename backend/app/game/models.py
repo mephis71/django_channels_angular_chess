@@ -24,8 +24,6 @@ class GameManager(models.Manager):
 class Game(models.Model):
     # default values
     DEFAULT_GAME_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-    STARTING_PLAYER = 'white'
-    DEFAULT_SECONDS = 300
 
     # players
     player_white = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='first', null=True)
@@ -33,20 +31,20 @@ class Game(models.Model):
     winner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='winner', default=None, null=True)
 
     # game info
-    fen = models.TextField(default=DEFAULT_GAME_FEN)
-    timer_black = models.PositiveIntegerField(default = DEFAULT_SECONDS)
-    timer_white = models.PositiveIntegerField(default = DEFAULT_SECONDS)
+    fen = models.TextField(default=DEFAULT_GAME_FEN, null=False)
+    timer_black = models.PositiveIntegerField(null=False)
+    timer_white = models.PositiveIntegerField(null=False)
     is_running = models.BooleanField(default=False)
     is_finished = models.BooleanField(default=False)
     game_positions = models.TextField(default=DEFAULT_GAME_FEN, null=False)
-    move_timestamps = models.TextField(default=f'{DEFAULT_SECONDS}-{DEFAULT_SECONDS}')
+    move_timestamps = models.TextField(null=False)
     endgame_cause = models.TextField(null=True)
     game_start_time = models.DateTimeField(default=None, null=True)
     last_move_time = models.DateTimeField(default=None, null=True)
     game_end_time = models.DateTimeField(default=None, null=True)
 
-    duration = models.PositiveIntegerField(null=True)
-    random_colors = models.BooleanField(null=True)
+    duration = models.PositiveIntegerField(null=False)
+    random_colors = models.BooleanField(null=False)
 
     _move_cancel_fen = models.TextField(null=True, default=None)
     _game_result = models.TextField(null=True)
@@ -61,9 +59,10 @@ class Game(models.Model):
             self.player_black = User.objects.get(username=settings['black'])
 
         self.timer_white = self.timer_black = settings['duration'] * 60
+        self.move_timestamps = f'{self.timer_white}-{self.timer_black}'
         self.duration = settings['duration']
         self.random_colors = settings['random_colors']
-
+        
     def get_game_positions(self):
         return self.game_positions.split(';')
 
@@ -124,10 +123,9 @@ class FreeBoardGameManager(models.Manager):
 class FreeBoardGame(models.Model):
     # default values
     DEFAULT_GAME_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-    STARTING_PLAYER = 'white'
 
     # game info
-    fen = models.TextField(default=DEFAULT_GAME_FEN)
+    fen = models.TextField(default=DEFAULT_GAME_FEN, null=False)
     game_positions = models.TextField(default=DEFAULT_GAME_FEN, null=False)
     endgame_cause = models.TextField(null=True)
 

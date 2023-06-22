@@ -21,12 +21,14 @@
                 [boardOrientation]="boardOrientation">
                 </game-live-timers>
 
-                <game-live-buttons></game-live-buttons>
-                
-                <game-rotate-board-button
-                [boardOrientation]="boardOrientation"
-                (rotateBoardEvent)="rotateBoard($event)">
-                </game-rotate-board-button>
+                <div>
+                    <game-live-buttons></game-live-buttons>
+                    
+                    <game-rotate-board-button
+                    [boardOrientation]="boardOrientation"
+                    (rotateBoardEvent)="rotateBoard($event)">
+                    </game-rotate-board-button>
+                </div>
             </div>
         </div>
     </div>

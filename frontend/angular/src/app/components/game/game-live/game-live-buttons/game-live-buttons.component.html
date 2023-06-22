@@ -1,15 +1,16 @@
 <div class="d-flex flex-column">
-    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="allowDrawOffer" id="offerdrawbutton" (click)="sendDrawOffer()">Offer a draw</button>
-    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="drawOfferPending" id="acceptdrawbutton" (click)="acceptDrawOffer()">Accept draw</button>
-    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="drawOfferPending" id="rejectdrawbutton" (click)="rejectDrawOffer()">Reject draw</button>
+    <button mat-stroked-button color="primary" class="text-wrap mb-1" *ngIf="allowDrawOffer" id="offerdrawbutton" (click)="sendDrawOffer()">Offer a draw</button>
+    <button mat-stroked-button color="primary" class="text-wrap mb-1" *ngIf="drawOfferPending" id="acceptdrawbutton" (click)="acceptDrawOffer()">Accept draw</button>
+    <button mat-stroked-button color="primary" class="text-wrap mb-1" *ngIf="drawOfferPending" id="rejectdrawbutton" (click)="rejectDrawOffer()">Reject draw</button>
 
-    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="allowMoveCancelRequest" id="requestmovecancelbutton" (click)="sendMoveCancelRequest()">Cancel move</button>
-    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="moveCancelRequestPending" id="acceptmovecancelbutton" (click)="acceptMoveCancelRequest()">Accept move cancel</button>
-    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="moveCancelRequestPending" id="rejectmovecancelbutton" (click)="rejectMoveCancelRequest()">Reject move cancel</button>
+    <button mat-stroked-button color="primary" class="text-wrap mb-1" *ngIf="allowMoveCancelRequest" id="requestmovecancelbutton" (click)="sendMoveCancelRequest()">Cancel move</button>
+    <div *ngIf="moveCancelError" class="text-center">{{moveCancelError}}</div>
+    <button mat-stroked-button color="primary" class="text-wrap mb-1" *ngIf="moveCancelRequestPending" id="acceptmovecancelbutton" (click)="acceptMoveCancelRequest()">Accept move cancel</button>
+    <button mat-stroked-button color="primary" class="text-wrap mb-1" *ngIf="moveCancelRequestPending" id="rejectmovecancelbutton" (click)="rejectMoveCancelRequest()">Reject move cancel</button>
 
-    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="showResignButton" id="resignbutton" (click)="resign()">Resign</button>
-    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="showResignConfirmButton" id="confirmresignbutton" (click)="confirmResign()">Confirm resign</button>
-    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="showResignCancelButton" id="cancelresignbutton" (click)="cancelResign()">Cancel resign</button>
+    <button mat-stroked-button color="primary" class="text-wrap mb-1" *ngIf="showResignButton" id="resignbutton" (click)="resign()">Resign</button>
+    <button mat-stroked-button color="primary" class="text-wrap mb-1" *ngIf="showResignConfirmButton" id="confirmresignbutton" (click)="confirmResign()">Confirm resign</button>
+    <button mat-stroked-button color="primary" class="text-wrap mb-1" *ngIf="showResignCancelButton" id="cancelresignbutton" (click)="cancelResign()">Cancel resign</button>
 
-    <div *ngIf="moveCancelError">{{moveCancelError}}</div>
+    
 </div>

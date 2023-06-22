@@ -1,4 +1,4 @@
-django==4.2
+django==4.2.1
 daphne==4.0.0
 channels==4.0.0
 Pillow==9.5.0
