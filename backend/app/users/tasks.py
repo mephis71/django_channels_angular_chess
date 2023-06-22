@@ -14,7 +14,7 @@ async def disconnect_countdown(user):
         await asyncio.sleep(1)
         if seconds == 0:
             user.is_online = False
-            database_sync_to_async(user.save)()
+            await database_sync_to_async(user.save)(update_fields=['is_online'])
             friends_usernames = await get_friends_usernames(user)
             await broadcast_online_status(user.username, 'offline', friends_usernames)
 

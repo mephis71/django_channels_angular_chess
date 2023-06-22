@@ -40,7 +40,7 @@ export class GameLivePiecesComponent implements OnInit, OnDestroy, AfterViewInit
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.broadcastBoardHeight();
-    }, 200)
+    }, 400)
     this.renderer.listen(window, 'resize', event => {
       this.broadcastBoardHeight();
     })
