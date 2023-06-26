@@ -1,0 +1,28 @@
+@import 'custom-theme';
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+// background and text
+$body-color: $chess-text-color;
+$body-bg: $chess-bg-color;
+
+// placeholder
+$input-placeholder-color: $chess-text-color;
+
+// list group
+
+// hover
+$list-group-hover-bg: $chess-bg-color-2;
+$list-group-action-hover-color: $chess-text-color;
+
+// click
+$list-group-action-active-bg: $chess-bg-color-3;
+$list-group-action-active-color: $chess-text-color;
+
+$font-family-base: $chess-font-family;
+// $font-size-base: 
+// $line-height-base:
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+
+

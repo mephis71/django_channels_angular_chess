@@ -4,7 +4,7 @@ import { UserService } from 'src/app/services/user.service';
 @Component({
   selector: 'home-add-friend',
   templateUrl: './home-add-friend.component.html',
-  styleUrls: ['./home-add-friend.component.css']
+  styleUrls: ['./home-add-friend.component.scss']
 })
 export class HomeAddFriendComponent {
   friendRequestMessage = '';

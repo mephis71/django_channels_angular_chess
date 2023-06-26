@@ -9,7 +9,7 @@ import { Color } from 'src/app/enums/pieces';
 @Component({
   selector: 'app-game-overview',
   templateUrl: './game-overview.component.html',
-  styleUrls: ['./game-overview.component.css']
+  styleUrls: ['./game-overview.component.scss']
 })
 export class GameOverviewComponent implements OnInit {
   game: Game;

@@ -7,7 +7,7 @@ import { UserService } from 'src/app/services/user.service';
 @Component({
   selector: 'home-friends',
   templateUrl: './home-friends.component.html',
-  styleUrls: ['./home-friends.component.css']
+  styleUrls: ['./home-friends.component.scss']
 })
 export class HomeFriendsComponent implements OnInit, OnDestroy {
   @Input() friends: string[];

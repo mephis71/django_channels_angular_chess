@@ -6,7 +6,7 @@ import { GameService } from 'src/app/services/game.service';
 @Component({
   selector: 'home-freeboard-settings',
   templateUrl: './home-freeboard-settings.component.html',
-  styleUrls: ['./home-freeboard-settings.component.css']
+  styleUrls: ['./home-freeboard-settings.component.scss']
 })
 export class HomeFreeboardSettingsComponent {
   freeboardFen: string;

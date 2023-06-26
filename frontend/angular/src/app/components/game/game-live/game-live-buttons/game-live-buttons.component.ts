@@ -6,7 +6,7 @@ import { GameService } from 'src/app/services/game.service';
 @Component({
   selector: 'game-live-buttons',
   templateUrl: './game-live-buttons.component.html',
-  styleUrls: ['./game-live-buttons.component.css']
+  styleUrls: ['./game-live-buttons.component.scss']
 })
 export class GameLiveButtonsComponent implements OnInit, OnDestroy {
   gameWsSub: Subscription;

@@ -8,7 +8,7 @@ import { StockfishService } from 'src/app/services/stockfish.service';
 @Component({
   selector: 'game-stockfish',
   templateUrl: './game-stockfish.component.html',
-  styleUrls: ['./game-stockfish.component.css']
+  styleUrls: ['./game-stockfish.component.scss']
 })
 export class GameStockfishComponent implements OnInit{
   game: Game;

@@ -13,7 +13,7 @@ import { StockfishPositionMessage } from 'src/app/models/ws-messages';
 @Component({
   selector: 'game-overview-pieces',
   templateUrl: './game-overview-pieces.component.html',
-  styleUrls: ['./../../css/game-pieces.css']
+  styleUrls: ['./../../css/game-pieces.scss']
 })
 export class GameOverviewPiecesComponent implements OnChanges {
   public Color = Color;

@@ -1,6 +1,6 @@
 <div id="endgameinfo" *ngIf="endgameInfo">
     <h4 id="endgametext">{{endgameInfo}}</h4>
-    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="showRematchButton"  (click)="sendRematch()">Rematch</button>
-    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="rematchOfferPending"  (click)="acceptRematch()">Accept</button>
-    <button mat-stroked-button color="primary" class="text-wrap" *ngIf="rematchOfferPending"  (click)="rejectRematch()">Reject</button>
+    <button mat-stroked-button color="accent" class="text-wrap" *ngIf="showRematchButton"  (click)="sendRematch()">Rematch</button>
+    <button mat-stroked-button color="accent" class="text-wrap" *ngIf="rematchOfferPending"  (click)="acceptRematch()">Accept</button>
+    <button mat-stroked-button color="accent" class="text-wrap" *ngIf="rematchOfferPending"  (click)="rejectRematch()">Reject</button>
 </div>

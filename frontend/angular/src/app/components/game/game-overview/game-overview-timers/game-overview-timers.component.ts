@@ -7,7 +7,7 @@ import { Color } from 'src/app/enums/pieces';
 @Component({
   selector: 'game-overview-timers',
   templateUrl: './../../templates/game-timers.html',
-  styleUrls: ['./../../css/game-timers.css']
+  styleUrls: ['./../../css/game-timers.scss']
 })
 export class GameOverviewTimersComponent implements OnInit, OnDestroy, OnChanges {
   public Color = Color;

@@ -7,7 +7,7 @@ import { GameService } from 'src/app/services/game.service';
 @Component({
   selector: 'home-game-settings',
   templateUrl: './home-game-settings.component.html',
-  styleUrls: ['./home-game-settings.component.css']
+  styleUrls: ['./home-game-settings.component.scss']
 })
 
 export class HomeGameSettingsComponent implements OnInit, OnDestroy {

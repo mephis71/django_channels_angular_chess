@@ -10,7 +10,7 @@ import { Color } from 'src/app/enums/pieces';
 @Component({
   selector: 'app-game-live',
   templateUrl: './game-live.component.html',
-  styleUrls: ['./game-live.component.css']
+  styleUrls: ['./game-live.component.scss']
 })
 
 export class GameLiveComponent implements OnInit, OnDestroy {

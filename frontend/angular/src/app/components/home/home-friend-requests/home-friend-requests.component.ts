@@ -7,7 +7,7 @@ import { UserService } from 'src/app/services/user.service';
 @Component({
   selector: 'home-friend-requests',
   templateUrl: './home-friend-requests.component.html',
-  styleUrls: ['./home-friend-requests.component.css']
+  styleUrls: ['./home-friend-requests.component.scss']
 })
 export class HomeFriendRequestsComponent implements OnInit, OnDestroy {
   @Input() friendRequests: FriendRequest[];

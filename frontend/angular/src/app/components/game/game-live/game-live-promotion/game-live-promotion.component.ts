@@ -9,7 +9,7 @@ import { PromotionPickMessage } from 'src/app/models/ws-messages';
 @Component({
   selector: 'game-live-promotion',
   templateUrl: './../../templates/game-promotion.html',
-  styleUrls: ['./../../css/game-promotion.css']
+  styleUrls: ['./../../css/game-promotion.scss']
 })
 export class GameLivePromotionComponent implements OnInit, OnDestroy, OnChanges {
   playerColor: Color;

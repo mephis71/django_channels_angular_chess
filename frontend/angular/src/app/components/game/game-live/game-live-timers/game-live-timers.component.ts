@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'game-live-timers',
   templateUrl: './../../templates/game-timers.html',
-  styleUrls: ['./../../css/game-timers.css']
+  styleUrls: ['./../../css/game-timers.scss']
 })
 export class GameLiveTimersComponent implements OnInit, OnDestroy {
   public Color = Color;

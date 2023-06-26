@@ -8,7 +8,7 @@ import { GameService } from 'src/app/services/game.service';
 @Component({
   selector: 'home-game-invites',
   templateUrl: './home-game-invites.component.html',
-  styleUrls: ['./home-game-invites.component.css']
+  styleUrls: ['./home-game-invites.component.scss']
 })
 export class HomeGameInvitesComponent implements OnInit, OnDestroy{
   @Input() username: string;

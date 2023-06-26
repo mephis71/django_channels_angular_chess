@@ -8,7 +8,7 @@ import { CssService } from 'src/app/services/css.service';
 @Component({
   selector: 'game-live-chat',
   templateUrl: './game-live-chat.component.html',
-  styleUrls: ['./game-live-chat.component.css']
+  styleUrls: ['./game-live-chat.component.scss']
 })
 export class GameLiveChatComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() username: string;

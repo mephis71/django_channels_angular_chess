@@ -6,7 +6,7 @@ import { GameService } from 'src/app/services/game.service';
 @Component({
   selector: 'game-freeboard-endgame',
   templateUrl: './game-freeboard-endgame.html',
-  styleUrls: ['./../../css/game-endgame.css']
+  styleUrls: ['./../../css/game-endgame.scss']
 })
 export class GameFreeBoardEndgameComponent implements OnInit, OnDestroy {
   gameWsSub: Subscription;

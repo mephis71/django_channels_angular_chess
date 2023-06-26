@@ -1,28 +1,77 @@
 @use '@angular/material' as mat;
+@use "sass:map";
 @import 'custom-palette';
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap");
 
-// TODO(v15): As of v15 mat.legacy-core no longer includes default typography styles.
-//  The following line adds:
-//    1. Default typography styles for all components
-//    2. Styles for typography hierarchy classes (e.g. .mat-headline-1)
-//  If you specify typography styles for the components you use elsewhere, you should delete this line.
-//  If you don't need the default component typographies but still want the hierarchy styles,
-//  you can delete this line and instead use:
-//    `@include mat.legacy-typography-hierarchy(mat.define-legacy-typography-config());`
 @include mat.all-legacy-component-typographies();
 @include mat.legacy-core();
 
-$chess-primary: mat.define-palette($chess-palette, 900);
-$chess-accent: mat.define-palette($chess-palette, A100);
+$chess-dark: mat.define-palette($chess-palette, 900, 700, 500);
+$chess-light: mat.define-palette($chess-palette, A100);
 $chess-warn: mat.define-palette(mat.$red-palette);
 
-$chess-theme: mat.define-light-theme((
+$chess-bg-color: map-get($chess-palette, 900);
+$chess-bg-color-2: map-get($chess-palette, 700);
+$chess-bg-color-3: map-get($chess-palette, 500);
+$chess-text-color: map-get($chess-palette, A100);
+
+@function get-foreground($color) {
+  @return (
+      base:              $color,
+      divider:           $color,
+      dividers:          $color,
+      disabled:          rgba($color, 0.38),
+      disabled-button:   rgba($color, 0.38),
+      disabled-text:     rgba($color, 0.38),
+      hint-text:         rgba($color, 0.38),
+      secondary-text:    rgba($color, 0.54),
+      icon:              rgba($color, 0.54),
+      icons:             rgba($color, 0.54),
+      text:              rgba($color, 0.87),
+      slider-off:        rgba($color, 0.26),
+      slider-off-active: rgba($color, 0.38),
+      slider-min:        rgba($color, 0.38)
+  );
+};
+
+@function get-background($color) {
+  @return (
+    status-bar: $color,
+    app-bar:    $color,
+    background: $color,
+    hover:      $color,
+    card:       $color,
+    dialog:     $color,
+    disabled-button: $color,
+    raised-button: $color,
+    focused-button: $color,
+    selected-button: $color,
+    selected-disabled-button: $color,
+    disabled-button-toggle: $color,
+  );
+}
+
+$chess-foreground: get-foreground($chess-text-color);
+
+$chess-background: get-background(darken($chess-bg-color, 2%));
+
+$chess-font-family: 'Quicksand';
+
+$chess-typography: mat.define-typography-config(
+  $font-family: $chess-font-family,
+);
+
+$chess-theme: mat.define-dark-theme((
   color: (
-    primary: $chess-primary,
-    accent: $chess-accent,
+    primary: $chess-dark,
+    accent: $chess-light,
     warn: $chess-warn,
-  )
+  ),
+  typography: $chess-typography,
 ));
 
-@include mat.all-legacy-component-themes($chess-theme);
+$chess-theme: map.set($chess-theme, color, foreground, $chess-foreground);
 
+$chess-theme: map.set($chess-theme, color, background, $chess-background);
+
+@include mat.all-legacy-component-themes($chess-theme);

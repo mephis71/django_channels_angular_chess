@@ -6,7 +6,7 @@ import { GameService } from 'src/app/services/game.service';
 @Component({
   selector: 'home-running-games',
   templateUrl: './home-running-games.component.html',
-  styleUrls: ['./home-running-games.component.css']
+  styleUrls: ['./home-running-games.component.scss']
 })
 export class HomeRunningGamesComponent implements OnInit{
   running_games: Game[];

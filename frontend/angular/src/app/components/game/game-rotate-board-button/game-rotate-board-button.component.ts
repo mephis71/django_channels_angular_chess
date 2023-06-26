@@ -4,7 +4,7 @@ import { Color } from 'src/app/enums/pieces';
 @Component({
   selector: 'game-rotate-board-button',
   templateUrl: './game-rotate-board-button.component.html',
-  styleUrls: ['./game-rotate-board-button.component.css']
+  styleUrls: ['./game-rotate-board-button.component.scss']
 })
 
 export class GameRotateBoardButtonComponent implements OnInit {

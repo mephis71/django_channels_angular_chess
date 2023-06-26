@@ -13,7 +13,7 @@ import { CssService } from 'src/app/services/css.service';
 @Component({
   selector: 'game-live-pieces',
   templateUrl: './game-live-pieces.component.html',
-  styleUrls: ['./../../css/game-pieces.css']
+  styleUrls: ['./../../css/game-pieces.scss']
 })
 export class GameLivePiecesComponent implements OnInit, OnDestroy, AfterViewInit {
   public Color = Color;

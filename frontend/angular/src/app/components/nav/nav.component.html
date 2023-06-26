@@ -1,13 +1,13 @@
 <mat-toolbar *ngIf="!user" class="gap-1 mb-4 justify-content-center">
-  <button mat-stroked-button color="primary" class="text-wrap" routerLink="/" >Home</button>
-  <button mat-stroked-button color="primary" class="text-wrap" routerLink="/login" >Login</button>
-  <button mat-stroked-button color="primary" class="text-wrap" routerLink="/register" >Register</button>
+  <button mat-stroked-button color="accent" class="text-wrap" routerLink="/" >Home</button>
+  <button mat-stroked-button color="accent" class="text-wrap" routerLink="/login" >Login</button>
+  <button mat-stroked-button color="accent" class="text-wrap" routerLink="/register" >Register</button>
 </mat-toolbar>
 
 <mat-toolbar *ngIf="user" class="gap-1 mb-4 justify-content-around">
-  <button mat-stroked-button color="primary" class="text-wrap" routerLink="/" >Home</button>
+  <button mat-stroked-button color="accent" class="text-wrap" routerLink="/" >Home</button>
   <div class="d-flex gap-1">
-    <button mat-stroked-button color="primary" class="text-wrap" [routerLink]="['/user', user.username]" >{{user.username}}</button>
-    <button mat-stroked-button color="primary" class="text-wrap" routerLink="/login"  (click)="logout()">Logout</button>
+    <button mat-stroked-button color="accent" class="text-wrap" [routerLink]="['/user', user.username]" >{{user.username}}</button>
+    <button mat-stroked-button color="accent" class="text-wrap" routerLink="/login"  (click)="logout()">Logout</button>
   </div>  
 </mat-toolbar>

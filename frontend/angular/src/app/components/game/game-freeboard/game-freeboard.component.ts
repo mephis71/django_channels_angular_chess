@@ -9,7 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'game-freeboard',
   templateUrl: './game-freeboard.component.html',
-  styleUrls: ['./game-freeboard.component.css']
+  styleUrls: ['./game-freeboard.component.scss']
 })
 
 export class GameFreeBoardComponent implements OnInit, OnDestroy {

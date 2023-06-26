@@ -5,7 +5,7 @@ import { UserService } from 'src/app/services/user.service';
 @Component({
   selector: 'app-online-status',
   templateUrl: './online-status.component.html',
-  styleUrls: ['./online-status.component.css']
+  styleUrls: ['./online-status.component.scss']
 })
 
 export class OnlineStatusComponent {

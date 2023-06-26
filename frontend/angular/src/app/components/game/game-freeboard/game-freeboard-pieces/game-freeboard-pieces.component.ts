@@ -12,7 +12,7 @@ import { CdkDragDrop, CdkDragStart } from '@angular/cdk/drag-drop';
 @Component({
   selector: 'game-freeboard-pieces',
   templateUrl: './game-freeboard-pieces.component.html',
-  styleUrls: ['./../../css/game-pieces.css']
+  styleUrls: ['./../../css/game-pieces.scss']
 })
 export class GameFreeBoardPiecesComponent implements OnInit, OnDestroy {
   public Color = Color;

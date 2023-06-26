@@ -6,7 +6,7 @@ import { User } from 'src/app/models/user';
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
-  styleUrls: ['./nav.component.css']
+  styleUrls: ['./nav.component.scss']
 })
 export class NavComponent implements OnInit, OnDestroy {
   user: User | null;
