@@ -1,6 +1,6 @@
 <div class="d-flex flex-column">
     <div *ngIf="showStockfish">
-        <div class="stockfish-eval">{{showStockfishEval(stockfishEval)}}</div>
+        <div class="stockfish-eval">{{stockfishEval}}</div>
     </div>
-    <button mat-stroked-button color="accent" class="text-wrap"  (click)="stockfishSwitch()">Show Stockfish Evaluation</button>
+    <button mat-stroked-button class="chess-button" (click)="stockfishSwitch()">Show Stockfish Evaluation</button>
 </div>

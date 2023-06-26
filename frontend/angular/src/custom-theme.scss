@@ -6,11 +6,12 @@
 @include mat.all-legacy-component-typographies();
 @include mat.legacy-core();
 
-$chess-dark: mat.define-palette($chess-palette, 900, 700, 500);
+$chess-dark: mat.define-palette($chess-palette, 800, 700, 500);
 $chess-light: mat.define-palette($chess-palette, A100);
 $chess-warn: mat.define-palette(mat.$red-palette);
 
-$chess-bg-color: map-get($chess-palette, 900);
+$chess-material-bg-color: map-get($chess-palette, 900);
+$chess-bg-color: map-get($chess-palette, 800);
 $chess-bg-color-2: map-get($chess-palette, 700);
 $chess-bg-color-3: map-get($chess-palette, 500);
 $chess-text-color: map-get($chess-palette, A100);
@@ -53,7 +54,7 @@ $chess-text-color: map-get($chess-palette, A100);
 
 $chess-foreground: get-foreground($chess-text-color);
 
-$chess-background: get-background(darken($chess-bg-color, 2%));
+$chess-background: get-background($chess-material-bg-color);
 
 $chess-font-family: 'Quicksand';
 
@@ -74,4 +75,4 @@ $chess-theme: map.set($chess-theme, color, foreground, $chess-foreground);
 
 $chess-theme: map.set($chess-theme, color, background, $chess-background);
 
-@include mat.all-legacy-component-themes($chess-theme);
+@include mat.all-component-themes($chess-theme);

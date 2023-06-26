@@ -4,6 +4,8 @@ Chess multiplayer web app made using Django, Django REST Framework, Django Chann
 
 You can scroll through the game (both real-time and while reviewing a game in the game history) using keyboard arrows.
 
+The application uses Stockfish 14.
+
 It is available at http://212.127.78.5/
 
 ## How to run the app
@@ -17,5 +19,3 @@ docker-compose -f docker-compose.prod.yml up
 ![alt text](https://github.com/mephis71/django_channels_angular_chess/blob/assets/screenshots/home_screenshot.png?raw=true)
 ## Gameplay
 ![alt text](https://github.com/mephis71/django_channels_angular_chess/blob/assets/screenshots/game_screenshot.png?raw=true)
-## Game history page
-![alt text](https://github.com/mephis71/django_channels_angular_chess/blob/assets/screenshots/game_history_screenshot.png?raw=true)

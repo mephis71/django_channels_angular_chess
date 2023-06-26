@@ -90,7 +90,7 @@ export class GameLivePiecesComponent implements OnInit, OnDestroy, AfterViewInit
   onDrop(event: CdkDragDrop<any>) {
     const drop_id = document.elementFromPoint(event.dropPoint.x, event.dropPoint.y)?.id;
     this.drop_id = drop_id ? parseInt(drop_id) : null;
-    if((this.pick_id && this.drop_id) && (this.pick_id != this.drop_id)) {
+    if((this.pick_id !== null && this.drop_id !== null) && (this.pick_id != this.drop_id)) {
       const msg = new MoveMessage(this.pick_id, this.drop_id);
       this.gameService.sendGameMoveMsg(msg)
     }

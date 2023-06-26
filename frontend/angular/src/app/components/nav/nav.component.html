@@ -1,13 +1,23 @@
-<mat-toolbar *ngIf="!user" class="gap-1 mb-4 justify-content-center">
-  <button mat-stroked-button color="accent" class="text-wrap" routerLink="/" >Home</button>
-  <button mat-stroked-button color="accent" class="text-wrap" routerLink="/login" >Login</button>
-  <button mat-stroked-button color="accent" class="text-wrap" routerLink="/register" >Register</button>
+<mat-toolbar *ngIf="!user" class="mb-2">
+  <div class="d-flex w-100 justify-content-between justify-content-md-around justify-content-lg-evenly">
+    <div class="d-flex gap-2">
+      <button mat-stroked-button class="chess-button" routerLink="/" >Home</button>
+    </div>
+    <div class="d-flex gap-2">
+      <button mat-stroked-button class="chess-button" routerLink="/login" >Login</button>
+      <button mat-stroked-button class="chess-button" routerLink="/register" >Register</button>
+    </div>
+  </div>
 </mat-toolbar>
 
-<mat-toolbar *ngIf="user" class="gap-1 mb-4 justify-content-around">
-  <button mat-stroked-button color="accent" class="text-wrap" routerLink="/" >Home</button>
-  <div class="d-flex gap-1">
-    <button mat-stroked-button color="accent" class="text-wrap" [routerLink]="['/user', user.username]" >{{user.username}}</button>
-    <button mat-stroked-button color="accent" class="text-wrap" routerLink="/login"  (click)="logout()">Logout</button>
-  </div>  
+<mat-toolbar *ngIf="user" class="mb-2">
+  <div class="d-flex w-100 justify-content-between justify-content-md-around justify-content-lg-evenly">
+    <div class="d-flex gap-2">
+      <button mat-stroked-button class="chess-button" routerLink="/" >Home</button>
+    </div>
+    <div class="d-flex gap-2">
+      <button mat-stroked-button class="chess-button" [routerLink]="['/user', user.username]" >{{user.username}}</button>
+      <button mat-stroked-button class="chess-button" (click)="logout()">Logout</button>
+    </div>
+  </div>
 </mat-toolbar>

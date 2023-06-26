@@ -15,9 +15,9 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 import { GameOverviewComponent } from './components/game/game-overview/game-overview.component';
 
-import { MatLegacySliderModule as MatSliderModule } from '@angular/material/legacy-slider'; 
-import { MatLegacyRadioModule as MatRadioModule } from '@angular/material/legacy-radio';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button'
+import { MatSliderModule } from '@angular/material/slider'; 
+import { MatRadioModule } from '@angular/material/radio';
+import { MatButtonModule } from '@angular/material/button'
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { GameLiveChatComponent } from './components/game/game-live/game-live-chat/game-live-chat.component';

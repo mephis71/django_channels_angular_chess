@@ -1,4 +1,5 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { throwToolbarMixedModesError } from '@angular/material/toolbar';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Game } from 'src/app/models/game';
@@ -13,7 +14,8 @@ import { StockfishService } from 'src/app/services/stockfish.service';
 export class GameStockfishComponent implements OnInit{
   game: Game;
   showStockfish = true;
-  stockfishEval: number;
+
+  stockfishEval: string;
 
   stockfishWsSub: Subscription;
   gameObjectSubjectSub: Subscription;
@@ -56,7 +58,25 @@ export class GameStockfishComponent implements OnInit{
       next: data => {
         if('type' in data) {
           if(data.type == 'stockfish_position') {
-            this.stockfishEval = data.eval.value;
+            if(data.eval.type == 'cp') {
+              const centipawns = data.eval.value;
+              if (centipawns > 0) {
+                this.stockfishEval = `+${(centipawns / 100)}`;
+              }
+              else {
+                this.stockfishEval = `${(centipawns / 100)}`;
+              }
+            }
+            else if(data.eval.type == 'mate') {
+              let movesToMate = data.eval.value;
+              if (movesToMate > 0) {
+                this.stockfishEval = `+M${movesToMate}`
+              }
+              else {
+                movesToMate = Math.abs(movesToMate);
+                this.stockfishEval = `-M${movesToMate}`
+              }
+            }
           }
         }
       }
@@ -70,16 +90,5 @@ export class GameStockfishComponent implements OnInit{
     else {
       this.showStockfish = false;
     }
-  }
-
-  showStockfishEval(cp: number) {
-    if(!cp) {
-      return 0;
-    }
-    let p = String(cp / 100);
-    if (Number(p) > 0) {
-      p = '+' + p;
-    }
-    return p;
   }
 }

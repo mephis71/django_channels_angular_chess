@@ -1,5 +1,5 @@
 <div class="container">
-  <form class="d-flex-column text-center" [formGroup]="registerForm">
+  <form class="text-center" [formGroup]="registerForm">
       <h4 class="mb-3">Register</h4>
 
       <input formControlName="username" class="form-control mb-1" placeholder="Username">
@@ -11,6 +11,6 @@
       <input formControlName="password" type="password" class="form-control mb-1" placeholder="Password">
       <h6 *ngIf="passwordError">{{passwordError}}</h6>
 
-      <button mat-stroked-button color="accent" class="text-wrap" (click)="sendRegisterInfo()">Sign up</button>
+      <button mat-stroked-button class="chess-button" (click)="sendRegisterInfo()">Sign up</button>
   </form>
 </div>

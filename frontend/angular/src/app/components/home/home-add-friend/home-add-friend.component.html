@@ -1,4 +1,4 @@
 <h4 class="text-center">Add a friend</h4>
 <input [(ngModel)]="friendRequestUsername" class="form-control mb-1" placeholder="Nickname">
-<button mat-stroked-button color="accent" class="text-wrap" (click)="sendFriendRequest()">Add</button>
+<button mat-stroked-button class="chess-button" (click)="sendFriendRequest()">Add</button>
 <h6 *ngIf="friendRequestMessage" class="mt-1 text-center">{{friendRequestMessage}}</h6>

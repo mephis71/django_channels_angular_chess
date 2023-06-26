@@ -1,6 +1,8 @@
-<div id="endgameinfo" *ngIf="endgameInfo">
-    <h4 id="endgametext">{{endgameInfo}}</h4>
-    <button mat-stroked-button color="accent" class="text-wrap" *ngIf="showRematchButton"  (click)="sendRematch()">Rematch</button>
-    <button mat-stroked-button color="accent" class="text-wrap" *ngIf="rematchOfferPending"  (click)="acceptRematch()">Accept</button>
-    <button mat-stroked-button color="accent" class="text-wrap" *ngIf="rematchOfferPending"  (click)="rejectRematch()">Reject</button>
+<div *ngIf="endgameInfo" class="pop-up-box shadow">
+    <h4 class="text-center">{{endgameInfo}}</h4>
+    <div class="pop-up-body">
+        <button mat-stroked-button class="chess-button" *ngIf="showRematchButton" (click)="sendRematch()">Rematch</button>
+        <button mat-stroked-button class="chess-button" *ngIf="rematchOfferPending" (click)="acceptRematch()">Accept</button>
+        <button mat-stroked-button class="chess-button" *ngIf="rematchOfferPending" (click)="rejectRematch()">Reject</button>
+    </div>
 </div>

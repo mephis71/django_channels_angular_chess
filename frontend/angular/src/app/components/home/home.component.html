@@ -3,7 +3,7 @@
     <div class="col">
     </div>
     <div class="col">
-      <h4 class="text-center">{{greetMessage}}</h4>
+      <h4 class="text-center">You are not logged in</h4>
     </div>
     <div class="col">
     </div>
@@ -13,7 +13,7 @@
 <div *ngIf="authenticated" class="container">
   <div class="row">
 
-    <div class="col">
+    <div class="col-md-4">
       <home-add-friend
       class="home-section"></home-add-friend>
       <home-friend-requests
@@ -24,8 +24,7 @@
       [friends]="user.friends"></home-friends>
     </div>
 
-    <div class="col">
-      <h4 [ngStyle]="{'text-align': 'center'}">{{greetMessage}}</h4>
+    <div class="col-md-4">
       <home-game-invites *ngIf="user"
         [username]="user.username"
         class="home-section">
@@ -35,7 +34,7 @@
       </home-running-games>
     </div>
 
-    <div class="col">
+    <div class="col-md-4">
       <home-game-settings *ngIf="user"
       class="home-section"
       [username]="user.username"></home-game-settings>

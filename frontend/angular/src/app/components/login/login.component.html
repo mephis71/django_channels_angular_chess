@@ -1,5 +1,5 @@
 <div class="container">
-  <form class="d-flex-column text-center" [formGroup]="loginForm">
+  <form class="text-center" [formGroup]="loginForm">
 
       <h4 class="mb-3">Sign in</h4>
       
@@ -9,7 +9,7 @@
       <input formControlName="password" type="password" class="form-control mb-1" placeholder="Password">
       <h6 *ngIf="passwordError">{{passwordError}}</h6>
       
-      <button mat-stroked-button color="accent" (click)="sendLoginForm()">Login</button>
+      <button mat-stroked-button class="chess-button" (click)="sendLoginForm()">Login</button>
       <h6 *ngIf="nonFieldError">{{nonFieldError}}</h6>
 
   </form>

@@ -22,6 +22,39 @@ $font-family-base: $chess-font-family;
 // $font-size-base: 
 // $line-height-base:
 
+.pop-up-box {
+    display: flex;
+    flex-direction: column;
+    border: $chess-text-color 1px solid;
+    border-radius: 20px;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+}
+
+.pop-up-body {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 5px;
+}
+
+.pop-up-body-2 {
+    width: 75%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 5px;
+}
+
+.chess-button {
+    border: $chess-text-color 1px solid !important;
+    border-radius: 20px !important;
+    color: $chess-text-color !important;
+    min-height: 36px !important;
+    height: 100% !important;
+}
+
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 

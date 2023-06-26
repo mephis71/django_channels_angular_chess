@@ -9,13 +9,15 @@
             [boardOrientation]="boardOrientation">
             </game-freeboard-pieces>
 
-            <div class="w-100">
-                <game-freeboard-endgame>
-                </game-freeboard-endgame>
-                
-                <game-freeboard-promotion
-                [game]="game">
-                </game-freeboard-promotion>
+            <div class="row justify-content-center d-md-none">
+                <div class="col-12 col-md-8"> 
+                    <game-freeboard-endgame>
+                    </game-freeboard-endgame>
+                    
+                    <game-freeboard-promotion
+                    [game]="game">
+                    </game-freeboard-promotion>
+                </div>
             </div>
         </div>
 
@@ -29,6 +31,17 @@
                 (rotateBoardEvent)="rotateBoard($event)">
                 </game-rotate-board-button>
             </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center d-none d-md-flex">
+        <div class="col-12 col-md-8"> 
+            <game-freeboard-endgame>
+            </game-freeboard-endgame>
+            
+            <game-freeboard-promotion
+            [game]="game">
+            </game-freeboard-promotion>
         </div>
     </div>
 </div>

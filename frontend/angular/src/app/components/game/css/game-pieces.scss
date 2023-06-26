@@ -2,11 +2,13 @@
     display: flex;
     flex-wrap: wrap;
     max-height: 80vh;
-    aspect-ratio: 1 / 1;
     margin-left: auto;
     margin-right: auto;
+    aspect-ratio: 1 / 1;
     background-image: url("/assets/img/game_img/chessboard.jpg");
     background-size: 100%;
+    margin-bottom: 5px;
+    border-radius: 20px;
 }
 
 .piece {
@@ -17,5 +19,6 @@
 }
 
 .piece:hover {
-    border: 3px solid blue;
+    border: 5px solid rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
 }

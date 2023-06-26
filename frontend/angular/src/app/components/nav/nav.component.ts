@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UserService } from 'src/app/services/user.service';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/models/user';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-nav',
@@ -13,7 +14,8 @@ export class NavComponent implements OnInit, OnDestroy {
   userSub: Subscription;
 
   constructor(
-    private userService: UserService
+    private userService: UserService,
+    private router: Router
     ) { }
 
   ngOnInit(): void {
@@ -37,6 +39,9 @@ export class NavComponent implements OnInit, OnDestroy {
         if (res.status == 200) {
           this.user = null;
           this.userService.refreshUser.next(null)
+          this.router.navigate([`/`]).then(() => {
+            window.location.reload()
+          })
         }
       },
       error: err => {

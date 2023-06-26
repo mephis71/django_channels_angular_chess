@@ -10,8 +10,6 @@ import { UserService } from 'src/app/services/user.service';
 export class HomeComponent implements OnInit, OnDestroy {
   authenticated = false;
   user: User;
-  
-  greetMessage = 'You are not logged in';
 
   constructor(
     private userService: UserService,
@@ -21,13 +19,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.userService.getUser().subscribe({
       next:(user: IUser) => {
         this.user = new User(user);
-        this.greetMessage = `Hi ${this.user.username}`;
         this.authenticated = true;
         this.userService.refreshUser.next(this.user)
       },
       error:(err: any) => {
         this.userService.refreshUser.next(null)
-        this.greetMessage = 'You are not logged in';
         this.authenticated = false;
       }
     })

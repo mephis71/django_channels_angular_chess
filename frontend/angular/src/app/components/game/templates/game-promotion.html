@@ -1,7 +1,9 @@
-<div id="promotionbox" *ngIf="promoting">
-    <div *ngFor="let piece of promotionPieces"
-    class="promotionpick"
-    [ngStyle]="{'background-image': 'url(' + piece.img_url + ')'}"
-    (click)="sendPromotionPick(piece.type)">
+<div *ngIf="promoting" class="pop-up-box shadow">
+    <div class="pop-up-body-2">
+        <div *ngFor="let piece of promotionPieces"
+        class="promotion-pick"
+        [ngStyle]="{'background-image': 'url(' + piece.img_url + ')'}"
+        (click)="sendPromotionPick(piece.type)">
+        </div>
     </div>
 </div>

@@ -1,4 +1,6 @@
-<div id="endgameinfo" *ngIf="endgameInfo">
+<div class="pop-up-box" *ngIf="endgameInfo">
     <h4 id="endgametext">{{endgameInfo}}</h4>
-    <button mat-stroked-button color="accent" class="text-wrap" *ngIf="showResetButton"  (click)="resetGame()">Reset</button>
+    <div class="pop-up-body">
+        <button mat-stroked-button class="chess-button" *ngIf="showResetButton"  (click)="resetGame()">Reset</button>
+    </div>
 </div>
