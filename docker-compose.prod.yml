@@ -8,24 +8,29 @@ services:
      - "80:80"
     depends_on:
       - backend
+    restart: always
 
   backend:
     container_name: backend
     build: backend
     volumes:
       - static_data:/vol/web
+      - db:/backend/app/db
     environment:
       - DEBUG=0
       - REDIS_URL=redis://redis:6379/0
     depends_on:
       - redis
+    restart: always
 
   redis:
     container_name: redis
     image: redis
     ports:
       - "6379:6379"
+    restart: always
     
 volumes:
  static_data:
+ db:
  

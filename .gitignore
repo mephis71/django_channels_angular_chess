@@ -2,6 +2,5 @@
 .vscode
 todo.txt
 db.sqlite3
-backend/app/db.sqlite3
 **/__pycache__/
 dump.rdb
