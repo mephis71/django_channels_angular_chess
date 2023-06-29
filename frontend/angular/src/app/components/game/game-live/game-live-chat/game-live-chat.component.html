@@ -1,6 +1,6 @@
 <div id="chat-bar" class="game-sidebar-chat">
   <h2 class="text-center">Game chat</h2>
-  <div class="list-group list-group-flush scrollarea">
+  <div #scrollarea class="list-group list-group-flush scrollarea">
     <div *ngFor="let msg of messages" class="list-group-item list-group-item-action py-2">
       <h6>{{msg.username}}</h6>
       <div class="message-text">{{msg.text}}</div>

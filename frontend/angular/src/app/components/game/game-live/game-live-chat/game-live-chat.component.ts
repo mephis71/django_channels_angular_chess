@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { GameChatService } from 'src/app/services/game-chat.service';
 import { ChatMessage } from 'src/app/models/ws-messages';
 import { Subscription } from 'rxjs';
@@ -10,10 +10,13 @@ import { CssService } from 'src/app/services/css.service';
   templateUrl: './game-live-chat.component.html',
   styleUrls: ['./game-live-chat.component.scss']
 })
-export class GameLiveChatComponent implements OnInit, OnDestroy, AfterViewInit {
+export class GameLiveChatComponent implements OnInit, OnDestroy, AfterViewInit, AfterViewChecked {
   @Input() username: string;
+  @ViewChild('scrollarea') private scrollarea: ElementRef;
+  
   chatWsSub: Subscription;
   chatWsSubjectSub: Subscription;
+  resizeSub: Subscription;
 
   messages: ChatMessage[] = [];
   chatMessageInput: string;
@@ -21,20 +24,27 @@ export class GameLiveChatComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private chatService: GameChatService,
     private route: ActivatedRoute,
-    private el: ElementRef,
     private cssService: CssService,
     private renderer: Renderer2
   ) { }
 
+  ngAfterViewChecked(): void {
+    this.scrollToBottom();
+  }
+
+  scrollToBottom(): void {
+    this.renderer.setProperty(this.scrollarea.nativeElement, 'scrollTop', this.scrollarea.nativeElement.scrollHeight);
+  }
+
   ngAfterViewInit(): void {
-    let el = document.getElementById('chat-bar')
-    this.cssService.boardHeightBroadcast.subscribe({
+    let chatBar = document.getElementById('chat-bar')
+    this.resizeSub = this.cssService.boardHeightBroadcast.subscribe({
       next: height => {
         if (window.innerWidth >= 768) {
-          this.renderer.setStyle(el, 'max-height', `${height}px`)
+          this.renderer.setStyle(chatBar, 'max-height', `${height}px`);
         }
         else {
-          this.renderer.setStyle(el, 'max-height', '34vh')
+          this.renderer.setStyle(chatBar, 'max-height', '350px');
         }
       }
     })
@@ -51,13 +61,11 @@ export class GameLiveChatComponent implements OnInit, OnDestroy, AfterViewInit {
       const path = `game/live/${params['id']}/chat`
       this.chatService.openChatWebSocket(path);
     })
-
-    
   }
 
   ngOnDestroy(): void {
     this.chatService.closeWebSocket()
-    const subs = [this.chatWsSub, this.chatWsSubjectSub]
+    const subs = [this.chatWsSub, this.chatWsSubjectSub, this.resizeSub]
     for(let sub of subs) {
       if(sub) {
         sub.unsubscribe()

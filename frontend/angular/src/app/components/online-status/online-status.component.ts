@@ -12,7 +12,7 @@ export class OnlineStatusComponent {
   userSub: Subscription;
   onlineStatusWsSub: Subscription;
   onlineStatusWsSubjectSub: Subscription;
-  onlineStatusUpdateSub: Subscription
+  onlineStatusUpdateSub: Subscription;
 
   friendsOnlineStatus = new Map<string, string>();
 
