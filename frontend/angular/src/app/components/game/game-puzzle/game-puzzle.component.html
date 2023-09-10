@@ -4,29 +4,26 @@
         </div>
         
         <div class="col-12 order-first col-md-8 order-md-2">
-            <div class="text-center" *ngIf="gameError">{{gameError}}</div>
-            <game-freeboard-pieces
+            <div class="text-center" *ngIf="puzzleError">{{puzzleError}}</div>
+
+            <game-puzzle-pieces
             [boardOrientation]="boardOrientation">
-            </game-freeboard-pieces>
+            </game-puzzle-pieces>
 
             <div class="row justify-content-center d-md-none">
                 <div class="col-12 col-md-8"> 
-                    <game-freeboard-endgame>
-                    </game-freeboard-endgame>
-                    
-                    <game-freeboard-promotion
-                    [game]="game">
-                    </game-freeboard-promotion>
+                    <game-puzzle-promotion
+                    [puzzle]="puzzle">
+                    </game-puzzle-promotion>
                 </div>
             </div>
         </div>
 
         <div class="col-12 order-3 col-md-2 order-md-last text-center">
-            <div class="game-freeboard-sidebar-right">
+            <div class="game-puzzle-sidebar-right">
                 <game-stockfish class="mt-1 mt-md-0 mb-1 mb-md-0">
                 </game-stockfish>
                 <div class="d-flex flex-column">
-                    <game-create-puzzle-button></game-create-puzzle-button>
                     <game-rotate-board-button
                     class="mt-1"
                     [boardOrientation]="boardOrientation"
@@ -39,12 +36,9 @@
 
     <div class="row justify-content-center d-none d-md-flex">
         <div class="col-12 col-md-8"> 
-            <game-freeboard-endgame>
-            </game-freeboard-endgame>
-            
-            <game-freeboard-promotion
-            [game]="game">
-            </game-freeboard-promotion>
+            <game-puzzle-promotion
+            [puzzle]="puzzle">
+            </game-puzzle-promotion>
         </div>
     </div>
 </div>

@@ -1,4 +1,6 @@
+import { Game } from "./game";
+
 export interface Profile {
-    game_history: Array<any>,
+    gameHistory: Game[],
     username: string
 }

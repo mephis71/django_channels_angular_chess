@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
 import { GameService } from 'src/app/services/game.service';
 import { StockfishService } from 'src/app/services/stockfish.service';
 import { MoveMessage, StockfishPositionMessage } from 'src/app/models/ws-messages';
-import { CdkDragDrop, CdkDragStart } from '@angular/cdk/drag-drop';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'game-freeboard-pieces',
@@ -47,9 +47,10 @@ export class GameFreeBoardPiecesComponent implements OnInit, OnDestroy {
     return this.gameService.gameWsObservable.subscribe({
       next: data => {
         if('type' in data) {
-          if(['init', 'move', 'endgame', 'move_cancel_accept', 'reset'].includes(data.type)) {
+          if(['init', 'move', 'game_end', 'move_cancel_accept', 'reset'].includes(data.type)) {
             this.gamePositions = data.game_positions;
             this.gamePositionsIterator = this.gamePositions.length - 1;
+            this.gameService.passCurrentPosition.next(this.gamePositions[this.gamePositionsIterator]);
             this.pieces = fenToPieces(this.gamePositions[this.gamePositionsIterator]);
           }
           
@@ -122,6 +123,7 @@ export class GameFreeBoardPiecesComponent implements OnInit, OnDestroy {
     if(scrolling) {
       this.pieces = fenToPieces(this.gamePositions[this.gamePositionsIterator]);
       const msg = new StockfishPositionMessage(this.gamePositions[this.gamePositionsIterator]);
+      this.gameService.passCurrentPosition.next(this.gamePositions[this.gamePositionsIterator]);
       this.stockfishService.sendStockfishPositionMsg(msg);
     }
   }

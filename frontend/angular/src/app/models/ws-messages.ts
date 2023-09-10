@@ -2,7 +2,7 @@ import { PieceType } from "../enums/pieces";
 
 // in-game messages
 
-export class MoveMessage implements IMoveMessage {
+export class MoveMessage {
     type: string = 'move';
     pick_id: number;
     drop_id: number;
@@ -13,35 +13,23 @@ export class MoveMessage implements IMoveMessage {
     }
 }
 
-interface IMoveMessage {
-    type: string;
-    pick_id: number;
-    drop_id: number;
-}
 
-export class PromotionPickMessage implements IPromotionPickMessage {
+export class PromotionPickMessage {
     type: string = 'promotion';
-    piece_type: PieceType;
+    pieceType: PieceType;
 
-    constructor(piece_type: PieceType) {
-        this.piece_type = piece_type;
+    constructor(pieceType: PieceType) {
+        this.pieceType = pieceType;
     }
 }
 
-interface IPromotionPickMessage {
-    type: string;
-    piece_type: PieceType;
-}
 
-export class GameResetMessage implements IGameResetMessage {
+export class GameResetMessage {
     type: string = 'reset';
 }
 
-interface IGameResetMessage {
-    type: string;
-}
 
-export class MoveCancelMessage implements IMoveCancelMessage {
+export class MoveCancelMessage {
     type: string = 'move_cancel';
     action: string;
 
@@ -50,20 +38,13 @@ export class MoveCancelMessage implements IMoveCancelMessage {
     }
 }
 
-interface IMoveCancelMessage {
-    type: string;
-    action: string;
-}
-
-export class ResignMessage implements IResignMessage {
+export class ResignMessage {
     type: string = 'resign';
 }
 
-interface IResignMessage {
-    type: string;
-}
 
-export class DrawMessage implements IDrawMessage {
+
+export class DrawMessage {
     type: string = 'draw';
     action: string;
 
@@ -72,12 +53,8 @@ export class DrawMessage implements IDrawMessage {
     }
 }
 
-interface IDrawMessage {
-    type: string;
-    action: string;
-}
 
-export class RematchMessage implements IRematchMessage {
+export class RematchMessage {
     type: string = 'rematch';
     action: string;
 
@@ -86,14 +63,9 @@ export class RematchMessage implements IRematchMessage {
     }
 }
 
-interface IRematchMessage {
-    type: string;
-    action: string;
-}
-
 // chat messages
 
-export class ChatMessage implements IChatMessage {
+export class ChatMessage {
     username: string;
     text: string;
 
@@ -103,58 +75,52 @@ export class ChatMessage implements IChatMessage {
     }
 }
 
-interface IChatMessage {
-    username: string;
-    text: string;
-}
-
 // game invites
 
-export class GameInvite implements IGameInvite {
-    type: string = 'game_invite';
-    from_user: string;
-    to_user: string;
+export class GameInvite {
+    type: string = 'game_invite'
+    from_user_id: number;
+    from_user_username: string;
+    to_user_id: number;
+    to_user_username: string;
     settings: {
-        white: string | null;
-        black: string | null;
+        white_id: number | null;
+        black_id: number | null;
         random_colors: boolean;
         duration: number;
     }
 
-    constructor (from_user: string, to_user: string, settings: IGameInviteSettings) {
-        this.from_user = from_user;
-        this.to_user = to_user;
+    constructor (from_user_id: number, from_user_username: string, to_user_id: number, to_user_username: string, settings: GameInviteSettings) {
+        this.from_user_id = from_user_id;
+        this.from_user_username = from_user_username;
+        this.to_user_id = to_user_id;
+        this.to_user_username = to_user_username;
         this.settings = settings;
     }
 }
 
-interface IGameInvite {
-    type: string;
-    from_user: string;
-    to_user: string;
-    settings: IGameInviteSettings
-}
 
-export interface IGameInviteSettings {
-    white: string | null;
-    black: string | null;
+export class GameInviteSettings {
+    white_id: number | null;
+    black_id: number | null;
     random_colors: boolean;
     duration: number;
+    constructor (white_id: number | null, black_id: number | null, random_colors: boolean, duration: number) {
+        this.white_id = white_id;
+        this.black_id = black_id;
+        this.random_colors = random_colors;
+        this.duration = duration;
+    }
 }
 
 // stockfish messages
 
-export class StockfishPositionMessage implements IStockfishPositionMessage {
+export class StockfishPositionMessage {
     type: string = 'position';
     fen: string;
 
     constructor(fen: string) {
         this.fen = fen;
     }
-}
-
-interface IStockfishPositionMessage {
-    type: string;
-    fen: string;
 }
 

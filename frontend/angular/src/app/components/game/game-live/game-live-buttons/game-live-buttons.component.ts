@@ -49,7 +49,7 @@ export class GameLiveButtonsComponent implements OnInit, OnDestroy {
     return this.gameService.gameWsObservable.subscribe({
       next: data => {
         if('type' in data) {
-          if(data.type == 'endgame') {
+          if(data.type == 'game_end') {
             this.drawOfferPending = false;
             this.allowDrawOffer = false;
             this.allowMoveCancelRequest = false;
@@ -146,7 +146,7 @@ export class GameLiveButtonsComponent implements OnInit, OnDestroy {
   }
 
   rejectDrawOffer() {
-    const msg = new DrawMessage('offer');
+    const msg = new DrawMessage('reject');
     this.gameService.sendDrawMsg(msg);
     this.drawOfferPending = false;
     this.allowDrawOffer = true;

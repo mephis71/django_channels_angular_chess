@@ -5,6 +5,8 @@ import { GameService } from 'src/app/services/game.service';
 import { Piece } from 'src/app/models/piece';
 import { Game } from 'src/app/models/game';
 import { PromotionPickMessage } from 'src/app/models/ws-messages';
+import { GameInProgress } from 'src/app/models/game-in-progress';
+import { User } from 'src/app/models/user';
 
 @Component({
   selector: 'game-live-promotion',
@@ -13,8 +15,8 @@ import { PromotionPickMessage } from 'src/app/models/ws-messages';
 })
 export class GameLivePromotionComponent implements OnInit, OnDestroy, OnChanges {
   playerColor: Color;
-  @Input() game: Game;
-  @Input() username: string;
+  @Input() game: GameInProgress;
+  @Input() user: User;
 
   gameWsSub: Subscription;
   wsSubjectSub: Subscription;
@@ -36,7 +38,7 @@ export class GameLivePromotionComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   ngOnChanges(): void {
-    if (this.game && this.username) {
+    if (this.game && this.user.id) {
       this.setPlayerColor()
       this.createPromotionPieces()
     }
@@ -77,10 +79,10 @@ export class GameLivePromotionComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   setPlayerColor() {
-    if (this.username == this.game.player_white) {
+    if (this.user.id == this.game.player_white_id) {
       this.playerColor = Color.WHITE;
     }
-    else if(this.username == this.game.player_black) {
+    else if(this.user.id == this.game.player_black_id) {
       this.playerColor = Color.BLACK;
     }
   }

@@ -1,6 +1,6 @@
 <div class="list-group w-auto">
   <h4 class="text-center">Friend requests</h4>
-  <h6 class="text-center" *ngIf="friendRequests.length == 0">You have no new friend requests</h6>
+  <h6 class="text-center" *ngIf="friendRequests">You have no new friend requests</h6>
   <a *ngFor="let friendRequest of friendRequests" class="list-group-item list-group-item-action d-flex flex-column p-2">
     <div class="text-center mb-1">{{friendRequest['username']}}</div>
 

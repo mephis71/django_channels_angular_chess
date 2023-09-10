@@ -1,6 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { GameInvite, IGameInviteSettings } from 'src/app/models/ws-messages';
+import { User } from 'src/app/models/user';
+import { GameInvite, GameInviteSettings } from 'src/app/models/ws-messages';
 import { InviteService } from 'src/app/services/game-invite.service';
 import { GameService } from 'src/app/services/game.service';
 
@@ -11,13 +12,10 @@ import { GameService } from 'src/app/services/game.service';
 })
 
 export class HomeGameSettingsComponent implements OnInit, OnDestroy {
-  @Input() username: string;
+  @Input() user: User;
   gameInviteSubjectSub: Subscription;
 
   colorChoice: string = 'random'
-  whitePlayer: string | null;
-  blackPlayer: string | null;
-  randomColors: boolean
   minutes: number = 5;
 
   constructor(
@@ -27,8 +25,8 @@ export class HomeGameSettingsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.gameInviteSubjectSub = this.gameService.sendGameInvite.subscribe({
-      next: username => {
-        this.sendGameInvite(username)
+      next: opponent => {
+        this.sendGameInvite(opponent)
       }
     })
   }
@@ -42,34 +40,33 @@ export class HomeGameSettingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  sendGameInvite(username: string) {
+  sendGameInvite(opponent: any) {
+    let whitePlayerId: number | null = 0
+    let blackPlayerId: number | null = 0
+    let randomColors = false;
+
     switch(this.colorChoice) {
       case 'white':
-        this.whitePlayer = this.username;
-        this.blackPlayer = username;
-        this.randomColors = false;
+        whitePlayerId = this.user.id;
+        blackPlayerId = opponent.id;
+        randomColors = false;
         break;
 
       case 'black':
-        this.whitePlayer = username;
-        this.blackPlayer = this.username;
-        this.randomColors = false;
+        whitePlayerId = opponent.id;
+        blackPlayerId = this.user.id;
+        randomColors = false;
         break;
 
       case 'random':
-        this.whitePlayer, this.blackPlayer = null;
-        this.randomColors = true;
+        whitePlayerId = null;
+        blackPlayerId = null;
+        randomColors = true;
         break;
     }
 
-    const settings: IGameInviteSettings = {
-      white: this.whitePlayer,
-      black: this.blackPlayer,
-      random_colors: this.randomColors,
-      duration: this.minutes
-    }
-
-    const invite = new GameInvite(this.username, username, settings)
+    const settings = new GameInviteSettings(whitePlayerId, blackPlayerId, randomColors, this.minutes) 
+    const invite = new GameInvite(this.user.id, this.user.username, opponent.id, opponent.username, settings)
 
     this.inviteService.sendGameInvite(invite);
   }

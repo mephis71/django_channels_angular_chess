@@ -3,12 +3,12 @@
   <h6 class="text-center" *ngIf="invites.length == 0">You have no game invites</h6>
 
   <a *ngFor="let invite of invites" class="list-group-item list-group-item-action d-flex flex-column p-2">
-    <div class="text-center">{{invite.from_user}}</div>
+    <div class="text-center">{{invite.from_user_username}}</div>
     <div class="d-flex text-center justify-content-evenly align-items-center mb-1">
-      <div *ngIf="invite.settings.white === username">
+      <div *ngIf="invite.settings.white_id === userId">
         Side: White
       </div>
-      <div *ngIf="invite.settings.black === username">
+      <div *ngIf="invite.settings.black_id === userId">
         Side: Black
       </div>
       <div *ngIf="invite.settings.random_colors">

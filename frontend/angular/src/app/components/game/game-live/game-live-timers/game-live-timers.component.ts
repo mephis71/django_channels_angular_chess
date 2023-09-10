@@ -3,6 +3,7 @@ import { Game } from 'src/app/models/game';
 import { GameService } from 'src/app/services/game.service';
 import { Color } from 'src/app/enums/pieces';
 import { Subscription } from 'rxjs';
+import { GameInProgress } from 'src/app/models/game-in-progress';
 
 @Component({
   selector: 'game-live-timers',
@@ -13,7 +14,7 @@ export class GameLiveTimersComponent implements OnInit, OnDestroy {
   public Color = Color;
   
   @Input() boardOrientation: Color;
-  @Input() game: Game;
+  @Input() game: GameInProgress;
 
   gameWsSub: Subscription;
   wsSubjectSub: Subscription;
@@ -46,7 +47,7 @@ export class GameLiveTimersComponent implements OnInit, OnDestroy {
     return this.gameService.gameWsObservable.subscribe({
       next: data => {
         if('type' in data) {
-          if(['init', 'move', 'endgame', 'move_cancel_accept'].includes(data.type)) {
+          if(['init', 'move', 'game_end', 'move_cancel_accept'].includes(data.type)) {
             this.timeWhite = data.time_white;
             this.timeBlack = data.time_black;
           }
@@ -67,9 +68,9 @@ export class GameLiveTimersComponent implements OnInit, OnDestroy {
   getPlayer(color: Color) {
     switch(color) {
       case Color.WHITE:
-        return (this.game && this.game.player_white) ? this.game.player_white : null
+        return (this.game && this.game.player_white_id) ? this.game.player_white_id : null
       case Color.BLACK:
-        return (this.game && this.game.player_black) ? this.game.player_black : null
+        return (this.game && this.game.player_black_id) ? this.game.player_black_id : null
       default:
         return null
     }

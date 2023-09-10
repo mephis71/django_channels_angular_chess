@@ -110,7 +110,7 @@ User = get_user_model()
 def test_checkmates(game_file_path: str, init_fen, end_fen, moves, game_result):
     player_white = UserFactory(username="testtesttest")
     player_black = UserFactory(username="othertest")
-    players = {"white": player_white.username, "black": player_black.username}
+    players = {"white": player_white.id, "black": player_black.id}
 
     game = GameEngine(players=players, duration=300, init_fen=init_fen)
     game.set_file_path(game_file_path)
@@ -128,12 +128,16 @@ def test_checkmates(game_file_path: str, init_fen, end_fen, moves, game_result):
     assert game.fen.fen == game.game_positions[-1]
 
     assert game.game_result == game_result
+    
+    model_data = game.get_model_data()
+    from rich import print
+    print(game)
+    game_db_obj = GameLive.objects.create_game(model_data)
 
-    game_db_obj = GameLive.objects.create_game(game.get_model_data())
-
-    assert game_db_obj.player_white.username == game.players['white']
-    assert game_db_obj.player_black.username == game.players['black']
-    assert game_db_obj.winner.username == game.winner
+    assert game_db_obj.player_white.id == game.players['white']
+    assert game_db_obj.player_black.id == game.players['black']
+    
+    assert game_db_obj.winner.id == game.winner_id
 
     assert game_db_obj.game_positions == game.get_game_positions_str()
     assert game_db_obj.move_timestamps == game.get_move_timestamps_str()

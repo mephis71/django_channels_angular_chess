@@ -19,6 +19,7 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonModule } from '@angular/material/button'
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSnackBarModule } from '@angular/material/snack-bar'; 
 
 import { GameLiveChatComponent } from './components/game/game-live/game-live-chat/game-live-chat.component';
 import { GameLivePiecesComponent } from './components/game/game-live/game-live-pieces/game-live-pieces.component';
@@ -42,6 +43,10 @@ import { HomeRunningGamesComponent } from './components/home/home-running-games/
 import { HomeAddFriendComponent } from './components/home/home-add-friend/home-add-friend.component';
 import { HomeFriendRequestsComponent } from './components/home/home-friend-requests/home-friend-requests.component';
 import { OnlineStatusComponent } from './components/online-status/online-status.component';
+import { GameCreatePuzzleButtonComponent } from './components/game/game-create-puzzle-button/game-create-puzzle-button.component';
+import { GamePuzzleComponent } from './components/game/game-puzzle/game-puzzle.component';
+import { GamePuzzlePiecesComponent } from './components/game/game-puzzle/game-puzzle-pieces/game-puzzle-pieces.component';
+import { GamePuzzlePromotionComponent } from './components/game/game-puzzle/game-puzzle-promotion/game-puzzle-promotion.component';
 
 @NgModule({
   declarations: [
@@ -75,6 +80,10 @@ import { OnlineStatusComponent } from './components/online-status/online-status.
     HomeAddFriendComponent,
     HomeFriendRequestsComponent,
     OnlineStatusComponent,
+    GameCreatePuzzleButtonComponent,
+    GamePuzzleComponent,
+    GamePuzzlePiecesComponent,
+    GamePuzzlePromotionComponent,
   ],
   imports: [
     BrowserModule,
@@ -87,7 +96,8 @@ import { OnlineStatusComponent } from './components/online-status/online-status.
     MatSliderModule,
     MatRadioModule,
     MatButtonModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MatSnackBarModule
   ],
   providers: [],
   bootstrap: [AppComponent]

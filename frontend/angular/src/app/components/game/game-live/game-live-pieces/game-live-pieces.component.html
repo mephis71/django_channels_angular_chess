@@ -7,7 +7,7 @@ cdkDropListOrientation="vertical">
     class="piece"
     [attr.id]="i"
     [cdkDragDisabled]="piece.empty"
-    [ngStyle]="!piece.empty? {'background-image': 'url(' + piece.img_url + ')'} : null"
+    [ngStyle]="!piece.empty? {'background-image': 'url(' + piece.imgUrl + ')'} : null"
     (cdkDragStarted)="onPick($event.event)"
     (cdkDragDropped)="onDrop($event)">
     </div>
@@ -22,7 +22,7 @@ cdkDropListOrientation="vertical">
     class="piece"
     [attr.id]="(pieces.length - i) - 1"
     [cdkDragDisabled]="piece.empty"
-    [ngStyle]="!piece.empty? {'background-image': 'url(' + piece.img_url + ')'} : null"
+    [ngStyle]="!piece.empty? {'background-image': 'url(' + piece.imgUrl + ')'} : null"
     (cdkDragStarted)="onPick($event.event)"
     (cdkDragDropped)="onDrop($event)">
     </div>

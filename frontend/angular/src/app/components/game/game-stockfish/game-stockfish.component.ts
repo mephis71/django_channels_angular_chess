@@ -84,7 +84,7 @@ export class GameStockfishComponent implements OnInit{
   }
 
   stockfishSwitch() {
-    if (this.showStockfish == false) {
+    if (!this.showStockfish) {
       this.showStockfish = true;
     }
     else {

@@ -4,7 +4,7 @@ import { UserService } from 'src/app/services/user.service';
 import { Game } from 'src/app/models/game';
 import { Color } from 'src/app/enums/pieces';
 import { GameService } from 'src/app/services/game.service';
-import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'game-freeboard',
@@ -49,6 +49,7 @@ export class GameFreeBoardComponent implements OnInit, OnDestroy {
           this.userService.refreshUser.next(null);
       }
     })
+
   }
 
   ngOnDestroy(): void {

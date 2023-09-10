@@ -4,3 +4,6 @@ todo.txt
 db.sqlite3
 **/__pycache__/
 dump.rdb
+**/.pytest_cache/
+**/game_pickles/
+**/game_test_pickles/

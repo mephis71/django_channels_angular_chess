@@ -48,6 +48,9 @@ $font-family-base: $chess-font-family;
 }
 
 .chess-button {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
     border: $chess-text-color 1px solid !important;
     border-radius: 20px !important;
     color: $chess-text-color !important;

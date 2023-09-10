@@ -10,7 +10,7 @@ import { UserService } from 'src/app/services/user.service';
   styleUrls: ['./home-friends.component.scss']
 })
 export class HomeFriendsComponent implements OnInit, OnDestroy {
-  @Input() friends: string[];
+  @Input() friends: any[];
 
   inviteWsSubjectSub: Subscription;
   inviteWsSub: Subscription;
@@ -59,8 +59,8 @@ export class HomeFriendsComponent implements OnInit, OnDestroy {
     this.friends = this.friends.filter(e => e != friend_username);
   }
 
-  sendGameInvite(username: string) {
-    this.gameService.sendGameInvite.next(username)
+  sendGameInvite(opponent: any) {
+    this.gameService.sendGameInvite.next(opponent)
   }
 
   getInviteWsSub(): Subscription {

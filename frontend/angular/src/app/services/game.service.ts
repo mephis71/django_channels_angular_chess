@@ -5,6 +5,8 @@ import { Observable, share, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { DrawMessage, GameInvite, MoveMessage, GameResetMessage, MoveCancelMessage, PromotionPickMessage, RematchMessage, ResignMessage } from '../models/ws-messages';
 import { FreeBoardGameSettings } from '../models/freeboard-game';
+import { GameInProgress } from '../models/game-in-progress';
+import { GameInfo } from '../models/game-info';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +17,8 @@ export class GameService {
 
   public gameWsObservableReady = new Subject<void>();
   public gameObjectReady = new Subject<Game>();
-  public sendGameInvite = new Subject<string>();
-  
+  public sendGameInvite = new Subject<any>();
+  public passCurrentPosition = new Subject<string>();
 
   gameWs: WebSocket;
   gameWsObservable: Observable<any>;
@@ -72,6 +74,13 @@ export class GameService {
     )
   }
 
+  getGameInProgress(id: number): Observable<GameInProgress>  {
+    return this.http.get<GameInProgress>(
+      `${this.apiUrl}/game/game_in_progress/${id}`,
+      {withCredentials: true}
+    )
+  }
+
   getFreeBoardGame(): Observable<Game>  {
     return this.http.get<Game>(
       `${this.apiUrl}/game/freeboard`,
@@ -99,10 +108,10 @@ export class GameService {
     }).pipe(share())
   }
 
-  acceptGameInvite(invite: GameInvite): Observable<Object> {
+  acceptGameInvite(gameInfo: GameInfo): Observable<Object> {
     return this.http.post(
       `${this.apiUrl}/game/invite_accept/`,
-      {invite},
+      {gameInfo},
       {withCredentials:true}
     )
   }

@@ -26,7 +26,7 @@
 
     <div class="col-md-4">
       <home-game-invites *ngIf="user"
-        [username]="user.username"
+        [userId]="user.id"
         class="home-section">
       </home-game-invites>
       <home-running-games
@@ -37,7 +37,7 @@
     <div class="col-md-4">
       <home-game-settings *ngIf="user"
       class="home-section"
-      [username]="user.username"></home-game-settings>
+      [user]="user"></home-game-settings>
       <home-freeboard-settings
       class="home-section">
       </home-freeboard-settings>

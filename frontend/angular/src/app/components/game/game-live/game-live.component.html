@@ -19,7 +19,7 @@
                     </game-live-endgame>
                     
                     <game-live-promotion *ngIf="user"
-                    [username]="user.username"
+                    [user]="user"
                     [game]="game">
                     </game-live-promotion>
                 </div>
@@ -34,7 +34,7 @@
                 [boardOrientation]="boardOrientation">
                 </game-live-timers>
 
-                <div>
+                <div class="d-flex flex-column">
                     <game-live-buttons></game-live-buttons>
                     
                     <game-rotate-board-button
@@ -52,7 +52,7 @@
             </game-live-endgame>
             
             <game-live-promotion *ngIf="user"
-            [username]="user.username"
+            [user]="user"
             [game]="game">
             </game-live-promotion>
         </div>

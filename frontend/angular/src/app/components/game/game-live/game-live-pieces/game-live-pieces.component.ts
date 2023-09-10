@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, AfterViewInit, numberAttribute } from '@angular/core';
 import { Color } from 'src/app/enums/pieces';
 import { Piece } from 'src/app/models/piece';
 import { GameService } from 'src/app/services/game.service';
@@ -62,7 +62,7 @@ export class GameLivePiecesComponent implements OnInit, OnDestroy, AfterViewInit
     return this.gameService.gameWsObservable.subscribe({
       next: data => {
         if('type' in data) {
-          if(['init', 'move', 'endgame', 'move_cancel_accept'].includes(data.type)) {
+          if(['init', 'move', 'game_end', 'move_cancel_accept'].includes(data.type)) {
             this.gamePositions = data.game_positions;
             this.gamePositionsIterator = this.gamePositions.length - 1;
             this.pieces = fenToPieces(this.gamePositions[this.gamePositionsIterator]);
@@ -90,7 +90,12 @@ export class GameLivePiecesComponent implements OnInit, OnDestroy, AfterViewInit
   onDrop(event: CdkDragDrop<any>) {
     const drop_id = document.elementFromPoint(event.dropPoint.x, event.dropPoint.y)?.id;
     this.drop_id = drop_id ? parseInt(drop_id) : null;
-    if((this.pick_id !== null && this.drop_id !== null) && (this.pick_id != this.drop_id)) {
+    if((
+      typeof this.pick_id == 'number' && 
+      typeof this.drop_id == 'number' && 
+      !isNaN(this.pick_id) && !isNaN(this.drop_id) && 
+      this.pick_id != this.drop_id 
+      )) {
       const msg = new MoveMessage(this.pick_id, this.drop_id);
       this.gameService.sendGameMoveMsg(msg)
     }

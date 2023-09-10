@@ -62,23 +62,23 @@ export class GameLiveEndgameComponent implements OnInit, OnDestroy {
     return this.gameService.gameWsObservable.subscribe({
       next: data => {
         if('type' in data) {
-          if(data.type == 'endgame') {
-            if(data.game_result == 'blackwins') {
+          if(data.type == 'game_end') {
+            if(data.game_result == 'blackwins-mate') {
               this.endgameInfo = 'Black wins by checkmate';
             }
-            else if(data.game_result == 'whitewins') {
+            else if(data.game_result == 'whitewins-mate') {
               this.endgameInfo = 'White wins by checkmate';
             }
             else if(data.game_result == 'draw-stalemate') {
               this.endgameInfo = 'Draw - stalemate';
             }
-            else if(data.game_result == 'draw-50m') {
+            else if(data.game_result == 'draw-50-moves') {
               this.endgameInfo = 'Draw - 50 moves rule';
             }
-            else if(data.game_result == 'draw-3r') {
+            else if(data.game_result == 'draw-threefold-rep') {
               this.endgameInfo = 'Draw - threefold repetition';
             }
-            else if(data.game_result == 'draw-mutual') {
+            else if(data.game_result == 'draw-agreement') {
               this.endgameInfo = 'Draw - mutual agreement';
             }
             else if(data.game_result == 'whitewins-oot') {
@@ -87,19 +87,19 @@ export class GameLiveEndgameComponent implements OnInit, OnDestroy {
             else if(data.game_result == 'blackwins-oot') {
               this.endgameInfo = 'Black wins - out of time';
             }
-            else if(data.game_result == 'blackwins-abandonment') {
+            else if(data.game_result == 'blackwins-abandoned') {
               this.endgameInfo = 'Black wins - White abandoned the game';
             }
-            else if(data.game_result == 'whitewins-abandonment') {
+            else if(data.game_result == 'whitewins-abandoned') {
               this.endgameInfo = 'White wins - Black abandoned the game';
             }
-            else if(data.game_result == 'whitewins-resignment') {
+            else if(data.game_result == 'whitewins-resigned') {
               this.endgameInfo = 'White wins - Black resigned';
             }
-            else if(data.game_result == 'blackwins-resignment') {
+            else if(data.game_result == 'blackwins-resigned') {
               this.endgameInfo = 'Black wins - White resigned';
             }
-            if(data.game_result == 'draw-abandonment') {
+            if(data.game_result == 'draw-abandoned') {
               this.endgameInfo = 'The game was abandoned';
             }
           }

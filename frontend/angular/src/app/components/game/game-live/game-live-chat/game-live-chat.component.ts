@@ -51,16 +51,16 @@ export class GameLiveChatComponent implements OnInit, OnDestroy, AfterViewInit, 
   }  
 
   ngOnInit(): void {
-    this.chatWsSubjectSub = this.chatService.chatWsObservableReady.subscribe({
-      next: () => {
-        this.chatWsSub = this.getChatWsSub()
-      }
-    })
+      // this.chatWsSubjectSub = this.chatService.chatWsObservableReady.subscribe({
+      //   next: () => {
+      //     this.chatWsSub = this.getChatWsSub()
+      //   }
+      // })
 
-    this.route.params.subscribe(params => {
-      const path = `game/live/${params['id']}/chat`
-      this.chatService.openChatWebSocket(path);
-    })
+      // this.route.params.subscribe(params => {
+      //   const path = `game/live/${params['id']}/chat`
+      //   this.chatService.openChatWebSocket(path);
+      // })
   }
 
   ngOnDestroy(): void {

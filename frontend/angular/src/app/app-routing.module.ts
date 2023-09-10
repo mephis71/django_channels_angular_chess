@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { GameFreeBoardComponent } from './components/game/game-freeboard/game-freeboard.component';
 import { GameLiveComponent } from './components/game/game-live/game-live.component';
 import { GameOverviewComponent } from './components/game/game-overview/game-overview.component';
+import { GamePuzzleComponent } from './components/game/game-puzzle/game-puzzle.component';
 import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
@@ -14,8 +15,9 @@ const routes: Routes = [
   {path: 'register', component:RegisterComponent},
   {path: 'game/:id', component:GameOverviewComponent},
   {path: 'game/live/:id', component:GameLiveComponent},
+  {path: 'game/puzzle/:id', component:GamePuzzleComponent},
   {path: 'user/:username', component:UserProfileComponent},
-  {path: 'freeboard', component:GameFreeBoardComponent}
+  {path: 'freeboard', component:GameFreeBoardComponent},
 ];
 
 @NgModule({

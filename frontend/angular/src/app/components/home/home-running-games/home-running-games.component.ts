@@ -19,13 +19,13 @@ export class HomeRunningGamesComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    this.gameService.getRunningGames().subscribe({
-      next: val => {
-        this.running_games = val;
-      },
-      error: err => {
-      }
-    })
+    // this.gameService.getRunningGames().subscribe({
+    //   next: val => {
+    //     this.running_games = val;
+    //   },
+    //   error: err => {
+    //   }
+    // })
   }
 
   runningGames() {

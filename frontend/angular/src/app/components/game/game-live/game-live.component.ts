@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Game } from 'src/app/models/game';
 import { Subscription, take } from 'rxjs';
 import { Color } from 'src/app/enums/pieces';
+import { GameInProgress } from 'src/app/models/game-in-progress';
 
 @Component({
   selector: 'app-game-live',
@@ -19,7 +20,7 @@ export class GameLiveComponent implements OnInit, OnDestroy {
   gameError: string;
   
   user: User;
-  game: Game;
+  game: GameInProgress;
 
   boardOrientation: Color;
   
@@ -43,11 +44,11 @@ export class GameLiveComponent implements OnInit, OnDestroy {
         this.user = new User(user);
         this.userService.refreshUser.next(this.user);
         this.route.params.subscribe(params => {
-          this.gameService.getGame(params['id']).subscribe({
+          this.gameService.getGameInProgress(params['id']).subscribe({
             next: game => {
               this.setGame(game);
-              this.gameService.gameObjectReady.next(game);
-              const path = `game/live/${this.game.id}`
+              // this.gameService.gameObjectReady.next(game);
+              const path = `game_in_progress/${this.game.id}`
               this.gameService.openGameWebsocket(path);
               this.gameError = '';
             },
@@ -75,16 +76,16 @@ export class GameLiveComponent implements OnInit, OnDestroy {
     }
   }
 
-  setGame(game: Game) {
+  setGame(game: GameInProgress) {
     this.game = game;
     this.setBoardOrientation();
   }
 
   setBoardOrientation() {
-    if (this.user.username == this.game.player_white) {
+    if (this.user.id == this.game.player_white_id) {
       this.boardOrientation = Color.WHITE;
     }
-    else if(this.user.username == this.game.player_black) {
+    else if(this.user.id == this.game.player_black_id) {
       this.boardOrientation = Color.BLACK;
     }
   }

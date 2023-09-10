@@ -1,10 +1,12 @@
 export class User {
+    id: number;
     username: string;
     email: string;
     friends: string[];
     friendRequests: IFriendRequest[];
 
     constructor(user: IUser) {
+        this.id = user.id;
         this.username = user.username;
         this.email = user.email;
         this.friends = user.friends;
@@ -13,6 +15,7 @@ export class User {
 }
 
 export interface IUser {
+    id: number;
     username: string,
     email: string,
     friends: string[],
