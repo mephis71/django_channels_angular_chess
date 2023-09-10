@@ -1,42 +1,48 @@
-from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from utils.getters import get_user_with_jwt, get_user_with_pk, get_friends_usernames, get_friends_online_status
+from async_getters import (
+    get_friends_online_status,
+    get_friends_usernames,
+    get_user_with_jwt,
+    get_user_with_pk,
+)
 from channels.db import database_sync_to_async
-from .utils import broadcast_online_status
-from .tasks import start_disconnect_countdown, cancel_disconnect_countdown
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
+
+from .tasks import (
+    broadcast_online_status,
+    cancel_disconnect_countdown,
+    start_disconnect_countdown,
+)
+
 
 class InviteConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
-        token = self.scope['cookies']['jwt']
+        token = self.scope["cookies"]["jwt"]
         self.user = await get_user_with_jwt(token)
         
         await self.channel_layer.group_add(
-            f'{self.user.username}_system',
-            self.channel_name
+            f"{self.user.id}_system", self.channel_name
         )
-
         await self.accept()
 
     async def receive_json(self, msg):
-        to_user = msg['to_user']
+        to_user_id = msg["to_user_id"]
         await self.channel_layer.group_send(
-            f'{to_user}_system',
-            {
-                'type': 'system_message',
-                'text': msg
-            }
+            f"{to_user_id}_system", {"type": "system_message", "text": msg}
         )
+        
 
     async def disconnect(self, close_code):
         pass
         # print('invite_close_code:', close_code)
 
     async def system_message(self, msg):
-        msg = msg['text']
+        msg = msg["text"]
         await self.send_json(msg)
+
 
 class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
-        token = self.scope['cookies']['jwt']
+        token = self.scope["cookies"]["jwt"]
         self.user = await get_user_with_jwt(token)
 
         await self.accept()
@@ -44,21 +50,20 @@ class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
         cancel_disconnect_countdown(self.user.username)
 
         await self.channel_layer.group_add(
-            f'{self.user.username}_system',
-            self.channel_name
+            f"{self.user.id}_system", self.channel_name
         )
 
         friends_online_status = await get_friends_online_status(self.user)
         data = {
-            'type': 'friends_online_status',
-            'friends_online_status': friends_online_status
+            "type": "friends_online_status",
+            "friends_online_status": friends_online_status,
         }
 
         await self.send_json(data)
-        
+
     async def receive_json(self, msg):
-        status = msg['status']
-        
+        status = msg["status"]
+
         user = await get_user_with_pk(self.user.pk)
         await self.set_online_status(user, status)
 
@@ -71,13 +76,12 @@ class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
 
     @database_sync_to_async
     def set_online_status(self, user, status):
-        if status == 'online':
+        if status == "online":
             user.is_online = True
-        elif status == 'offline':
+        elif status == "offline":
             user.is_online = False
         user.save()
 
     async def system_message(self, msg):
-        msg = msg['text']
+        msg = msg["text"]
         await self.send_json(msg)
-            

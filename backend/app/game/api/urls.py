@@ -1,9 +1,16 @@
 from django.urls import path
+from rest_framework import routers
 
-from .views import *
+from .views import (
+    GameInProgressViewSet,
+    GameLiveViewSet,
+    GamePuzzleViewSet,
+    StartGameAPIView,
+)
 
-urlpatterns = [
-    path('<int:id>/', GameAPIView.as_view()),
-    path('invite_accept/', GameInviteAcceptAPIView.as_view()),
-    path('freeboard/', GameFreeBoardAPIView.as_view()),
-] 
+router = routers.SimpleRouter()
+router.register(r"puzzle", GamePuzzleViewSet)
+router.register(r"live", GameLiveViewSet)
+router.register(r"game_in_progress", GameInProgressViewSet)
+
+urlpatterns = [path("invite_accept/", StartGameAPIView.as_view())] + router.urls

@@ -1,165 +1,107 @@
-import random
-
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models import Q
+from game.game_engine.game_vars import DEFAULT_GAME_FEN
 from users.models import UserProfile
 
-from .utils import to_timer_format
+from .managers import GameLiveManager
 
 User = get_user_model()
 
-class GameManager(models.Manager):
-    def new_game(self, usernames, settings):
-        game_obj = self.model()
-        game_obj.apply_settings(usernames, settings)
-        game_obj.save()
-        return game_obj
 
-    def get_running_games(self, username):
-        qs = self.get_queryset().filter(Q(is_running=True) & (Q(player_white__username=username) | Q(player_black__username=username)))
-        return qs
+class GameInProgress(models.Model):
+    uuid = models.UUIDField()
+    player_white = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="games_as_white_in_progress",
+    )
 
-class Game(models.Model):
-    # default values
-    DEFAULT_GAME_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+    player_black = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="games_as_black_in_progress",
+    )
 
-    # players
-    player_white = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='first', null=True)
-    player_black = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='second', null=True)
-    winner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='winner', default=None, null=True)
+    @property
+    def file_name(self):
+        return f"game_{self.uuid}"
 
-    # game info
-    fen = models.TextField(default=DEFAULT_GAME_FEN, null=False)
-    timer_black = models.PositiveIntegerField(null=False)
-    timer_white = models.PositiveIntegerField(null=False)
-    is_running = models.BooleanField(default=False)
-    is_finished = models.BooleanField(default=False)
-    game_positions = models.TextField(default=DEFAULT_GAME_FEN, null=False)
-    move_timestamps = models.TextField(null=False)
-    endgame_cause = models.TextField(null=True)
-    game_start_time = models.DateTimeField(default=None, null=True)
-    last_move_time = models.DateTimeField(default=None, null=True)
-    game_end_time = models.DateTimeField(default=None, null=True)
+    @property
+    def task_name(self):
+        return f"game_{self.uuid}"
 
-    duration = models.PositiveIntegerField(null=False)
-    random_colors = models.BooleanField(null=False)
+    @property
+    def group_name(self):
+        return f"group_{self.uuid}"
 
-    _move_cancel_fen = models.TextField(null=True, default=None)
-    _game_result = models.TextField(null=True)
 
-    objects = GameManager()
+class GameBase(models.Model):
+    fen = models.TextField(null=False)
+    game_positions = models.TextField(null=False)
 
-    def apply_settings(self, usernames, settings):
-        if settings['random_colors']:
-            self.assign_colors_randomly(usernames)
-        else:
-            self.player_white = User.objects.get(username=settings['white'])
-            self.player_black = User.objects.get(username=settings['black'])
-
-        self.timer_white = self.timer_black = settings['duration'] * 60
-        self.move_timestamps = f'{self.timer_white}-{self.timer_black}'
-        self.duration = settings['duration']
-        self.random_colors = settings['random_colors']
-        
     def get_game_positions(self):
-        return self.game_positions.split(';')
+        return self.game_positions.split(";")
+
+    class Meta:
+        abstract = True
+
+
+class GameLive(GameBase):
+    # Players
+    player_white = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="games_as_white",
+    )
+    player_black = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="games_as_black",
+    )
+    winner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="won_games",
+        null=True,
+    )
+
+    # Game info
+    duration = models.PositiveIntegerField()
+    move_history = models.TextField()
+    move_timestamps = models.TextField()
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    game_result = models.TextField()
+
+    objects = GameLiveManager()
 
     def get_move_timestamps(self):
-        pairs = self.move_timestamps.split(';')
-        output = []
-        for pair in pairs:
-            pair = pair.split('-')
-            pair = [to_timer_format(pair[0]), to_timer_format(pair[1])]
-            output.append(pair)
-        return output
+        """Returns move timestamps in (('05:00', '03:27'), ('04:47', '03:27'), ...) format."""
+        timestamps = self.move_timestamps.split(";")
+        return tuple([tuple(timestamp.split("-")) for timestamp in timestamps])
 
-    def get_raw_move_timestamps(self):
-        output = self.move_timestamps.split(';')
-        return output
+    def get_move_history(self):
+        """Returns move history in ((8, 16), (6, 20), ...) format."""
+        move_history = self.move_history.split(";")
+        return tuple([tuple(map(int, move.split("-"))) for move in move_history])
 
-    def get_turn(self):
-        fen = self.fen
-        fen = fen.split()
-        fen_turn = fen[1]
-        if fen_turn == 'w':
-            return 'white'
-        elif fen_turn == 'b':
-            return 'black'
-
-    def get_game_name(self):
-        return f'game_{self.id}'        
-
-    def get_color(self, username):
-        if self.player_white.username == username:
-            return 'white'
-        elif self.player_black.username == username:
-            return 'black'
-    
-    def assign_colors_randomly(self, usernames):
-        user1 = User.objects.get(username=usernames[0])
-        user2 = User.objects.get(username=usernames[1])
-        number = random.randint(1, 2)
-        if number == 1:
-            self.player_white = user1 
-            self.player_black = user2
-        elif number == 2:
-            self.player_white = user2
-            self.player_black = user1
+    def get_game_positions(self):
+        """Returns game positions in (fen1, fen2, ...) format."""
+        return tuple(self.game_positions.split(";"))
 
     def add_to_history(self):
         UserProfile.objects.get(pk=self.player_white.pk).game_history.add(self)
         UserProfile.objects.get(pk=self.player_black.pk).game_history.add(self)
 
-class FreeBoardGameManager(models.Manager):
-    def new_freeboard_game(self, settings):
-        game_obj = self.model()
-        if 'fen' in settings:
-            game_obj.set_fen(settings['fen'])
-        game_obj.save()
-        return game_obj
 
-class FreeBoardGame(models.Model):
-    # default values
-    DEFAULT_GAME_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-
-    # game info
-    fen = models.TextField(default=DEFAULT_GAME_FEN, null=False)
-    game_positions = models.TextField(default=DEFAULT_GAME_FEN, null=False)
-    endgame_cause = models.TextField(null=True)
-
-    _game_result = models.TextField(null=True)
-
-    objects = FreeBoardGameManager()
-
-    def get_game_positions(self):
-        return self.game_positions.split(';')
-
-    def get_turn(self):
-        fen = self.fen
-        fen = fen.split()
-        fen_turn = fen[1]
-        if fen_turn == 'w':
-            return 'white'
-        elif fen_turn == 'b':
-            return 'black'
-
+class FreeBoardGame(GameBase):
     def get_game_name(self):
-        return f'freeboard_game_{self.id}'     
-
-    def set_fen(self, fen):
-        self.fen = fen
-        self.game_positions = fen
-
-    def reset(self):
-        self.fen = self.DEFAULT_GAME_FEN
-        self.game_positions = self.fen
-        self.endgame_cause = None
-        self._game_result = None
+        return f"freeboard_game_{self.id}"
 
 
+class GamePuzzle(models.Model):
+    fen = models.TextField(default=DEFAULT_GAME_FEN)
 
-
-
-    
+    @property
+    def url(self):
+        return f"/game/puzzle/{self.id}"

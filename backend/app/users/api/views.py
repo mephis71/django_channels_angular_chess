@@ -1,5 +1,7 @@
-from game.api.serializers import GameSerializer
-from game.models import Game
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+from game.api.serializers import RetrieveGameLiveSerializer
+from game.models import GameLive
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -7,21 +9,23 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from users.models import FriendRequest, User, UserProfile
 
-from .serializers import (FriendRequestSerializer, LoginSerializer,
-                          RegistrationSerializer, UserProfileSerializer,
-                          UserSerializer)
-
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
+from .serializers import (
+    FriendRequestSerializer,
+    LoginSerializer,
+    RegistrationSerializer,
+    UserProfileSerializer,
+    UserSerializer,
+)
 
 channel_layer = get_channel_layer()
+
 
 class RegistrationAPIView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = RegistrationSerializer
 
     def post(self, request):
-        register_info = request.data.get('register_info', {})
+        register_info = request.data.get("register_info", {})
         serializer = self.serializer_class(data=register_info)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -29,25 +33,36 @@ class RegistrationAPIView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_200_OK)
 
+
 class LoginAPIView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
 
     def post(self, request):
-        login_info = request.data.get('login_info', {})
+        login_info = request.data.get("login_info", {})
         serializer = self.serializer_class(data=login_info)
         serializer.is_valid(raise_exception=True)
-        response = Response(data=UserSerializer(serializer.validated_data['user']).data, status=status.HTTP_200_OK)
-        response.set_cookie(key='jwt', value=serializer.validated_data['token'], httponly=True, samesite=None)
+        response = Response(
+            data=UserSerializer(serializer.validated_data["user"]).data,
+            status=status.HTTP_200_OK,
+        )
+        response.set_cookie(
+            key="jwt",
+            value=serializer.validated_data["token"],
+            httponly=True,
+            samesite=None,
+        )
         return response
+
 
 class LogoutAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         response = Response(status=status.HTTP_200_OK)
-        response.delete_cookie('jwt')
+        response.delete_cookie("jwt")
         return response
+
 
 class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
@@ -58,7 +73,7 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
-        serializer_data = request.data.get('user', {})
+        serializer_data = request.data.get("user", {})
         serializer = self.serializer_class(
             request.user, data=serializer_data, partial=True
         )
@@ -67,20 +82,18 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class SendFriendRequestAPIView(APIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = FriendRequestSerializer
 
     def post(self, request, *args, **kwargs):
-        to_username = request.data.get('to_username')
+        to_username = request.data.get("to_username")
         to_user = User.objects.filter(username=to_username).first()
         if to_user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
         else:
-            data = {
-                "from_user": request.user.id,
-                "to_user": to_user.id
-            }
+            data = {"from_user": request.user.id, "to_user": to_user.id}
             serializer = self.serializer_class(data=data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -88,29 +101,34 @@ class SendFriendRequestAPIView(APIView):
                 return Response(status=status.HTTP_200_OK)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
+
     def send_ws_msg(self, data):
-        to_user = data.to_user.username
-        from_user = data.from_user.username
-        id = data.id
+        to_user_id = data.to_user.id
+        from_user_id = data.from_user.id
+        from_user_username = data.from_user.username
+        invite_id = data.invite_id
+        
+        data = {
+            'type': 'friend_request',
+            'from_user_id': from_user_id,
+            'from_user_username': from_user_username,
+            'invite_id': invite_id
+        }
 
         async_to_sync(channel_layer.group_send)(
-            f'{to_user}_system',
+            f"{to_user_id}_system",
             {
-                'type': 'system_message',
-                'text': {
-                    'type': 'friend_request',
-                    'username': from_user,
-                    'id': id
-                }
+                "type": "system_message",
+                "text": data
             }
         )
+
 
 class AcceptFriendRequestAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        friend_request_id = kwargs['id']
+        friend_request_id = kwargs["id"]
         friend_request = FriendRequest.objects.filter(id=friend_request_id).first()
         if friend_request is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -118,30 +136,28 @@ class AcceptFriendRequestAPIView(APIView):
             friend = friend_request.from_user
             friend_request.accept()
             self.send_ws_msg(friend.username, friend_request.to_user)
-            data = {
-                'friend_username': friend.username,
-                'is_online': friend.is_online
-            }
+            data = {"friend_username": friend.username, "is_online": friend.is_online}
             return Response(data, status=status.HTTP_200_OK)
-        
-    def send_ws_msg(self, msg_target, user):
+
+    def send_ws_msg(self, msg_target_id, user):
         async_to_sync(channel_layer.group_send)(
-            f'{msg_target}_system',
+            f"{msg_target_id}_system",
             {
-                'type': 'system_message',
-                'text': {
-                    'type': 'add_friend',
-                    'friend_username': user.username,
-                    'is_online': user.is_online
-                }
-            }
+                "type": "system_message",
+                "text": {
+                    "type": "add_friend",
+                    "friend_id": user.id,
+                    "is_online": user.is_online,
+                },
+            },
         )
+
 
 class RejectFriendRequestAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        friend_request_id = kwargs['id']
+        friend_request_id = kwargs["id"]
         friend_request = FriendRequest.objects.filter(id=friend_request_id).first()
         if friend_request is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -149,11 +165,12 @@ class RejectFriendRequestAPIView(APIView):
             friend_request.reject()
             return Response(status=status.HTTP_200_OK)
 
+
 class RemoveFriendAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        friend_username = kwargs['friend_username']
+        friend_username = kwargs["friend_username"]
         friend = User.objects.filter(username=friend_username).first()
         if friend is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -163,19 +180,15 @@ class RemoveFriendAPIView(APIView):
             friend.friends.remove(user)
             self.send_ws_msg(friend.username, user.username)
             return Response(status=status.HTTP_200_OK)
-        
-    def send_ws_msg(self, msg_target, username):
-        async_to_sync(channel_layer.group_send)(
-            f'{msg_target}_system',
-            {
-                'type': 'system_message',
-                'text': {
-                    'type': 'remove_friend',
-                    'friend_username': username
-                }
-            }
-        )
 
+    def send_ws_msg(self, msg_target_id, username):
+        async_to_sync(channel_layer.group_send)(
+            f"{msg_target_id}_system",
+            {
+                "type": "system_message",
+                "text": {"type": "remove_friend", "friend_username": username},
+            },
+        )
 
 
 class UserProfileAPIView(APIView):
@@ -183,7 +196,7 @@ class UserProfileAPIView(APIView):
     serializer_class = UserProfileSerializer
 
     def get(self, request, *args, **kwargs):
-        username = kwargs['username']
+        username = kwargs["username"]
         profile = UserProfile.objects.filter(username=username).first()
         if profile is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -191,14 +204,14 @@ class UserProfileAPIView(APIView):
             serializer = self.serializer_class(instance=profile)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        
+
 class UserRunningGamesAPIView(APIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = GameSerializer
+    serializer_class = RetrieveGameLiveSerializer
 
     def get(self, request, *args, **kwargs):
         username = request.user.username
-        qs = Game.objects.get_running_games(username)
+        qs = GameLive.objects.get_running_games(username)
         if qs is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
         else:

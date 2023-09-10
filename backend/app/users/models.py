@@ -10,9 +10,11 @@ class User(AbstractUser):
     username = models.CharField(max_length=50, unique=True)
     password = models.CharField(max_length=100)
     email = models.EmailField(max_length=100)
-    friends = models.ManyToManyField('User')
+    friends = models.ManyToManyField("User")
     is_online = models.BooleanField(default=False)
-    freeboard_game = models.ForeignKey('game.FreeBoardGame', on_delete=models.CASCADE, null=True)
+    freeboard_game = models.ForeignKey(
+        "game.FreeBoardGame", on_delete=models.CASCADE, null=True
+    )
 
     def __str__(self):
         return self.username
@@ -28,36 +30,47 @@ class User(AbstractUser):
         """
         dt = datetime.now() + timedelta(days=60)
 
-        token = jwt.encode({
-            'id': self.pk,
-            'exp': int(dt.strftime('%s'))
-        }, settings.SECRET_KEY, algorithm='HS256')
+        token = jwt.encode(
+            {"id": self.pk, "exp": int(dt.strftime("%s"))},
+            settings.SECRET_KEY,
+            algorithm="HS256",
+        )
 
         return token
 
     def get_friend_requests(self):
         f_requests = FriendRequest.objects.filter(to_user=self.pk)
-        output = []
-        for req in f_requests:
-            item = {
-                "username": req.from_user.username,
-                "id": req.id
-            }
-            output.append(item)
-        return output
+        if f_requests:
+            output = []
+            for req in f_requests:
+                item = {"username": req.from_user.username, "id": req.id}
+                output.append(item)
+            return output
+        else:
+            return None
 
     def get_friends_list(self):
         output = []
         for friend in self.friends.all():
-            output.append(friend.username)
+            data = {
+                'id': friend.id,
+                'username': friend.username
+            }
+            output.append(data)
         return output
 
+
 class UserProfile(models.Model):
-    user = models.OneToOneField('User', on_delete=models.CASCADE)
-    profile_pic = models.ImageField(null=True, blank=True, upload_to='profile_pics/', default='profile_pics/blank_profile_pic.png')
-    game_history = models.ManyToManyField('game.Game')
+    user = models.OneToOneField("User", on_delete=models.CASCADE)
+    profile_pic = models.ImageField(
+        null=True,
+        blank=True,
+        upload_to="profile_pics/",
+        default="profile_pics/blank_profile_pic.png",
+    )
+    game_history = models.ManyToManyField("game.GameLive")
     username = models.CharField(max_length=50, unique=True)
-    
+
     def __init__(self, *args, **kwargs):
         super(UserProfile, self).__init__(*args, **kwargs)
         self.username = self.user.username
@@ -67,22 +80,24 @@ class UserProfile(models.Model):
 
     def get_profile_pic(self):
         if not self.profile_pic:
-            return '/img/profile_pics/blank_profile_pic.png'
+            return "/img/profile_pics/blank_profile_pic.png"
         else:
             return self.profile_pic.url
 
     def get_game_history(self):
-        return self.game_history.all().order_by('-game_end_time')
+        return self.game_history.all().order_by("-end_time")
 
-        
+
 class FriendRequest(models.Model):
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='from_user')
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='to_user')
+    from_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="from_user"
+    )
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="to_user")
 
     def accept(self):
         self.from_user.friends.add(self.to_user)
         self.to_user.friends.add(self.from_user)
         self.delete()
-    
+
     def reject(self):
         self.delete()

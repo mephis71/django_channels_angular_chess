@@ -1,77 +1,65 @@
 from channels.layers import get_channel_layer
-from game.api.serializers import FreeBoardGameSerializer, GameSerializer
-from game.models import Game
+from django.contrib.auth import get_user_model
+from game.api.serializers import (
+    CreateGameLiveSerializer,
+    CreateGamePuzzleSerializer,
+    RetrieveGameInProgressSerializer,
+    RetrieveGameLiveSerializer,
+    RetrieveGamePuzzleSerializer,
+)
+from game.models import GameInProgress, GameLive, GamePuzzle
 from rest_framework import status
+from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet
+from game.misc import start_game
 
+User = get_user_model()
 channel_layer = get_channel_layer()
-from asgiref.sync import async_to_sync
-from utils.getters import new_game
 
-class GameAPIView(APIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = GameSerializer
 
-    def get(self, request, *args, **kwargs):
-        game_id = kwargs['id']
-        try:
-            game_obj = Game.objects.get(id=game_id)
-        except Game.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = self.serializer_class(game_obj)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-class GameInviteAcceptAPIView(APIView):
+class StartGameAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        invite = request.data['invite']
-        usernames = (invite['from_user'], invite['to_user'])
-        settings = invite['settings']
-        
-        game_obj = new_game(usernames, settings)
-        game_id = game_obj.id
-
-        msg = {
-            'type': 'game_invite_accept',
-            'usernames': usernames,
-            'game_id': game_id
-        }
-
-        for username in usernames:
-            async_to_sync(channel_layer.group_send)(
-            f"{username}_system",
-            {
-                "type": "system_message",
-                'text': msg
-            }
-        )
-
-        return Response(status=status.HTTP_202_ACCEPTED)
+        game_info = request.data["gameInfo"]
+        start_game(game_info)
+        return Response(status.HTTP_200_OK)
     
-class GameFreeBoardAPIView(APIView):
+
+class GameInProgressViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
     permission_classes = (IsAuthenticated,)
-    serializer_class = FreeBoardGameSerializer
+    serializer_class = RetrieveGameInProgressSerializer
+    queryset = GameInProgress.objects.all()
 
-    def get(self, request, *args, **kwargs):
-        game_obj = request.user.freeboard_game
-        if not game_obj:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        else:
-            serializer = self.serializer_class(game_obj)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    def post(self, request):
-        settings = request.data['settings']
-        serializer = self.serializer_class(data=settings)
-        if serializer.is_valid(raise_exception=True):
-            game_obj = serializer.save()
-            request.user.freeboard_game = game_obj
-            request.user.save(update_fields=['freeboard_game'])
-            return Response(serializer.data, status=status.HTTP_200_OK)
+    def get_serializer_class(self):
+        if self.action == "create":
+            return ...
+        if self.action == "retrieve":
+            return RetrieveGameInProgressSerializer
 
-        
- 
+
+class GameLiveViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = RetrieveGameLiveSerializer
+    queryset = GameLive.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return CreateGameLiveSerializer
+        if self.action == "retrieve":
+            return RetrieveGameLiveSerializer
+
+
+class GamePuzzleViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = RetrieveGamePuzzleSerializer
+    queryset = GamePuzzle.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return CreateGamePuzzleSerializer
+        if self.action == "retrieve":
+            return RetrieveGamePuzzleSerializer
