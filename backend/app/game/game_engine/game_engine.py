@@ -271,7 +271,6 @@ class GameEngine:
         """
         pick_id = int(pick_id)
         drop_id = int(drop_id)
-
         if not self.is_correct_piece(pick_id):
             return None
         if self.is_move_enpassant(pick_id, drop_id):
@@ -339,8 +338,8 @@ class GameEngine:
 
     def is_correct_piece(self, pick_id) -> bool:
         """Checks if a player selected a valid piece."""
-        not_empty = ~self.is_field_empty(pick_id)
-        correct_color = ~self.is_wrong_piece_color(pick_id)
+        not_empty = not self.is_field_empty(pick_id)
+        correct_color = not self.is_wrong_piece_color(pick_id)
         return not_empty and correct_color
 
     def is_move_enpassant(self, pick_id, drop_id) -> bool:
@@ -431,7 +430,7 @@ class GameEngine:
         """Checks if the move is legal."""
         self.update_possible_moves(pick_id)
 
-        is_legal = ~(self.is_move_against_pattern(drop_id) or self.is_checked_nextmove(pick_id, drop_id))
+        is_legal = not (self.is_move_against_pattern(drop_id) or self.is_checked_nextmove(pick_id, drop_id))
         return is_legal
 
     def update_halfmoves(self, pick_id, drop_id) -> None:

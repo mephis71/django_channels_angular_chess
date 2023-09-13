@@ -143,14 +143,14 @@ class GameLiveConsumer(AsyncJsonWebsocketConsumer):
 
         elif action == "accept":
             await self.accept_move_cancel_request()
-            trigger_timer_task(self.game_obj)
+            trigger_timer_task(self.game_engine)
 
         elif action == "reject":
-            await self.reject_move_cancel_request(self.game_obj)
+            await self.reject_move_cancel_request(self.game_engine)
 
     async def send_move_cancel_request(self):
         sender_color = self.game_engine.get_user_color(self.user.username)
-        game_positions = self.game_engine.game_postitons
+        game_positions = self.game_engine.game_positions
 
         try:
             if sender_color == self.game_engine.current_turn:
