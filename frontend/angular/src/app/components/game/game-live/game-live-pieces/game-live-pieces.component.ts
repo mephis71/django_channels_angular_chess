@@ -15,7 +15,7 @@ import { CssService } from 'src/app/services/css.service';
   templateUrl: './game-live-pieces.component.html',
   styleUrls: ['./../../css/game-pieces.scss']
 })
-export class GameLivePiecesComponent implements OnInit, OnDestroy, AfterViewInit {
+export class GamePiecesComponent implements OnInit, OnDestroy, AfterViewInit {
   public Color = Color;
   
   @Input() boardOrientation: Color;

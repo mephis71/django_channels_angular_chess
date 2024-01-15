@@ -10,7 +10,7 @@ import { GameInProgress } from 'src/app/models/game-in-progress';
   templateUrl: './../../templates/game-timers.html',
   styleUrls: ['./../../css/game-timers.scss']
 })
-export class GameLiveTimersComponent implements OnInit, OnDestroy {
+export class GameTimersComponent implements OnInit, OnDestroy {
   public Color = Color;
   
   @Input() boardOrientation: Color;

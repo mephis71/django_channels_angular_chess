@@ -8,7 +8,7 @@ import { GameService } from 'src/app/services/game.service';
   templateUrl: './../../templates/game-endgame.html',
   styleUrls: ['./../../css/game-endgame.scss']
 })
-export class GameLiveEndgameComponent implements OnInit, OnDestroy {
+export class GameEndgameComponent implements OnInit, OnDestroy {
   gameWsSub: Subscription;
   wsSubjectSub: Subscription;
 

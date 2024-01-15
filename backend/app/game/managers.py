@@ -4,7 +4,7 @@ from django.db import models
 User = get_user_model()
 
 
-class GameLiveManager(models.Manager):
+class GameManager(models.Manager):
     def create_game(self, validated_data):
         if validated_data['winner_id']:
             game_obj = self.create(**validated_data)

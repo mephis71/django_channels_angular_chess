@@ -7,11 +7,12 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.layers import get_channel_layer
 from django.contrib.auth import get_user_model
+from game.websocket import MyAsyncJsonWebsocketConsumer
 from django_chess.settings import BASE_DIR
 from game.game_engine.game_cls import Color, GameResult
 from game.game_engine.game_funcs import number_to_field, opposite_color
 from game.game_engine.stockfish import stockfish
-from game.models import GameInProgress, GameLive
+from game.models import GameInProgress, Game
 
 from .game_engine.game_engine import GameEngine
 from .tasks import cancel_countdown_task, trigger_countdown_task, trigger_timer_task
@@ -22,7 +23,7 @@ User = get_user_model()
 channel_layer = get_channel_layer()
 
 
-class GameLiveConsumer(AsyncJsonWebsocketConsumer):
+class GameConsumer(MyAsyncJsonWebsocketConsumer):
     async def connect(self):
         token = self.scope["cookies"]["jwt"]
         self.game_id = self.scope["url_route"]["kwargs"]["game_id"]
@@ -91,7 +92,7 @@ class GameLiveConsumer(AsyncJsonWebsocketConsumer):
     @database_sync_to_async
     def save_game_to_db(self):
         data = self.game_engine.get_model_data()
-        GameLive.objects.create_game(data)
+        Game.objects.create_game(data)
 
     async def process_move_result(self, move_result):
         type = move_result["type"]

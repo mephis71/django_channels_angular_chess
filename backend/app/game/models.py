@@ -3,7 +3,7 @@ from django.db import models
 from game.game_engine.game_vars import DEFAULT_GAME_FEN
 from users.models import UserProfile
 
-from .managers import GameLiveManager
+from .managers import GameManager
 
 User = get_user_model()
 
@@ -46,7 +46,7 @@ class GameBase(models.Model):
         abstract = True
 
 
-class GameLive(GameBase):
+class Game(GameBase):
     # Players
     player_white = models.ForeignKey(
         User,
@@ -73,7 +73,7 @@ class GameLive(GameBase):
     end_time = models.DateTimeField()
     game_result = models.TextField()
 
-    objects = GameLiveManager()
+    objects = GameManager()
 
     def get_move_timestamps(self):
         """Returns move timestamps in (('05:00', '03:27'), ('04:47', '03:27'), ...) format."""

@@ -1,6 +1,6 @@
 import pytest
 from django.contrib.auth import get_user_model
-from game.models import GameLive
+from game.models import Game
 from game.game_engine.game_cls import GameResult
 from game.game_engine.game_engine import GameEngine
 
@@ -132,7 +132,7 @@ def test_checkmates(game_file_path: str, init_fen, end_fen, moves, game_result):
     model_data = game.get_model_data()
     from rich import print
     print(game)
-    game_db_obj = GameLive.objects.create_game(model_data)
+    game_db_obj = Game.objects.create_game(model_data)
 
     assert game_db_obj.player_white.id == game.players['white']
     assert game_db_obj.player_black.id == game.players['black']

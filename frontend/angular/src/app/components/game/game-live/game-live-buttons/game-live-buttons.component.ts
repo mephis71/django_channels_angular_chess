@@ -8,7 +8,7 @@ import { GameService } from 'src/app/services/game.service';
   templateUrl: './game-live-buttons.component.html',
   styleUrls: ['./game-live-buttons.component.scss']
 })
-export class GameLiveButtonsComponent implements OnInit, OnDestroy {
+export class GameButtonsComponent implements OnInit, OnDestroy {
   gameWsSub: Subscription;
   wsSubjectSub: Subscription;
 

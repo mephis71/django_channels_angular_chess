@@ -13,7 +13,7 @@ import { User } from 'src/app/models/user';
   templateUrl: './../../templates/game-promotion.html',
   styleUrls: ['./../../css/game-promotion.scss']
 })
-export class GameLivePromotionComponent implements OnInit, OnDestroy, OnChanges {
+export class GamePromotionComponent implements OnInit, OnDestroy, OnChanges {
   playerColor: Color;
   @Input() game: GameInProgress;
   @Input() user: User;

@@ -28,6 +28,7 @@ export class UserProfileComponent implements OnInit {
         this.route.params.subscribe(params => {
           this.userService.getProfile(params['username']).subscribe({
             next: profile => {
+              console.log(profile)
               this.setProfile(profile);
               this.profileError = '';
             },

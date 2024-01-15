@@ -9,7 +9,7 @@ import { HomeComponent } from './components/home/home.component';
 import { NavComponent } from './components/nav/nav.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { GameLiveComponent } from './components/game/game-live/game-live.component';
+import { GameComponent } from './components/game/game-live/game-live.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
@@ -21,13 +21,13 @@ import { MatButtonModule } from '@angular/material/button'
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSnackBarModule } from '@angular/material/snack-bar'; 
 
-import { GameLiveChatComponent } from './components/game/game-live/game-live-chat/game-live-chat.component';
-import { GameLivePiecesComponent } from './components/game/game-live/game-live-pieces/game-live-pieces.component';
-import { GameLivePromotionComponent } from './components/game/game-live/game-live-promotion/game-live-promotion.component';
-import { GameLiveEndgameComponent } from './components/game/game-live/game-live-endgame/game-live-endgame.component';
-import { GameLiveButtonsComponent } from './components/game/game-live/game-live-buttons/game-live-buttons.component';
+import { GameChatComponent } from './components/game/game-live/game-live-chat/game-live-chat.component';
+import { GamePiecesComponent } from './components/game/game-live/game-live-pieces/game-live-pieces.component';
+import { GamePromotionComponent } from './components/game/game-live/game-live-promotion/game-live-promotion.component';
+import { GameEndgameComponent } from './components/game/game-live/game-live-endgame/game-live-endgame.component';
+import { GameButtonsComponent } from './components/game/game-live/game-live-buttons/game-live-buttons.component';
 import { GameRotateBoardButtonComponent } from './components/game/game-rotate-board-button/game-rotate-board-button.component';
-import { GameLiveTimersComponent } from './components/game/game-live/game-live-timers/game-live-timers.component';
+import { GameTimersComponent } from './components/game/game-live/game-live-timers/game-live-timers.component';
 import { GameOverviewTimersComponent } from './components/game/game-overview/game-overview-timers/game-overview-timers.component';
 import { GameOverviewPiecesComponent } from './components/game/game-overview/game-overview-pieces/game-overview-pieces.component';
 import { GameFreeBoardComponent } from './components/game/game-freeboard/game-freeboard.component';
@@ -60,13 +60,13 @@ import { GamePuzzlePromotionComponent } from './components/game/game-puzzle/game
     GameOverviewComponent,
     GameOverviewTimersComponent,
     GameOverviewPiecesComponent,
-    GameLiveComponent,
-    GameLiveChatComponent,
-    GameLivePiecesComponent,
-    GameLiveEndgameComponent,
-    GameLivePromotionComponent,
-    GameLiveButtonsComponent,
-    GameLiveTimersComponent,
+    GameComponent,
+    GameChatComponent,
+    GamePiecesComponent,
+    GameEndgameComponent,
+    GamePromotionComponent,
+    GameButtonsComponent,
+    GameTimersComponent,
     GameFreeBoardComponent,
     GameFreeBoardPiecesComponent,
     GameFreeBoardPromotionComponent,

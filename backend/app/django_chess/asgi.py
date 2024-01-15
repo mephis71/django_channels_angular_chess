@@ -7,7 +7,7 @@ from django.urls import path, re_path
 from game.consumers import (
     GameChatConsumer,
     GameFreeBoardConsumer,
-    GameLiveConsumer,
+    GameConsumer,
     GamePuzzleConsumer,
     StockfishConsumer,
 )
@@ -25,15 +25,15 @@ application = ProtocolTypeRouter(
                 [
                     path("ws/invites", InviteConsumer.as_asgi()),
                     path("ws/online_status", OnlineStatusConsumer.as_asgi()),
+                    path("ws/game/stockfish", StockfishConsumer.as_asgi()),
                     re_path(
                         r"^ws/game_in_progress/(?P<game_id>[0-9]+)$",
-                        GameLiveConsumer.as_asgi(),
+                        GameConsumer.as_asgi(),
                     ),
                     re_path(
                         r"^ws/game/live/(?P<game_id>[0-9]+)/chat",
                         GameChatConsumer.as_asgi(),
                     ),
-                    path("ws/game/stockfish", StockfishConsumer.as_asgi()),
                     path("ws/game/freeboard", GameFreeBoardConsumer.as_asgi()),
                     re_path(
                         r"^ws/game/puzzle/(?P<puzzle_id>[0-9]+)$",

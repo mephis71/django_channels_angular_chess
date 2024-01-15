@@ -1,9 +1,9 @@
 from django.contrib import admin
-from game.models import GameLive
+from game.models import Game
 
 
-class GameLiveAdmin(admin.ModelAdmin):
-    model = GameLive
+class GameAdmin(admin.ModelAdmin):
+    model = Game
 
 
-admin.site.register(GameLive, GameLiveAdmin)
+admin.site.register(Game, GameAdmin)

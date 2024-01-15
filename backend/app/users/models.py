@@ -7,15 +7,15 @@ from django.db import models
 
 
 class User(AbstractUser):
-    username = models.CharField(max_length=50, unique=True)
-    password = models.CharField(max_length=100)
-    email = models.EmailField(max_length=100)
     friends = models.ManyToManyField("User")
     is_online = models.BooleanField(default=False)
     freeboard_game = models.ForeignKey(
         "game.FreeBoardGame", on_delete=models.CASCADE, null=True
     )
-
+    
+    first_name = None
+    last_name = None
+    
     def __str__(self):
         return self.username
 
@@ -43,7 +43,10 @@ class User(AbstractUser):
         if f_requests:
             output = []
             for req in f_requests:
-                item = {"username": req.from_user.username, "id": req.id}
+                item = {
+                    "username": req.from_user.username,
+                    "id": req.id
+                }
                 output.append(item)
             return output
         else:
@@ -68,12 +71,7 @@ class UserProfile(models.Model):
         upload_to="profile_pics/",
         default="profile_pics/blank_profile_pic.png",
     )
-    game_history = models.ManyToManyField("game.GameLive")
-    username = models.CharField(max_length=50, unique=True)
-
-    def __init__(self, *args, **kwargs):
-        super(UserProfile, self).__init__(*args, **kwargs)
-        self.username = self.user.username
+    game_history = models.ManyToManyField("game.Game")
 
     def __str__(self):
         return self.user.username

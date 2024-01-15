@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from game.api.validators import is_fen_valid
 from game.game_engine.stockfish import stockfish
-from game.models import FreeBoardGame, GameInProgress, GameLive, GamePuzzle
+from game.models import FreeBoardGame, GameInProgress, Game, GamePuzzle
 from rest_framework import serializers
 
 User = get_user_model()
@@ -22,7 +22,7 @@ class RetrieveGameInProgressSerializer(serializers.ModelSerializer):
         read_only_fields = ("id",)
 
 
-class CreateGameLiveSerializer(serializers.ModelSerializer):
+class CreateGameSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     player_white = serializers.PrimaryKeyRelatedField(write_only=True, queryset=User.objects.all())
     player_black = serializers.PrimaryKeyRelatedField(write_only=True, queryset=User.objects.all())
@@ -35,7 +35,7 @@ class CreateGameLiveSerializer(serializers.ModelSerializer):
     duration = serializers.IntegerField(write_only=True)
 
     class Meta:
-        model = GameLive
+        model = Game
         fields = (
             "id",
             "player_white",
@@ -50,12 +50,12 @@ class CreateGameLiveSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        return GameLive.objects.create_game(validated_data)
+        return Game.objects.create_game(validated_data)
 
 
-class RetrieveGameLiveSerializer(serializers.ModelSerializer):
+class RetrieveGameSerializer(serializers.ModelSerializer):
     class Meta:
-        model = GameLive
+        model = Game
         fields = (
             "id",
             "player_white",
@@ -124,5 +124,5 @@ class GameHistorySerializer(serializers.ModelSerializer):
     end_time = serializers.DateTimeField()
 
     class Meta:
-        model = GameLive
+        model = Game
         fields = ("id", "player_white", "player_black", "winner", "end_time")

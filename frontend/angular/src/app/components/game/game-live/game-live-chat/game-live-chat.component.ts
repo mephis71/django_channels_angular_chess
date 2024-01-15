@@ -10,7 +10,7 @@ import { CssService } from 'src/app/services/css.service';
   templateUrl: './game-live-chat.component.html',
   styleUrls: ['./game-live-chat.component.scss']
 })
-export class GameLiveChatComponent implements OnInit, OnDestroy, AfterViewInit, AfterViewChecked {
+export class GameChatComponent implements OnInit, OnDestroy, AfterViewInit, AfterViewChecked {
   @Input() username: string;
   @ViewChild('scrollarea') private scrollarea: ElementRef;
   

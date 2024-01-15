@@ -1,13 +1,13 @@
 from channels.layers import get_channel_layer
 from django.contrib.auth import get_user_model
 from game.api.serializers import (
-    CreateGameLiveSerializer,
+    CreateGameSerializer,
     CreateGamePuzzleSerializer,
     RetrieveGameInProgressSerializer,
-    RetrieveGameLiveSerializer,
+    RetrieveGameSerializer,
     RetrieveGamePuzzleSerializer,
 )
-from game.models import GameInProgress, GameLive, GamePuzzle
+from game.models import GameInProgress, Game, GamePuzzle
 from rest_framework import status
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -41,16 +41,16 @@ class GameInProgressViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet
             return RetrieveGameInProgressSerializer
 
 
-class GameLiveViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
+class GameViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
     permission_classes = (IsAuthenticated,)
-    serializer_class = RetrieveGameLiveSerializer
-    queryset = GameLive.objects.all()
+    serializer_class = RetrieveGameSerializer
+    queryset = Game.objects.all()
 
     def get_serializer_class(self):
         if self.action == "create":
-            return CreateGameLiveSerializer
+            return CreateGameSerializer
         if self.action == "retrieve":
-            return RetrieveGameLiveSerializer
+            return RetrieveGameSerializer
 
 
 class GamePuzzleViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):

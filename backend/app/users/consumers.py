@@ -5,7 +5,9 @@ from async_getters import (
     get_user_with_pk,
 )
 from channels.db import database_sync_to_async
-from channels.generic.websocket import AsyncJsonWebsocketConsumer
+
+
+from game.websocket import MyAsyncJsonWebsocketConsumer
 
 from .tasks import (
     broadcast_online_status,
@@ -13,8 +15,7 @@ from .tasks import (
     start_disconnect_countdown,
 )
 
-
-class InviteConsumer(AsyncJsonWebsocketConsumer):
+class InviteConsumer(MyAsyncJsonWebsocketConsumer):
     async def connect(self):
         token = self.scope["cookies"]["jwt"]
         self.user = await get_user_with_jwt(token)
@@ -24,12 +25,9 @@ class InviteConsumer(AsyncJsonWebsocketConsumer):
         )
         await self.accept()
 
-    async def receive_json(self, msg):
+    async def receive_json(self, msg: dict):
         to_user_id = msg["to_user_id"]
-        await self.channel_layer.group_send(
-            f"{to_user_id}_system", {"type": "system_message", "text": msg}
-        )
-        
+        await self.send_system_message(to_user_id)
 
     async def disconnect(self, close_code):
         pass
@@ -40,7 +38,7 @@ class InviteConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(msg)
 
 
-class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
+class OnlineStatusConsumer(MyAsyncJsonWebsocketConsumer):
     async def connect(self):
         token = self.scope["cookies"]["jwt"]
         self.user = await get_user_with_jwt(token)

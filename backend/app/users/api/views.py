@@ -1,7 +1,7 @@
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from game.api.serializers import RetrieveGameLiveSerializer
-from game.models import GameLive
+from game.api.serializers import RetrieveGameSerializer
+from game.models import Game
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -106,7 +106,7 @@ class SendFriendRequestAPIView(APIView):
         to_user_id = data.to_user.id
         from_user_id = data.from_user.id
         from_user_username = data.from_user.username
-        invite_id = data.invite_id
+        invite_id = data.id
         
         data = {
             'type': 'friend_request',
@@ -207,11 +207,11 @@ class UserProfileAPIView(APIView):
 
 class UserRunningGamesAPIView(APIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = RetrieveGameLiveSerializer
+    serializer_class = RetrieveGameSerializer
 
     def get(self, request, *args, **kwargs):
         username = request.user.username
-        qs = GameLive.objects.get_running_games(username)
+        qs = Game.objects.get_running_games(username)
         if qs is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
         else:

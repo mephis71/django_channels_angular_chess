@@ -6,7 +6,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "changeme")
 
 DEBUG = bool(int(os.environ.get("DEBUG", 1)))
 
-ALLOWED_HOSTS = ["0.0.0.0", "backend"]
+ALLOWED_HOSTS = ["0.0.0.0", "backend", '127.0.0.1']
 
 INSTALLED_APPS = [
     "users",

@@ -14,7 +14,7 @@ import { GameInProgress } from 'src/app/models/game-in-progress';
   styleUrls: ['./game-live.component.scss']
 })
 
-export class GameLiveComponent implements OnInit, OnDestroy {
+export class GameComponent implements OnInit, OnDestroy {
   gameWsSub: Subscription;
   gameWsSubjectSub: Subscription
   gameError: string;

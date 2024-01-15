@@ -2,7 +2,7 @@ import jwt
 from channels.db import database_sync_to_async
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from game.models import GameLive, GamePuzzle
+from game.models import Game, GamePuzzle
 from rest_framework import exceptions
 
 User = get_user_model()
@@ -10,7 +10,7 @@ User = get_user_model()
 
 @database_sync_to_async
 def get_game_by_id(game_id):
-    return GameLive.objects.select_related("player_white", "player_black").get(
+    return Game.objects.select_related("player_white", "player_black").get(
         id=game_id
     )
 

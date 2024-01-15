@@ -1,4 +1,4 @@
-from game.models import FreeBoardGame, GameLive
+from game.models import FreeBoardGame, Game
 
-GameLive.objects.all().delete()
+Game.objects.all().delete()
 FreeBoardGame.objects.all().delete()
